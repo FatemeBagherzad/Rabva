@@ -1,0 +1,23 @@
+@use '../../styles/partials/variables' as *;
+@use '../../styles/partials/typography' as *;
+@use '../../styles/partials/mixins' as *;
+@use '../../styles/global.scss' as *;
+
+.topNav {
+  width: 100vw;
+  height: 6rem;
+  background-color: $logo-success-700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  &__menuIcn,
+  &__userIcn {
+    height: 2.5rem;
+  }
+  &__logoIcn {
+    height: 4rem;
+    color: white;
+  }
+}

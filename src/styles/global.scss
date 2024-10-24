@@ -1,0 +1,144 @@
+@use './partials/variables' as *;
+@use './partials/typography' as *;
+@use './partials/mixins' as *;
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 50%; /* 1rem = 8px */
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent; /* Removes tap highlight on mobile */
+  @include tablet {
+    font-size: 56.25%; /* 1rem = 9px */
+  }
+  @include desktop {
+    font-size: 62.5%; /* 1rem = 10px */
+  }
+}
+
+body {
+  font-family: 'inter', sans-serif;
+  background-color: $backgroundbody-btntxt;
+  color: $maintxt-playbar;
+  min-height: 100vh;
+  font-size: 1.4rem;
+}
+.ltr {
+  direction: ltr;
+  text-align: left;
+}
+
+.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+.rtl p,
+.rtl h1,
+.rtl h2 {
+  font-family: 'inter', serif; /* Good for Arabic/Farsi text */
+}
+
+.ltr p,
+.ltr h1,
+.ltr h2 {
+  font-family: 'Arial', sans-serif; /* Good for English */
+}
+a {
+  text-decoration: none;
+  color: $maintxt-playbar;
+  transition: color 0.3s ease;
+  &:hover {
+    color: $secondtxt-hover;
+  }
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  border-radius: 0.4rem;
+  padding: 0.8rem 1.2rem;
+  background-color: $buttonbck-success-600;
+  color: $backgroundbody-btntxt;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: $checkbox-btnhover-success-50;
+    color: $buttonbck-success-600;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+ul {
+  list-style: none;
+}
+
+input,
+textarea {
+  font-family: inherit;
+  font-size: 1.2rem;
+  padding: 0.8rem;
+  border: 1px solid $input-border;
+  border-radius: 0.4rem;
+  outline: none;
+
+  &:focus {
+    border-color: $input-placeholder-focus;
+  }
+}
+.inputErrorStyle {
+  &:focus {
+    border-color: $error-500;
+  }
+  border: 1px solid $error-500;
+  background-color: $error-300;
+  animation: shake 0.3s ease;
+}
+/* Typography Styles */
+h1 {
+  font-size: 2.4rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+h2 {
+  font-size: 2.2rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+h3 {
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+h4 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+h5 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+h6 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1.2;
+}

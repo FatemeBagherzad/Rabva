@@ -1,0 +1,56 @@
+@use './variables' as *;
+
+@mixin mobile {
+  @media (min-width: $breakpoint-mobile) {
+    @content;
+  }
+}
+
+/* Tablet Portrait */
+@mixin tablet {
+  @media (min-width: $breakpoint-tablet) {
+    @content;
+  }
+}
+
+/* Desktop */
+@mixin desktop {
+  @media (min-width: $breakpoint-desktop) {
+    @content;
+  }
+}
+
+/* Large Desktop */
+@mixin large-desktop {
+  @media (min-width: $breakpoint-large-desktop) {
+    @content;
+  }
+}
+
+/* Landscape Orientation */
+@mixin landscape {
+  @media (orientation: landscape) {
+    @content;
+  }
+}
+
+/* Portrait Orientation */
+@mixin portrait {
+  @media (orientation: portrait) {
+    @content;
+  }
+}
+
+/* Media Query for Exact Width */
+@mixin exact-width($width) {
+  @media (min-width: $width) and (max-width: $width) {
+    @content;
+  }
+}
+
+/* Example Breakpoints for Fine Control */
+@mixin min-max($min, $max) {
+  @media (min-width: $min) and (max-width: $max) {
+    @content;
+  }
+}

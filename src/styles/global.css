@@ -1,0 +1,181 @@
+@font-face {
+  font-family: "uthmanic";
+  src: url("src/assets/font/uthmanic/KfgqpcHafsUthmanicScriptRegular-nARZ1.woff") format("woff"), url("src/assets/font/uthmanic/kfgqpchafsuthmanicscript_regula.otf") format("opentype"), url("src/assets/font/uthmanic/KfgqpcHafsUthmanicScriptRegular-nARZ1.ttf") format("truetype");
+}
+@font-face {
+  font-family: "noto-naskh-arabic";
+  src: url("src/assets/font/Noto_Naskh_Arabic/NotoNaskhArabic-VariableFont_wght.ttf") format("truetype");
+}
+@font-face {
+  font-family: "inter";
+  font-weight: 400;
+  src: url("src/assets/font/inter/Inter-Regular.woff") format("woff"), url("src/assets/font/inter/Inter-Regular.woff2") format("woff2"), url("src/assets/font/inter/Inter_18pt-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: "inter";
+  font-weight: 600;
+  src: url("src/assets/font/inter/Inter-Medium.woff") format("woff"), url("src/assets/font/inter/Inter-Medium.woff2") format("woff2"), url("src/assets/font/inter/Inter_18pt-Medium.ttf") format("truetype");
+}
+@font-face {
+  font-family: "inter";
+  font-weight: 900;
+  src: url("src/assets/font/inter/Inter-SemiBold.woff") format("woff"), url("src/assets/font/inter/Inter-SemiBold.woff2") format("woff2"), url("src/assets/font/inter/Inter_18pt-SemiBold.ttf") format("truetype");
+}
+/* Tablet Portrait */
+/* Desktop */
+/* Large Desktop */
+/* Landscape Orientation */
+/* Portrait Orientation */
+/* Media Query for Exact Width */
+/* Example Breakpoints for Fine Control */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 50%; /* 1rem = 8px */
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent; /* Removes tap highlight on mobile */
+}
+@media (min-width: 768px) {
+  html {
+    font-size: 56.25%; /* 1rem = 9px */
+  }
+}
+@media (min-width: 1024px) {
+  html {
+    font-size: 62.5%; /* 1rem = 10px */
+  }
+}
+
+body {
+  font-family: "inter", sans-serif;
+  background-color: #fff;
+  color: #101828;
+  min-height: 100vh;
+  font-size: 1.4rem;
+}
+
+.ltr {
+  direction: ltr;
+  text-align: left;
+}
+
+.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+.rtl p,
+.rtl h1,
+.rtl h2 {
+  font-family: "inter", serif; /* Good for Arabic/Farsi text */
+}
+
+.ltr p,
+.ltr h1,
+.ltr h2 {
+  font-family: "Arial", sans-serif; /* Good for English */
+}
+
+a {
+  text-decoration: none;
+  color: #101828;
+  transition: color 0.3s ease;
+}
+a:hover {
+  color: #344054;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  border-radius: 0.4rem;
+  padding: 0.8rem 1.2rem;
+  background-color: #039855;
+  color: #fff;
+  transition: background-color 0.3s;
+}
+button:hover {
+  background-color: #ecfdf3;
+  color: #039855;
+}
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+ul {
+  list-style: none;
+}
+
+input,
+textarea {
+  font-family: inherit;
+  font-size: 1.2rem;
+  padding: 0.8rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 0.4rem;
+  outline: none;
+}
+input:focus,
+textarea:focus {
+  border-color: #667085;
+}
+
+.inputErrorStyle {
+  border: 1px solid #f04438;
+  background-color: #fda29b;
+  animation: shake 0.3s ease;
+}
+.inputErrorStyle:focus {
+  border-color: #f04438;
+}
+
+/* Typography Styles */
+h1 {
+  font-size: 2.4rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: 2.2rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+h3 {
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+h4 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+h5 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+h6 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
