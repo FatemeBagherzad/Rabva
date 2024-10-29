@@ -1,0 +1,73 @@
+@use '../../styles/partials/variables' as *;
+@use '../../styles/partials/typography' as *;
+@use '../../styles/partials/mixins' as *;
+@use '../../styles/global.scss' as *;
+
+.player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  gap: 1rem;
+  padding: 2rem 2rem;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+
+  &__icn {
+    height: 2.5rem;
+    cursor: pointer;
+  }
+  &__progress-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+  }
+  &__time {
+    font-size: 1.5rem;
+    color: #333;
+
+    text-align: center;
+  }
+  &__progress-bar {
+    flex: 1;
+  }
+  &__second-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+  &__control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  &__volume {
+    position: relative;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  &__volume-control {
+    position: absolute;
+    bottom: 300%;
+    left: 50%;
+    transform: translateX(-50%) rotate(-90deg);
+    width: 100px;
+    opacity: 1;
+    // visibility: visible;
+    transition: opacity 0.3s ease-in-out;
+    z-index: 10;
+  }
+}
+
+.show-volume .player__volume-control {
+  display: flex;
+}

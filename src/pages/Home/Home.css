@@ -134,6 +134,15 @@ textarea:focus {
   border-color: #667085;
 }
 
+.inputErrorStyle {
+  border: 1px solid #f04438;
+  background-color: #fda29b;
+  animation: shake 0.3s ease;
+}
+.inputErrorStyle:focus {
+  border-color: #f04438;
+}
+
 /* Typography Styles */
 h1 {
   font-size: 2.4rem;

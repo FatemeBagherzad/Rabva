@@ -182,8 +182,6 @@ h6 {
 
 .quran {
   text-align: justify;
-  -moz-text-align-last: justify;
-       text-align-last: justify;
   margin: 20px;
   font-family: "inter", serif;
   direction: rtl;

@@ -5,14 +5,30 @@
 
 .quran {
   text-align: justify;
-  text-align-last: justify;
-  margin: 20px;
+  margin: 2.8rem;
   font-family: 'inter', serif;
   direction: rtl;
-
+  padding-bottom: 15rem;
+  &__besm-back {
+    width: 250px;
+  }
+  &__besm-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  &__besm {
+    position: absolute;
+    font-family: 'noto-naskh-arabic';
+    font-size: 2rem;
+    font-weight: 400;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
   &__verse {
     font-family: 'noto-naskh-arabic';
-    margin: 10px 0;
     font-size: 2rem;
     font-weight: 400;
     line-height: 2;
@@ -20,6 +36,6 @@
   }
   &__ayah-number {
     font-weight: bold;
-    margin-right: 5px;
+    margin: 0 0.5rem;
   }
 }

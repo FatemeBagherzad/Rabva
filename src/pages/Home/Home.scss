@@ -9,8 +9,11 @@
   padding: 1rem 2rem;
   height: 4rem;
   background-color: $setting-aya-background;
-
-  &__navigation {
+  width: 100%;
+  &__surah-navigation {
+    width: 70%;
+  }
+  &__page-navigation {
     display: flex;
     gap: 1rem;
   }
