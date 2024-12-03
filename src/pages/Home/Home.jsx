@@ -1,8 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-
-import quranData from '../../assets/data/quran.json';
-import chaptersData from '../../assets/data/quran_chapters.json';
-import verseByPage from '../../assets/data/quran-verse-number-by-page.json';
+import axios from 'axios';
 
 import QuranTxt from '../../components/QuranTxt/QuranTxt';
 import TopNavigation from '../../components/TopNavigation/TopNavigation';
@@ -14,32 +11,62 @@ import chevronRight from '../../assets/icons/chevron-right.svg';
 
 import './Home.scss';
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+const quranMain_Url = `${BACKEND_URL}/api/v1/quran/quranMain`;
+const quranByWords_MH_Url = `${BACKEND_URL}/api/v1/quran/quranTranslationMehdiMiryahya`;
+const quranChapters_Url = `${BACKEND_URL}/api/v1/quran/chapters`;
 const TOTAL_PAGES = 604;
 
 const Home = () => {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [quranMain, setQuranMain] = useState(null);
+  const [quranByWordsMH, setQuranByWordsMH] = useState(null);
+  const [quranChapters, setQuranChapters] = useState(null);
+
   const [verses, setVerses] = useState([]);
-  const [selectedSurah, setSelectedSurah] = useState(chaptersData[0].id);
+  const [selectedChapter, setSelectedChapter] = useState(null);
+  const [currentVerseId, setCurrentVerseId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const [showQuranHeader, setShowQuranHeader] = useState(false);
   const [inputPage, setInputPage] = useState(1);
   const [isEditingPage, setIsEditingPage] = useState(false);
   const [isInputError, setIsInputError] = useState(false);
-  const [currentAyahId, setCurrentAyahId] = useState(null);
 
-  const findVersesByPageNumber = useCallback((page) => {
-    const versesInPage = verseByPage
-      .filter((v) => v.page_number === page)
-      .map((v) => v.id);
-
-    const filteredVerses = Object.values(quranData).filter((v) =>
-      versesInPage.includes(v.id)
-    );
-
-    const firstAyah = verseByPage.find((v) => v.page_number === page);
-    if (firstAyah) setSelectedSurah(firstAyah.verse_key.split(':')[0]);
-
-    setVerses(filteredVerses);
+  useEffect(() => {
+    const getQuran = async () => {
+      try {
+        const [quranMainData, quranByWordsMHData, quranChaptersData] =
+          await Promise.all([
+            axios.get(quranMain_Url),
+            axios.get(quranByWords_MH_Url),
+            axios.get(quranChapters_Url),
+          ]);
+        setQuranMain(quranMainData.data);
+        setQuranByWordsMH(quranByWordsMHData.data);
+        setQuranChapters(quranChaptersData.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getQuran();
   }, []);
+
+  const findVersesByPageNumber = useCallback(
+    (page) => {
+      const versesInPage = quranMain.filter((v) => v.page_id === page);
+      setVerses(versesInPage);
+      const wordsInPage = quranByWordsMH.filter((v) => v.page_id === page);
+      setQuranByWordsMH(wordsInPage);
+
+      if (versesInPage.length > 0) {
+        const firstVerse = versesInPage[0];
+        const chapter = quranChapters.find(
+          (ch) => ch.id === firstVerse.chapter_id
+        );
+        setSelectedChapter(chapter ? chapter.name : '');
+      }
+    },
+    [quranMain, quranChapters]
+  );
 
   const goToPage = (pageNumber) => {
     if (pageNumber >= 1 && pageNumber <= TOTAL_PAGES) {
@@ -61,18 +88,24 @@ const Home = () => {
   const toggleQuranHeader = () => setShowQuranHeader((prev) => !prev);
 
   useEffect(() => {
-    findVersesByPageNumber(currentPage);
-  }, [currentPage, findVersesByPageNumber]);
+    if (quranMain) {
+      findVersesByPageNumber(currentPage);
+    }
+  }, [currentPage, findVersesByPageNumber, quranMain]);
+
+  if (!quranMain || !quranByWordsMH || !quranChapters) {
+    return <h3>Loading ...</h3>;
+  }
 
   return (
     <>
       <TopNavigation />
       <div className="quran-page-header">
         <div
-          className="quran-page-header__surah-navigation"
+          className="quran-page-header__chapter-navigation"
           onClick={toggleQuranHeader}
         >
-          {selectedSurah}
+          {selectedChapter}
         </div>
         <div className="quran-page-header__page-navigation">
           <img
@@ -104,10 +137,10 @@ const Home = () => {
 
       {showQuranHeader && (
         <QuranHeader
-          chapters={chaptersData}
-          setSelectedSurah={setSelectedSurah}
+          chapters={quranChapters}
+          setSelectedChapter={setSelectedChapter}
           setCurrentPage={goToPage}
-          verseByPage={verseByPage}
+          verseByPage={quranMain}
         />
       )}
 
@@ -115,12 +148,20 @@ const Home = () => {
         currentPage={currentPage}
         convertToPersianNumber={convertToPersianNumber}
         verses={verses}
+        selectedChapter={selectedChapter}
+      />
+
+      <QuranTxt
+        currentPage={currentPage}
+        convertToPersianNumber={convertToPersianNumber}
+        verses={verses}
+        selectedChapter={selectedChapter}
       />
 
       <QuranPlayer
-        currentAyahId={currentAyahId}
-        setCurrentAyahId={setCurrentAyahId}
-        ayahList={verses}
+        currentVerseId={currentVerseId}
+        setCurrentVerseId={setCurrentVerseId}
+        verseList={verses}
       />
     </>
   );

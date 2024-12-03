@@ -10,7 +10,7 @@ import volumeUpIcn from '../../assets/icons/volume-up.svg';
 import volumeOffIcn from '../../assets/icons/volume-off.svg';
 import './QuranPlayer.scss';
 
-const QuranPlayer = ({ currentAyahId }) => {
+const QuranPlayer = ({ currentVerseId }) => {
   const audioRef = useRef(null);
   const [audioState, setAudioState] = useState({
     isPlaying: false,
@@ -22,13 +22,13 @@ const QuranPlayer = ({ currentAyahId }) => {
     progress: 0,
   });
 
-  // Update audio source when a new Ayah is selected
+  // Update audio source when a new Verse is selected
   useEffect(() => {
-    if (currentAyahId && audioRef.current) {
-      audioRef.current.src = `/assets/audio/${currentAyahId}.mp3`;
+    if (currentVerseId && audioRef.current) {
+      audioRef.current.src = `/assets/audio/${currentVerseId}.mp3`;
       playAudio();
     }
-  }, [currentAyahId]);
+  }, [currentVerseId]);
 
   const playAudio = () => {
     audioRef.current.play();

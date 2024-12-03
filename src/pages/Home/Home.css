@@ -186,8 +186,12 @@ h6 {
   padding: 1rem 2rem;
   height: 4rem;
   background-color: #f9fafb;
+  width: 100%;
 }
-.quran-page-header__navigation {
+.quran-page-header__chapter-navigation {
+  width: 70%;
+}
+.quran-page-header__page-navigation {
   display: flex;
   gap: 1rem;
 }

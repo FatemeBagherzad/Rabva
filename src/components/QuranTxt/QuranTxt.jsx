@@ -1,28 +1,32 @@
 import besmBack from '../../assets/img/quran-besm-frame-green.png';
 import './QuranTxt.scss';
 
-const QuranTxt = ({ convertToPersianNumber, verses }) => {
+const QuranTxt = ({ convertToPersianNumber, verses, selectedChapter }) => {
   return (
     <div className="quran">
       <div className="quran__verses">
-        {verses.map((verse) => (
-          <span key={verse.id} className="quran__verse">
-            {verse.ayah === 1 && (
-              <div className="quran__besm-container">
+        {verses.map((ver) => (
+          <span key={ver.id} className="quran__verse">
+            {ver.verse_id === 1 && (
+              <div className="quran__chapter-name-container">
                 <img
                   src={besmBack}
                   alt="border image"
-                  className="quran__besm-back"
+                  className="quran__chapter-name-back"
                 />
-                <span className="quran__besm">
-                  بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
-                </span>
+                <span className="quran__chapter-name">{selectedChapter}</span>
               </div>
             )}
 
-            {'\u00A0' + verse.verse + '\u00A0'}
-            <span className="quran__ayah-number">
-              ﴿‏{convertToPersianNumber(verse.ayah)}‎﴾
+            {ver.verse_id === 1 && selectedChapter !== 'التوبة' && (
+              <div className="quran__besm">
+                بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
+              </div>
+            )}
+
+            {ver.verse_text + '\u00A0'}
+            <span className="quran__verse-number">
+              ﴿‏{convertToPersianNumber(ver.verse_id)}‎﴾ {'\u00A0'}
             </span>
           </span>
         ))}

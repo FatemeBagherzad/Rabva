@@ -27,16 +27,17 @@
     width: 100%;
     position: absolute;
     top: 4rem;
+    z-index: 999;
   }
-  &__surahs,
-  &__ayahs {
+  &__chapters,
+  &__verses {
     display: flex;
     flex-direction: column;
     // gap: 1rem;
     padding: 2rem 3rem;
   }
-  &__surah,
-  &__ayah {
+  &__chapter,
+  &__verse {
     border-bottom: 1px solid $player-border-grey-200;
     padding: 1rem 0;
     cursor: pointer;

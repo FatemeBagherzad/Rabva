@@ -3,72 +3,73 @@ import './QuranHeader.scss';
 
 const QuranHeader = ({
   chapters,
-  setSelectedSurah,
+  setSelectedChapter,
   setCurrentPage,
   verseByPage,
 }) => {
-  const [showSurahList, setShowSurahList] = useState(false);
-  const [showAyahList, setShowAyahList] = useState(false);
-  const [selectedAyahCount, setSelectedAyahCount] = useState(null);
-  const [surah, setSurah] = useState(chapters[0].id);
+  const [showChapterList, setShowChapterList] = useState(false);
+  const [showVerseList, setShowVerseList] = useState(false);
+  const [selectedVerseCount, setSelectedVerseCount] = useState(null);
+  const [chapter, setChapter] = useState(chapters[0].id);
 
-  const findVersePage = (surahId, ayah = null) => {
-    const verse = verseByPage.find((v) => {
-      const [sId, vNum] = v.verse_key.split(':');
-      return sId === String(surahId) && (ayah ? v.verse_number === ayah : true);
+  const findVersePage = (chapterId, verse = null) => {
+    const verseData = verseByPage.find((v) => {
+      return (
+        v.chapter_id === chapterId && (verse ? v.verse_id === verse : true)
+      );
     });
-    return verse ? verse.page_number : 1;
+    return verseData ? verseData.page_id : 1;
   };
 
-  const handleSurahClick = (surah) => {
-    const pageNumber = findVersePage(surah.id);
-    setSurah(surah);
-    setCurrentPage(pageNumber);
-    setSelectedSurah(surah.id);
-    setSelectedAyahCount(surah.total_verses);
-    toggleLists(false, false);
-  };
-
-  const handleAyahClick = (ayah) => {
-    const pageNumber = findVersePage(surah.id, ayah);
+  const handleChapterClick = (selectedChapter) => {
+    const pageNumber = findVersePage(selectedChapter.id);
+    setChapter(selectedChapter);
+    setSelectedChapter(selectedChapter.name);
+    setSelectedVerseCount(selectedChapter.total_verses);
     setCurrentPage(pageNumber);
     toggleLists(false, false);
   };
 
-  const toggleLists = (surahList, ayahList) => {
-    setShowSurahList(surahList);
-    setShowAyahList(ayahList);
+  const handleVerseClick = (selectedVerse) => {
+    const pageNumber = findVersePage(chapter.id, selectedVerse);
+    setCurrentPage(pageNumber);
+    toggleLists(false, false);
+  };
+
+  const toggleLists = (chapterList, verseList) => {
+    setShowChapterList(chapterList);
+    setShowVerseList(verseList);
   };
 
   return (
     <div className="quran-header">
       <header className="quran-header__header">
-        <span onClick={() => toggleLists(!showSurahList, false)}>السوره</span>
-        <span onClick={() => toggleLists(false, !showAyahList)}>الآیه</span>
+        <span onClick={() => toggleLists(!showChapterList, false)}>السوره</span>
+        <span onClick={() => toggleLists(false, !showVerseList)}>الآیه</span>
       </header>
 
       <div className="quran-header__body">
-        {showSurahList && (
-          <ul className="quran-header__surahs">
-            {chapters.map((surah) => (
+        {showChapterList && (
+          <ul className="quran-header__chapters">
+            {chapters.map((chapter) => (
               <li
-                key={surah.id}
-                onClick={() => handleSurahClick(surah)}
-                className="quran-header__surah"
+                key={chapter.id}
+                onClick={() => handleChapterClick(chapter)}
+                className="quran-header__chapter"
               >
-                {surah.name} - {surah.transliteration}
+                {chapter.name} - {chapter.id}
               </li>
             ))}
           </ul>
         )}
 
-        {showAyahList && selectedAyahCount && (
-          <ul className="quran-header__ayahs">
-            {Array.from({ length: selectedAyahCount }, (_, index) => (
+        {showVerseList && selectedVerseCount && (
+          <ul className="quran-header__verses">
+            {Array.from({ length: selectedVerseCount }, (_, index) => (
               <li
                 key={index + 1}
-                onClick={() => handleAyahClick(index + 1)}
-                className="quran-header__ayah"
+                onClick={() => handleVerseClick(index + 1)}
+                className="quran-header__verse"
               >
                 {index + 1}
               </li>
