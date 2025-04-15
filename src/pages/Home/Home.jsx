@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 import QuranTxt from '../../components/QuranTxt/QuranTxt';
+import QuranTxtByWord from '../../components/QuranTxtByWord/QuranTxtByWord';
 import TopNavigation from '../../components/TopNavigation/TopNavigation';
 import QuranHeader from '../../components/QuranHeader/QuranHeader';
 import QuranPlayer from '../../components/QuranPlayer/QuranPlayer';
@@ -23,6 +24,7 @@ const Home = () => {
   const [quranChapters, setQuranChapters] = useState(null);
 
   const [verses, setVerses] = useState([]);
+  const [words, setWords] = useState(null);
   const [selectedChapter, setSelectedChapter] = useState(null);
   const [currentVerseId, setCurrentVerseId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -54,8 +56,8 @@ const Home = () => {
     (page) => {
       const versesInPage = quranMain.filter((v) => v.page_id === page);
       setVerses(versesInPage);
-      const wordsInPage = quranByWordsMH.filter((v) => v.page_id === page);
-      setQuranByWordsMH(wordsInPage);
+      const wordsInPage = quranByWordsMH.filter((w) => w.page_id === page);
+      setWords(wordsInPage);
 
       if (versesInPage.length > 0) {
         const firstVerse = versesInPage[0];
@@ -93,25 +95,28 @@ const Home = () => {
     }
   }, [currentPage, findVersesByPageNumber, quranMain]);
 
-  if (!quranMain || !quranByWordsMH || !quranChapters) {
+  if (!quranMain || !quranByWordsMH || !quranChapters || !quranByWordsMH) {
     return <h3>Loading ...</h3>;
   }
 
   return (
     <>
       <TopNavigation />
-      <div className="quran-page-header">
+
+      <div className="quran-page-header container">
         <div
           className="quran-page-header__chapter-navigation"
           onClick={toggleQuranHeader}
         >
           {selectedChapter}
         </div>
+
         <div className="quran-page-header__page-navigation">
           <img
             src={chevronLeft}
             alt="left chevron"
             onClick={() => goToPage(currentPage - 1)}
+            className="quran-page-header__chevron"
           />
           {isEditingPage ? (
             <input
@@ -120,7 +125,9 @@ const Home = () => {
               onChange={(e) => setInputPage(e.target.value)}
               onKeyDown={handlePageInputSubmit}
               onBlur={() => setIsEditingPage(false)}
-              className={isInputError ? 'inputErrorStyle' : ''}
+              className={
+                isInputError ? 'inputErrorStyle' : 'quran-page-header__input '
+              }
             />
           ) : (
             <span onClick={() => setIsEditingPage(true)}>
@@ -131,6 +138,7 @@ const Home = () => {
             src={chevronRight}
             alt="right chevron"
             onClick={() => goToPage(currentPage + 1)}
+            className="quran-page-header__chevron"
           />
         </div>
       </div>
@@ -144,25 +152,28 @@ const Home = () => {
         />
       )}
 
-      <QuranTxt
-        currentPage={currentPage}
-        convertToPersianNumber={convertToPersianNumber}
-        verses={verses}
-        selectedChapter={selectedChapter}
-      />
+      <div className="container">
+        <QuranTxt
+          currentPage={currentPage}
+          convertToPersianNumber={convertToPersianNumber}
+          verses={verses}
+          selectedChapter={selectedChapter}
+        />
 
-      <QuranTxt
-        currentPage={currentPage}
-        convertToPersianNumber={convertToPersianNumber}
-        verses={verses}
-        selectedChapter={selectedChapter}
-      />
+        <QuranTxtByWord
+          currentPage={currentPage}
+          convertToPersianNumber={convertToPersianNumber}
+          verses={verses}
+          selectedChapter={selectedChapter}
+          words={words}
+        />
 
-      <QuranPlayer
-        currentVerseId={currentVerseId}
-        setCurrentVerseId={setCurrentVerseId}
-        verseList={verses}
-      />
+        <QuranPlayer
+          currentVerseId={currentVerseId}
+          setCurrentVerseId={setCurrentVerseId}
+          verseList={verses}
+        />
+      </div>
     </>
   );
 };

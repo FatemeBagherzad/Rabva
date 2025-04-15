@@ -97,73 +97,80 @@ const QuranPlayer = ({ currentVerseId }) => {
   };
 
   return (
-    <div className="player">
-      <audio ref={audioRef} onTimeUpdate={updateProgress} />
+    <>
+      <div className="player__back">
+        <div className="player container">
+          <audio ref={audioRef} onTimeUpdate={updateProgress} />
 
-      {/* Progress Bar with Time Display */}
-      <div className="player__progress-container">
-        <span className="player__time">
-          {formatTime(audioState.currentTime)}
-        </span>
-        <input
-          type="range"
-          value={audioState.progress}
-          onChange={handleSeek}
-          max="100"
-          className="player__progress-bar"
-        />
-        <span className="player__time">{formatTime(audioState.duration)}</span>
-      </div>
-
-      <div className="player__second-row">
-        <img src={settingIcn} alt="setting icon" className="player__icn" />
-        <img src={micIcon} alt="microphone icon" className="player__icn" />
-        <div className="player__control">
-          <img
-            src={playerRewIcn}
-            alt="player rewind icon"
-            className="player__icn"
-          />
-          <img
-            src={audioState.isPlaying ? pauseIcn : playIcn}
-            alt="play pause icon"
-            onClick={handlePlayPause}
-          />
-          <img
-            src={playerffIcon}
-            alt="player forward icon"
-            className="player__icn"
-          />
-        </div>
-        <img
-          src={playerListIcn}
-          alt="player list icon"
-          className="player__icn"
-        />
-
-        <div className="player__volume">
-          <img
-            src={audioState.isMuted ? volumeOffIcn : volumeUpIcn}
-            alt="volume icon"
-            onClick={() => {
-              toggleMute();
-              toggleVolumeControl();
-            }}
-            className="player__icn"
-          />
-          {audioState.showVolumeControl && (
+          {/* Progress Bar with Time Display */}
+          <div className="player__progress-container">
+            <span className="player__time">
+              {formatTime(audioState.currentTime)}
+            </span>
             <input
               type="range"
-              value={audioState.volume}
-              onChange={handleVolumeChange}
-              max="1"
-              step="0.01"
-              className="player__volume-control"
+              value={audioState.progress}
+              onChange={handleSeek}
+              max="100"
+              className="player__progress-bar"
             />
-          )}
-        </div>
+            <span className="player__time">
+              {formatTime(audioState.duration)}
+            </span>
+          </div>
+
+          <div className="player__second-row">
+            <img src={settingIcn} alt="setting icon" className="player__icn" />
+            <img src={micIcon} alt="microphone icon" className="player__icn" />
+            <div className="player__control">
+              <img
+                src={playerRewIcn}
+                alt="player rewind icon"
+                className="player__icn"
+              />
+              <img
+                src={audioState.isPlaying ? pauseIcn : playIcn}
+                alt="play pause icon"
+                onClick={handlePlayPause}
+                className="player__play-pause"
+              />
+              <img
+                src={playerffIcon}
+                alt="player forward icon"
+                className="player__icn"
+              />
+            </div>
+            <img
+              src={playerListIcn}
+              alt="player list icon"
+              className="player__icn"
+            />
+
+            <div className="player__volume">
+              <img
+                src={audioState.isMuted ? volumeOffIcn : volumeUpIcn}
+                alt="volume icon"
+                onClick={() => {
+                  toggleMute();
+                  toggleVolumeControl();
+                }}
+                className="player__icn"
+              />
+              {audioState.showVolumeControl && (
+                <input
+                  type="range"
+                  value={audioState.volume}
+                  onChange={handleVolumeChange}
+                  max="1"
+                  step="0.01"
+                  className="player__volume-control"
+                />
+              )}
+            </div>
+          </div>
+        </div>{' '}
       </div>
-    </div>
+    </>
   );
 };
 

@@ -58,6 +58,7 @@ body {
   color: #101828;
   min-height: 100vh;
   font-size: 1.4rem;
+  overflow-x: hidden;
 }
 
 .ltr {
@@ -86,9 +87,78 @@ a {
   text-decoration: none;
   color: #101828;
   transition: color 0.3s ease;
+  padding: 0;
 }
 a:hover {
   color: #344054;
+  cursor: pointer;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+hr {
+  border: 1px solid #f2f4f7;
+  margin: 1.6rem 0;
+}
+
+h1 {
+  font-size: 2.4rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+@media (min-width: 768px) {
+  h1 {
+    font-size: 3rem;
+  }
+}
+
+h2 {
+  font-size: 2.2rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+@media (min-width: 768px) {
+  h2 {
+    font-size: 2.8rem;
+  }
+}
+
+h3 {
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+@media (min-width: 768px) {
+  h3 {
+    font-size: 2.6rem;
+  }
+}
+
+h4 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+@media (min-width: 768px) {
+  h4 {
+    font-size: 2.2rem;
+  }
+}
+
+h5,
+h6 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+@media (min-width: 768px) {
+  h5,
+  h6 {
+    font-size: 1.8rem;
+  }
 }
 
 button {
@@ -116,15 +186,11 @@ img {
   display: block;
 }
 
-ul {
-  list-style: none;
-}
-
 input,
 textarea {
   font-family: inherit;
   font-size: 1.2rem;
-  padding: 0.8rem;
+  padding: 0.2rem;
   border: 1px solid #d0d5dd;
   border-radius: 0.4rem;
   outline: none;
@@ -134,57 +200,50 @@ textarea:focus {
   border-color: #667085;
 }
 
-/* Typography Styles */
-h1 {
-  font-size: 2.4rem;
-  font-weight: 900;
-  line-height: 1.2;
+.inputErrorStyle {
+  border: 1px solid #f04438;
+  background-color: #fda29b;
+  animation: shake 0.3s ease;
+}
+.inputErrorStyle:focus {
+  border-color: #f04438;
 }
 
-h2 {
-  font-size: 2.2rem;
-  font-weight: 900;
-  line-height: 1.2;
+.container {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  max-width: 75rem;
+  margin: auto;
+}
+@media (min-width: 768px) {
+  .container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+@media (min-width: 1024px) {
+  .container {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
 }
 
-h3 {
-  font-size: 2rem;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-h4 {
-  font-size: 1.6rem;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-h5 {
-  font-size: 1.4rem;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-h6 {
-  font-size: 1.4rem;
-  font-weight: 600;
-  line-height: 1.2;
+.topNav__back {
+  background-color: #027a48;
 }
 
 .topNav {
-  width: 100vw;
-  height: 6rem;
-  background-color: #027a48;
+  width: 100%;
+  height: 4.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1rem 2rem;
 }
 .topNav__menuIcn, .topNav__userIcn {
-  height: 2.5rem;
+  height: 1.6rem;
 }
 .topNav__logoIcn {
-  height: 4rem;
+  height: 3rem;
   color: white;
 }

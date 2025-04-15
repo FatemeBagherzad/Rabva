@@ -58,6 +58,7 @@ body {
   color: #101828;
   min-height: 100vh;
   font-size: 1.4rem;
+  overflow-x: hidden;
 }
 
 .ltr {
@@ -86,9 +87,78 @@ a {
   text-decoration: none;
   color: #101828;
   transition: color 0.3s ease;
+  padding: 0;
 }
 a:hover {
   color: #344054;
+  cursor: pointer;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+hr {
+  border: 1px solid #f2f4f7;
+  margin: 1.6rem 0;
+}
+
+h1 {
+  font-size: 2.4rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+@media (min-width: 768px) {
+  h1 {
+    font-size: 3rem;
+  }
+}
+
+h2 {
+  font-size: 2.2rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+@media (min-width: 768px) {
+  h2 {
+    font-size: 2.8rem;
+  }
+}
+
+h3 {
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+@media (min-width: 768px) {
+  h3 {
+    font-size: 2.6rem;
+  }
+}
+
+h4 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+@media (min-width: 768px) {
+  h4 {
+    font-size: 2.2rem;
+  }
+}
+
+h5,
+h6 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+@media (min-width: 768px) {
+  h5,
+  h6 {
+    font-size: 1.8rem;
+  }
 }
 
 button {
@@ -116,10 +186,6 @@ img {
   display: block;
 }
 
-ul {
-  list-style: none;
-}
-
 input,
 textarea {
   font-family: inherit;
@@ -143,45 +209,30 @@ textarea:focus {
   border-color: #f04438;
 }
 
-/* Typography Styles */
-h1 {
-  font-size: 2.4rem;
-  font-weight: 900;
-  line-height: 1.2;
+.container {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  max-width: 75rem;
+  margin: auto;
+}
+@media (min-width: 768px) {
+  .container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+@media (min-width: 1024px) {
+  .container {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
 }
 
-h2 {
-  font-size: 2.2rem;
-  font-weight: 900;
-  line-height: 1.2;
-}
-
-h3 {
-  font-size: 2rem;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-h4 {
-  font-size: 1.6rem;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-h5 {
-  font-size: 1.4rem;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-h6 {
-  font-size: 1.4rem;
-  font-weight: 600;
-  line-height: 1.2;
+.quran-header__back {
+  background-color: #027a48;
 }
 
 .quran-header {
-  margin: auto;
   direction: rtl;
   position: relative;
 }
@@ -192,13 +243,10 @@ h6 {
   display: flex;
   gap: 4rem;
   align-items: center;
-  padding: 1rem 2rem;
-  background-color: #027a48;
   color: #f9fafb;
 }
 .quran-header__header span {
   cursor: pointer;
-  padding: 0 1rem;
 }
 .quran-header__body {
   background-color: white;
@@ -210,7 +258,6 @@ h6 {
 .quran-header__chapters, .quran-header__verses {
   display: flex;
   flex-direction: column;
-  padding: 2rem 3rem;
 }
 .quran-header__chapter, .quran-header__verse {
   border-bottom: 1px solid #e4e7ec;

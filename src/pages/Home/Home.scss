@@ -6,15 +6,19 @@
 .quran-page-header {
   display: flex;
   justify-content: space-between;
-  padding: 1rem 2rem;
-  height: 4rem;
+  align-items: center;
+  height: 3rem;
   background-color: $setting-aya-background;
   width: 100%;
-  &__chapter-navigation {
-    width: 70%;
-  }
+  // &__chapter-navigation {
+  //   width: 70%;
+  // }
   &__page-navigation {
     display: flex;
     gap: 1rem;
+  }
+  &__chevron {
+    height: 2rem;
+    cursor: pointer;
   }
 }

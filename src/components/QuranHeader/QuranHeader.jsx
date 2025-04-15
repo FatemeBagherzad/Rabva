@@ -42,41 +42,45 @@ const QuranHeader = ({
   };
 
   return (
-    <div className="quran-header">
-      <header className="quran-header__header">
-        <span onClick={() => toggleLists(!showChapterList, false)}>السوره</span>
-        <span onClick={() => toggleLists(false, !showVerseList)}>الآیه</span>
-      </header>
+    <div className="quran-header__back">
+      <div className="quran-header container">
+        <header className="quran-header__header">
+          <span onClick={() => toggleLists(!showChapterList, false)}>
+            السوره
+          </span>
+          <span onClick={() => toggleLists(false, !showVerseList)}>الآیه</span>
+        </header>
 
-      <div className="quran-header__body">
-        {showChapterList && (
-          <ul className="quran-header__chapters">
-            {chapters.map((chapter) => (
-              <li
-                key={chapter.id}
-                onClick={() => handleChapterClick(chapter)}
-                className="quran-header__chapter"
-              >
-                {chapter.name} - {chapter.id}
-              </li>
-            ))}
-          </ul>
-        )}
+        <div className="quran-header__body">
+          {showChapterList && (
+            <ul className="quran-header__chapters">
+              {chapters.map((chapter) => (
+                <li
+                  key={chapter.id}
+                  onClick={() => handleChapterClick(chapter)}
+                  className="quran-header__chapter"
+                >
+                  {chapter.name} - {chapter.id}
+                </li>
+              ))}
+            </ul>
+          )}
 
-        {showVerseList && selectedVerseCount && (
-          <ul className="quran-header__verses">
-            {Array.from({ length: selectedVerseCount }, (_, index) => (
-              <li
-                key={index + 1}
-                onClick={() => handleVerseClick(index + 1)}
-                className="quran-header__verse"
-              >
-                {index + 1}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+          {showVerseList && selectedVerseCount && (
+            <ul className="quran-header__verses">
+              {Array.from({ length: selectedVerseCount }, (_, index) => (
+                <li
+                  key={index + 1}
+                  onClick={() => handleVerseClick(index + 1)}
+                  className="quran-header__verse"
+                >
+                  {index + 1}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>{' '}
     </div>
   );
 };

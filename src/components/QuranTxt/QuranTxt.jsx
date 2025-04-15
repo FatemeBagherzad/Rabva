@@ -18,11 +18,13 @@ const QuranTxt = ({ convertToPersianNumber, verses, selectedChapter }) => {
               </div>
             )}
 
-            {ver.verse_id === 1 && selectedChapter !== 'التوبة' && (
-              <div className="quran__besm">
-                بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
-              </div>
-            )}
+            {ver.verse_id === 1 &&
+              selectedChapter !== 'التوبة' &&
+              selectedChapter !== 'الفاتحة' && (
+                <div className="quran__besm">
+                  بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
+                </div>
+              )}
 
             {ver.verse_text + '\u00A0'}
             <span className="quran__verse-number">

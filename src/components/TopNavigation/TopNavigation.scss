@@ -3,21 +3,22 @@
 @use '../../styles/partials/mixins' as *;
 @use '../../styles/global.scss' as *;
 
-.topNav {
-  width: 100vw;
-  height: 6rem;
+.topNav__back {
   background-color: $logo-success-700;
+}
+.topNav {
+  width: 100%;
+  height: 4.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1rem 2rem;
   &__menuIcn,
   &__userIcn {
-    height: 2.5rem;
+    height: 1.6rem;
   }
   &__logoIcn {
-    height: 4rem;
+    height: 3rem;
     color: white;
   }
 }

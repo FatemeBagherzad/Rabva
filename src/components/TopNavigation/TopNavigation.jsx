@@ -5,10 +5,12 @@ import userIcon from '../../assets/icons/user.svg';
 
 const TopNavigation = () => {
   return (
-    <div className="topNav">
-      <img src={menuIcon} alt="menu icon" className="topNav__menuIcn" />
-      <img src={logoIcon} alt="hifdth logo" className="topNav__logoIcn" />
-      <img src={userIcon} alt="user icon" className="topNav__userIcn" />
+    <div className="topNav__back">
+      <div className="topNav container">
+        <img src={menuIcon} alt="menu icon" className="topNav__menuIcn" />
+        <img src={logoIcon} alt="hifdth logo" className="topNav__logoIcn" />
+        <img src={userIcon} alt="user icon" className="topNav__userIcn" />
+      </div>
     </div>
   );
 };
