@@ -1,34 +1,46 @@
 import besmBack from '../../assets/img/quran-besm-frame-green.png';
+import convertToPersianNumber from '../../utils/convertToPersianNumber';
 import './QuranTxt.scss';
 
-const QuranTxt = ({ convertToPersianNumber, verses, selectedChapter }) => {
+const QuranTxt = ({ quranData, selectedSurah }) => {
+  const pageAyahs = [];
+
+  for (const [surahNumber, ayahs] of Object.entries(quranData)) {
+    for (const [ayahNumber, ayahText] of Object.entries(ayahs)) {
+      pageAyahs.push([parseInt(surahNumber), parseInt(ayahNumber), ayahText]);
+    }
+  }
+
+  if (!quranData || pageAyahs.length === 0) {
+    return <div>Loading Quran data...</div>;
+  }
   return (
     <div className="quran">
-      <div className="quran__verses">
-        {verses.map((ver) => (
-          <span key={ver.id} className="quran__verse">
-            {ver.verse_id === 1 && (
-              <div className="quran__chapter-name-container">
+      <div className="quran__ayahs">
+        {pageAyahs.map((ver) => (
+          <span key={ver[0] / ver[1]} className="quran__ayah">
+            {ver[1] === 1 && (
+              <div className="quran__surah-name-container">
                 <img
                   src={besmBack}
                   alt="border image"
-                  className="quran__chapter-name-back"
+                  className="quran__surah-name-back"
                 />
-                <span className="quran__chapter-name">{selectedChapter}</span>
+                <span className="quran__surah-name">{selectedSurah}</span>
               </div>
             )}
 
-            {ver.verse_id === 1 &&
-              selectedChapter !== 'التوبة' &&
-              selectedChapter !== 'الفاتحة' && (
+            {ver[1] === 1 &&
+              selectedSurah !== 'التوبة' &&
+              selectedSurah !== 'الفاتحة' && (
                 <div className="quran__besm">
                   بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
                 </div>
               )}
 
-            {ver.verse_text + '\u00A0'}
-            <span className="quran__verse-number">
-              ﴿‏{convertToPersianNumber(ver.verse_id)}‎﴾ {'\u00A0'}
+            {ver[2] + '\u00A0'}
+            <span className="quran__ayah-number">
+              ﴿‏{convertToPersianNumber(ver[1])}‎﴾ {'\u00A0'}
             </span>
           </span>
         ))}

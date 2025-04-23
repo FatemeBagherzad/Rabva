@@ -236,6 +236,10 @@ textarea:focus {
   background-color: #f9fafb;
   width: 100%;
 }
+.quran-page-header__chapter-navigation {
+  width: 70%;
+  cursor: pointer;
+}
 .quran-page-header__page-navigation {
   display: flex;
   gap: 1rem;

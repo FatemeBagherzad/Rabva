@@ -6,6 +6,7 @@ const QuranHeader = ({
   setSelectedChapter,
   setCurrentPage,
   verseByPage,
+  convertToPersianNumber,
 }) => {
   const [showChapterList, setShowChapterList] = useState(false);
   const [showVerseList, setShowVerseList] = useState(false);
@@ -60,7 +61,7 @@ const QuranHeader = ({
                   onClick={() => handleChapterClick(chapter)}
                   className="quran-header__chapter"
                 >
-                  {chapter.name} - {chapter.id}
+                  {convertToPersianNumber(chapter.id)} - {chapter.name}
                 </li>
               ))}
             </ul>
@@ -74,7 +75,7 @@ const QuranHeader = ({
                   onClick={() => handleVerseClick(index + 1)}
                   className="quran-header__verse"
                 >
-                  {index + 1}
+                  {convertToPersianNumber(index + 1)}
                 </li>
               ))}
             </ul>

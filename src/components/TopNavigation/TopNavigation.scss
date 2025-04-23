@@ -16,9 +16,11 @@
   &__menuIcn,
   &__userIcn {
     height: 1.6rem;
+    cursor: pointer;
   }
   &__logoIcn {
     height: 3rem;
     color: white;
+    cursor: pointer;
   }
 }

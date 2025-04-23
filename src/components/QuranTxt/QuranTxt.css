@@ -234,24 +234,24 @@ textarea:focus {
   font-family: "inter", serif;
   direction: rtl;
 }
-.quran__verse {
+.quran__ayah {
   font-family: "noto-naskh-arabic";
   font-size: 2rem;
   font-weight: 400;
   line-height: 2;
   display: inline;
 }
-.quran__chapter-name-container {
+.quran__surah-name-container {
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
-.quran__chapter-name-back {
-  width: 250px;
+.quran__surah-name-back {
+  width: 25rem;
 }
-.quran__chapter-name {
+.quran__surah-name {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -261,7 +261,7 @@ textarea:focus {
   text-align: center;
   margin: 1rem;
 }
-.quran__verse-number {
+.quran__ayah-number {
   font-weight: bold;
   margin: 0 0.5rem;
 }
