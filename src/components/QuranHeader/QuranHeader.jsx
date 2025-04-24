@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import convertToPersianNumber from '../../utils/convertToPersianNumber';
 import './QuranHeader.scss';
 
@@ -6,65 +6,51 @@ const QuranHeader = ({
   surahs,
   setSelectedSurah,
   setCurrentPage,
-  quranData,
   ayahPagesInfo,
   fetchQuranPageData,
-  pagesInfo,
-  setQuranData,
 }) => {
   const [showSurahList, setShowSurahList] = useState(false);
   const [showAyahList, setShowAyahList] = useState(false);
   const [selectedSurahId, setSelectedSurahId] = useState(
-    Object.keys(surahs)[0]
+    Object.keys(surahs)[0] || '1'
+  );
+  const [totalAyahs, setTotalAyahs] = useState(
+    surahs[selectedSurahId]?.[1] || 7
   );
 
-  const handleSurahClick = (surahId) => {
-    const firstPage = findFirstPageOfSurah(surahId);
-    if (!firstPage) return;
-
-    setSelectedSurah(surahs[surahId][0]); // Set the surah name
-    setSelectedSurahId(surahId);
-    setCurrentPage(firstPage);
-
-    fetchQuranPageData(
-      firstPage,
-      pagesInfo,
-      surahs,
-      setQuranData,
-      setSelectedSurah
-    ).catch((err) => console.error('Error fetching Quran:', err));
-
-    toggleLists(false, false);
-  };
-
-  const handleAyahClick = (ayahNum) => {
-    const firstPage = findPageOfAyah(parseInt(selectedSurahId), ayahNum);
-    setCurrentPage(firstPage);
-    toggleLists(false, false);
-  };
-
-  const toggleLists = (surahList, ayahList) => {
-    setShowSurahList(surahList);
-    setShowAyahList(ayahList);
-  };
-
-  const findFirstPageOfSurah = (surahId) => {
-    const pageInfo = ayahPagesInfo[parseInt(surahId)];
-    if (!pageInfo) return null;
-    const pageNo = pageInfo[1];
-    return pageNo;
-  };
-
-  const findPageOfAyah = (surahId, ayahNum) => {
-    const pages = Object.entries(quranData);
-    for (const [page, surahObj] of pages) {
-      const ayahs = surahObj[surahId];
-      if (ayahs && ayahs[ayahNum]) return parseInt(page);
+  useEffect(() => {
+    if (surahs[selectedSurahId]) {
+      setTotalAyahs(surahs[selectedSurahId][1]);
     }
-    return 1;
+  }, [selectedSurahId, surahs]);
+
+  const toggleLists = (surahToggle, ayahToggle) => {
+    setShowSurahList(surahToggle);
+    setShowAyahList(ayahToggle);
   };
 
-  const totalAyahs = surahs[selectedSurahId]?.[1];
+  const handleSurahClick = async (id) => {
+    setSelectedSurahId(id);
+    setSelectedSurah(surahs[id][0]);
+    toggleLists(false, true);
+
+    const matchingEntry = ayahPagesInfo[id][1];
+    console.log(id, matchingEntry);
+    if (matchingEntry) {
+      setCurrentPage(Number(matchingEntry));
+      await fetchQuranPageData(matchingEntry);
+    }
+  };
+
+  const handleAyahClick = async (ayahNumber) => {
+    const page = ayahPagesInfo[selectedSurahId][ayahNumber];
+
+    if (page) {
+      setCurrentPage(Number(page));
+      await fetchQuranPageData(Number(page));
+      toggleLists(false, false);
+    }
+  };
 
   return (
     <div className="quran-header__back">

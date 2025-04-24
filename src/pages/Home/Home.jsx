@@ -173,11 +173,8 @@ const Home = () => {
           surahs={surahs}
           setSelectedSurah={setSelectedSurah}
           setCurrentPage={goToPage}
-          quranData={quranData}
           ayahPagesInfo={ayahPagesInfo}
           fetchQuranPageData={fetchQuranPageData}
-          pagesInfo={pagesInfo}
-          setQuranData={setQuranData}
         />
       )}
 
