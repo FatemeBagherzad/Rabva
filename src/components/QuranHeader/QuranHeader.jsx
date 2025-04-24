@@ -1,87 +1,109 @@
 import { useState } from 'react';
+import convertToPersianNumber from '../../utils/convertToPersianNumber';
 import './QuranHeader.scss';
 
 const QuranHeader = ({
-  chapters,
-  setSelectedChapter,
+  surahs,
+  setSelectedSurah,
   setCurrentPage,
-  verseByPage,
-  convertToPersianNumber,
+  quranData,
+  ayahPagesInfo,
+  fetchQuranPageData,
+  pagesInfo,
+  setQuranData,
 }) => {
-  const [showChapterList, setShowChapterList] = useState(false);
-  const [showVerseList, setShowVerseList] = useState(false);
-  const [selectedVerseCount, setSelectedVerseCount] = useState(null);
-  const [chapter, setChapter] = useState(chapters[0].id);
+  const [showSurahList, setShowSurahList] = useState(false);
+  const [showAyahList, setShowAyahList] = useState(false);
+  const [selectedSurahId, setSelectedSurahId] = useState(
+    Object.keys(surahs)[0]
+  );
 
-  const findVersePage = (chapterId, verse = null) => {
-    const verseData = verseByPage.find((v) => {
-      return (
-        v.chapter_id === chapterId && (verse ? v.verse_id === verse : true)
-      );
-    });
-    return verseData ? verseData.page_id : 1;
-  };
+  const handleSurahClick = (surahId) => {
+    const firstPage = findFirstPageOfSurah(surahId);
+    if (!firstPage) return;
 
-  const handleChapterClick = (selectedChapter) => {
-    const pageNumber = findVersePage(selectedChapter.id);
-    setChapter(selectedChapter);
-    setSelectedChapter(selectedChapter.name);
-    setSelectedVerseCount(selectedChapter.total_verses);
-    setCurrentPage(pageNumber);
+    setSelectedSurah(surahs[surahId][0]); // Set the surah name
+    setSelectedSurahId(surahId);
+    setCurrentPage(firstPage);
+
+    fetchQuranPageData(
+      firstPage,
+      pagesInfo,
+      surahs,
+      setQuranData,
+      setSelectedSurah
+    ).catch((err) => console.error('Error fetching Quran:', err));
+
     toggleLists(false, false);
   };
 
-  const handleVerseClick = (selectedVerse) => {
-    const pageNumber = findVersePage(chapter.id, selectedVerse);
-    setCurrentPage(pageNumber);
+  const handleAyahClick = (ayahNum) => {
+    const firstPage = findPageOfAyah(parseInt(selectedSurahId), ayahNum);
+    setCurrentPage(firstPage);
     toggleLists(false, false);
   };
 
-  const toggleLists = (chapterList, verseList) => {
-    setShowChapterList(chapterList);
-    setShowVerseList(verseList);
+  const toggleLists = (surahList, ayahList) => {
+    setShowSurahList(surahList);
+    setShowAyahList(ayahList);
   };
+
+  const findFirstPageOfSurah = (surahId) => {
+    const pageInfo = ayahPagesInfo[parseInt(surahId)];
+    if (!pageInfo) return null;
+    const pageNo = pageInfo[1];
+    return pageNo;
+  };
+
+  const findPageOfAyah = (surahId, ayahNum) => {
+    const pages = Object.entries(quranData);
+    for (const [page, surahObj] of pages) {
+      const ayahs = surahObj[surahId];
+      if (ayahs && ayahs[ayahNum]) return parseInt(page);
+    }
+    return 1;
+  };
+
+  const totalAyahs = surahs[selectedSurahId]?.[1];
 
   return (
     <div className="quran-header__back">
       <div className="quran-header container">
         <header className="quran-header__header">
-          <span onClick={() => toggleLists(!showChapterList, false)}>
-            السوره
-          </span>
-          <span onClick={() => toggleLists(false, !showVerseList)}>الآیه</span>
+          <span onClick={() => toggleLists(!showSurahList, false)}>السوره</span>
+          <span onClick={() => toggleLists(false, !showAyahList)}>الآیه</span>
         </header>
 
         <div className="quran-header__body">
-          {showChapterList && (
-            <ul className="quran-header__chapters">
-              {chapters.map((chapter) => (
+          {showSurahList && (
+            <ul className="quran-header__surahs">
+              {Object.entries(surahs).map(([id, [name]]) => (
                 <li
-                  key={chapter.id}
-                  onClick={() => handleChapterClick(chapter)}
-                  className="quran-header__chapter"
+                  key={id}
+                  onClick={() => handleSurahClick(id)}
+                  className="quran-header__surah"
                 >
-                  {convertToPersianNumber(chapter.id)} - {chapter.name}
+                  {convertToPersianNumber(id)} - {name}
                 </li>
               ))}
             </ul>
           )}
 
-          {showVerseList && selectedVerseCount && (
-            <ul className="quran-header__verses">
-              {Array.from({ length: selectedVerseCount }, (_, index) => (
+          {showAyahList && totalAyahs && (
+            <ul className="quran-header__ayahs">
+              {Array.from({ length: totalAyahs }, (_, i) => (
                 <li
-                  key={index + 1}
-                  onClick={() => handleVerseClick(index + 1)}
-                  className="quran-header__verse"
+                  key={i + 1}
+                  onClick={() => handleAyahClick(i + 1)}
+                  className="quran-header__ayah"
                 >
-                  {convertToPersianNumber(index + 1)}
+                  {convertToPersianNumber(i + 1)}
                 </li>
               ))}
             </ul>
           )}
         </div>
-      </div>{' '}
+      </div>
     </div>
   );
 };

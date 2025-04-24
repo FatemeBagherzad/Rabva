@@ -4,7 +4,7 @@ import axios from 'axios';
 import QuranTxtOld from '../../components/QuranTxt/QuranTxtOld';
 import QuranTxtByWord from '../../components/QuranTxtByWord/QuranTxtByWord';
 import TopNavigation from '../../components/TopNavigation/TopNavigation';
-import QuranHeader from '../../components/QuranHeader/QuranHeader';
+import QuranHeaderOld from '../../components/QuranHeader/QuranHeaderOld';
 import QuranPlayer from '../../components/QuranPlayer/QuranPlayer';
 
 import chevronLeft from '../../assets/icons/chevron-left.svg';
@@ -144,7 +144,7 @@ const Home = () => {
       </div>
 
       {showQuranHeader && (
-        <QuranHeader
+        <QuranHeaderOld
           chapters={quranChapters}
           setSelectedChapter={setSelectedChapter}
           setCurrentPage={goToPage}
@@ -154,7 +154,7 @@ const Home = () => {
       )}
 
       <div className="container">
-        <QuranTxt
+        <QuranTxtOld
           currentPage={currentPage}
           convertToPersianNumber={convertToPersianNumber}
           ayahs={verses}

@@ -28,13 +28,13 @@
     top: 4rem;
     z-index: 999;
   }
-  &__chapters,
-  &__verses {
+  &__surahs,
+  &__ayahs {
     display: flex;
     flex-direction: column;
   }
-  &__chapter,
-  &__verse {
+  &__surah,
+  &__ayah {
     border-bottom: 1px solid $player-border-grey-200;
     padding: 1rem 0;
     cursor: pointer;

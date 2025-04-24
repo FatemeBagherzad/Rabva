@@ -255,11 +255,11 @@ textarea:focus {
   top: 4rem;
   z-index: 999;
 }
-.quran-header__chapters, .quran-header__verses {
+.quran-header__surahs, .quran-header__ayahs {
   display: flex;
   flex-direction: column;
 }
-.quran-header__chapter, .quran-header__verse {
+.quran-header__surah, .quran-header__ayah {
   border-bottom: 1px solid #e4e7ec;
   padding: 1rem 0;
   cursor: pointer;

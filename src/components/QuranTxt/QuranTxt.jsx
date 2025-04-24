@@ -2,7 +2,7 @@ import besmBack from '../../assets/img/quran-besm-frame-green.png';
 import convertToPersianNumber from '../../utils/convertToPersianNumber';
 import './QuranTxt.scss';
 
-const QuranTxt = ({ quranData, selectedSurah }) => {
+const QuranTxt = ({ quranData, surahs }) => {
   const pageAyahs = [];
 
   for (const [surahNumber, ayahs] of Object.entries(quranData)) {
@@ -17,30 +17,32 @@ const QuranTxt = ({ quranData, selectedSurah }) => {
   return (
     <div className="quran">
       <div className="quran__ayahs">
-        {pageAyahs.map((ver) => (
-          <span key={ver[0] / ver[1]} className="quran__ayah">
-            {ver[1] === 1 && (
+        {pageAyahs.map((ayah) => (
+          <span key={ayah[0] / ayah[1]} className="quran__ayah">
+            {ayah[1] === 1 && (
               <div className="quran__surah-name-container">
                 <img
                   src={besmBack}
                   alt="border image"
                   className="quran__surah-name-back"
                 />
-                <span className="quran__surah-name">{selectedSurah}</span>
+                <span className="quran__surah-name">
+                  {surahs[ayah[0]] ? surahs[ayah[0]][0] : ''}
+                </span>
               </div>
             )}
 
-            {ver[1] === 1 &&
-              selectedSurah !== 'التوبة' &&
-              selectedSurah !== 'الفاتحة' && (
+            {ayah[1] === 1 &&
+              surahs[ayah[0]][0] !== 'التوبة' &&
+              surahs[ayah[0]][0] !== 'الفاتحة' && (
                 <div className="quran__besm">
                   بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
                 </div>
               )}
 
-            {ver[2] + '\u00A0'}
+            {ayah[2] + '\u00A0'}
             <span className="quran__ayah-number">
-              ﴿‏{convertToPersianNumber(ver[1])}‎﴾ {'\u00A0'}
+              ﴿‏{convertToPersianNumber(ayah[1])}‎﴾ {'\u00A0'}
             </span>
           </span>
         ))}

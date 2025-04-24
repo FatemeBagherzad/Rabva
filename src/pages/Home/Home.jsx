@@ -5,12 +5,17 @@ import {
   fetchPagesInfo,
   fetchAyahPagesInfo,
 } from '../../services/mainService';
+import convertToPersianNumber from '../../utils/convertToPersianNumber';
 
 import TopNavigation from '../../components/TopNavigation/TopNavigation';
+import QuranHeader from '../../components/QuranHeader/QuranHeader';
+import QuranTxt from '../../components/QuranTxt/QuranTxt';
 import QuranPlayer from '../../components/QuranPlayer/QuranPlayer';
 
+import chevronLeft from '../../assets/icons/chevron-left.svg';
+import chevronRight from '../../assets/icons/chevron-right.svg';
+
 import './Home.scss';
-import QuranTxt from '../../components/QuranTxt/QuranTxt';
 
 const Home = () => {
   const [quranData, setQuranData] = useState([]);
@@ -18,82 +23,103 @@ const Home = () => {
   const [selectedSurah, setSelectedSurah] = useState();
   const [ayahPagesInfo, setAyahPagesInfo] = useState([]);
   const [pagesInfo, setPagesInfo] = useState([]);
-  const [currentPage, setCurrentPage] = useState(56);
+  const [currentPage, setCurrentPage] = useState(5);
+
+  const [showQuranHeader, setShowQuranHeader] = useState(false);
+  const [inputPage, setInputPage] = useState(1);
+  const [isEditingPage, setIsEditingPage] = useState(false);
+  const [isInputError, setIsInputError] = useState(false);
 
   useEffect(() => {
-    fetchSurahNames()
-      .then((res) => {
-        setSurahs(res.data.surahs);
-        // console.log('*************Surahs', res.data.surahs);
-      })
-      .catch((err) => console.error('Error fetching Surah names:', err));
+    const loadInitialData = async () => {
+      try {
+        const [{ data: surahData }, { data: ayahData }, { data: pageData }] =
+          await Promise.all([
+            fetchSurahNames(),
+            fetchAyahPagesInfo(),
+            fetchPagesInfo(),
+          ]);
 
-    fetchAyahPagesInfo()
-      .then((res) => {
-        setAyahPagesInfo(res.data.ayah_page);
-        // console.log('*************ayahpages info', res.data.ayah_page);
-      })
-      .catch((err) => console.error('Error fetching ayah pages info'));
+        setSurahs(surahData.surahs);
+        setAyahPagesInfo(ayahData.ayah_page);
+        setPagesInfo(pageData.pages);
+      } catch (err) {
+        console.error('Error fetching initial Quran data:', err);
+      }
+    };
 
-    fetchPagesInfo()
-      .then((res) => {
-        setPagesInfo(res.data.pages);
-        // console.log('**********pages info', res.data.pages);
-      })
-      .catch((err) => console.error('Error fetching pages info'));
+    loadInitialData();
   }, []);
 
   useEffect(() => {
-    if (!pagesInfo || !currentPage || !pagesInfo[currentPage] || !surahs)
+    if (
+      !pagesInfo ||
+      !currentPage ||
+      !pagesInfo[currentPage] ||
+      !surahs ||
+      !ayahPagesInfo
+    )
       return;
-    const [
-      surahNumberFirstOfPage,
-      ayahNumberFirstOfPage,
-      surahNumberEndOfPage,
-      ayahNumberEndOfPage,
-    ] = pagesInfo[currentPage];
 
-    fetchQuran({
-      surah_number: surahNumberFirstOfPage,
-      ayah_number: ayahNumberFirstOfPage,
-      per_page: 50,
-      page: 1,
-    })
-      .then((res) => {
-        const pageBeforeTrim = res.data.data; // object: { [surah]: { [ayah]: text } }
-        const pageAfterTrim = {};
-
-        for (
-          let surah = surahNumberFirstOfPage;
-          surah <= surahNumberEndOfPage;
-          surah++
-        ) {
-          const ayahs = pageBeforeTrim[surah];
-          if (!ayahs) continue;
-
-          const trimmedAyahs = {};
-          const startAyah =
-            surah === surahNumberFirstOfPage ? ayahNumberFirstOfPage : 1;
-          const endAyah =
-            surah === surahNumberEndOfPage ? ayahNumberEndOfPage : Infinity;
-
-          for (const ayahKey in ayahs) {
-            const ayahNum = parseInt(ayahKey, 10);
-            if (ayahNum >= startAyah && ayahNum <= endAyah) {
-              trimmedAyahs[ayahKey] = ayahs[ayahKey];
-            }
-          }
-
-          if (Object.keys(trimmedAyahs).length > 0) {
-            pageAfterTrim[surah] = trimmedAyahs;
-          }
-        }
-
-        setQuranData(pageAfterTrim);
-        setSelectedSurah(surahs[surahNumberFirstOfPage][0]);
-      })
-      .catch((err) => console.error('Error fetching Quran:', err));
+    fetchQuranPageData(currentPage);
   }, [currentPage, pagesInfo, surahs]);
+
+  const fetchQuranPageData = async (pageNumber) => {
+    const [startSurah, startAyah, endSurah, endAyah] = pagesInfo[pageNumber];
+
+    try {
+      const { data } = await fetchQuran({
+        surah_number: startSurah,
+        ayah_number: startAyah,
+        per_page: 50,
+        page: 1,
+      });
+
+      const trimmedData = {};
+      for (let surah = startSurah; surah <= endSurah; surah++) {
+        const ayahs = data.data[surah];
+        if (!ayahs) continue;
+
+        const start = surah === startSurah ? startAyah : 1;
+        const end = surah === endSurah ? endAyah : Infinity;
+
+        const filteredAyahs = Object.entries(ayahs)
+          .filter(([key]) => {
+            const num = parseInt(key);
+            return num >= start && num <= end;
+          })
+          .reduce((obj, [key, val]) => ({ ...obj, [key]: val }), {});
+
+        if (Object.keys(filteredAyahs).length)
+          trimmedData[surah] = filteredAyahs;
+      }
+
+      setQuranData(trimmedData);
+      setSelectedSurah(surahs[startSurah][0]);
+    } catch (err) {
+      console.error('Error fetching Quran page:', err);
+    }
+  };
+
+  const goToPage = (pageNumber) => {
+    if (pageNumber < 1 || pageNumber > 604) {
+      setIsInputError(true);
+      return;
+    }
+    setCurrentPage(pageNumber);
+    setInputPage(pageNumber);
+    setIsInputError(false);
+  };
+
+  const handlePageInputSubmit = (e) => {
+    if (e.key === 'Enter') {
+      goToPage(Number(inputPage));
+      setInputPage('');
+      e.target.value = '';
+    }
+  };
+
+  const toggleQuranHeader = () => setShowQuranHeader((prev) => !prev);
 
   if (!surahs && !ayahPagesInfo && !pagesInfo && !currentPage && !quranData)
     return <h3>Loading ...</h3>;
@@ -102,8 +128,61 @@ const Home = () => {
     <>
       <TopNavigation />
 
+      <div className="quran-page-header container">
+        <div
+          className="quran-page-header__chapter-navigation"
+          onClick={toggleQuranHeader}
+        >
+          {selectedSurah}
+        </div>
+
+        <div className="quran-page-header__page-navigation">
+          <img
+            src={chevronLeft}
+            alt="left chevron"
+            onClick={() => goToPage(currentPage - 1)}
+            className="quran-page-header__chevron"
+          />
+          {isEditingPage ? (
+            <input
+              type="number"
+              value={inputPage}
+              onChange={(e) => setInputPage(e.target.value)}
+              onKeyDown={handlePageInputSubmit}
+              onBlur={() => setIsEditingPage(false)}
+              className={
+                isInputError ? 'inputErrorStyle' : 'quran-page-header__input '
+              }
+            />
+          ) : (
+            <span onClick={() => setIsEditingPage(true)}>
+              {convertToPersianNumber(currentPage)}
+            </span>
+          )}
+          <img
+            src={chevronRight}
+            alt="right chevron"
+            onClick={() => goToPage(currentPage + 1)}
+            className="quran-page-header__chevron"
+          />
+        </div>
+      </div>
+
+      {showQuranHeader && (
+        <QuranHeader
+          surahs={surahs}
+          setSelectedSurah={setSelectedSurah}
+          setCurrentPage={goToPage}
+          quranData={quranData}
+          ayahPagesInfo={ayahPagesInfo}
+          fetchQuranPageData={fetchQuranPageData}
+          pagesInfo={pagesInfo}
+          setQuranData={setQuranData}
+        />
+      )}
+
       <div className="container">
-        <QuranTxt quranData={quranData} selectedSurah={selectedSurah} />
+        <QuranTxt quranData={quranData} surahs={surahs} />
         <QuranPlayer />
       </div>
     </>
