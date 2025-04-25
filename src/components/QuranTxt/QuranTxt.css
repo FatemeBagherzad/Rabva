@@ -247,6 +247,7 @@ textarea:focus {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  margin-top: 3rem;
 }
 .quran__surah-name-back {
   width: 25rem;
@@ -259,7 +260,6 @@ textarea:focus {
 }
 .quran__besm {
   text-align: center;
-  margin: 1rem;
 }
 .quran__ayah-number {
   font-weight: bold;

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 import QuranTxtOld from '../../components/QuranTxt/QuranTxtOld';
-import QuranTxtByWord from '../../components/QuranTxtByWord/QuranTxtByWord';
+import QuranTxtByWordOld from '../../components/QuranTxtByWord/QuranTxtByWordOld';
 import TopNavigation from '../../components/TopNavigation/TopNavigation';
 import QuranHeaderOld from '../../components/QuranHeader/QuranHeaderOld';
 import QuranPlayer from '../../components/QuranPlayer/QuranPlayer';
@@ -161,7 +161,7 @@ const Home = () => {
           selectedSurah={selectedChapter}
         />
 
-        {/* <QuranTxtByWord
+        {/* <QuranTxtByWordOld
           currentPage={currentPage}
           convertToPersianNumber={convertToPersianNumber}
           verses={verses}

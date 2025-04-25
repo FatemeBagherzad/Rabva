@@ -21,6 +21,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    margin-top: 3rem;
   }
   &__surah-name-back {
     width: 25rem;
@@ -33,7 +34,7 @@
   }
   &__besm {
     text-align: center;
-    margin: 1rem;
+    // margin: 1rem;
   }
   &__ayah-number {
     font-weight: bold;

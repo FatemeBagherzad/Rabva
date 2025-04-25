@@ -1,4 +1,7 @@
-import api from '../api/api';
+import { wordApi } from '../api/api';
 
-export const fetchRoots = () => api.get('/words/root/');
-export const fetchWordRoots = () => api.get('/words/word_root/');
+export const fetchQuranWordByWord = (params = {}) => {
+  return wordApi.get('/quran_word_by_word/', { params });
+};
+export const fetchRoots = () => wordApi.get('/root/');
+export const fetchWordRoots = () => wordApi.get('/word_root/');
