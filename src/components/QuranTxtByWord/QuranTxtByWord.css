@@ -231,9 +231,14 @@ textarea:focus {
 .quran__words {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  justify-items: center;
+  justify-content: space-between;
+  align-items: flex-end;
+  row-gap: 3rem;
+  -moz-column-gap: 0.5rem;
+       column-gap: 0.5rem;
   line-height: 1.5;
-  margin-bottom: 1rem;
+  margin-top: 3rem;
 }
 .quran__word {
   text-align: center;
@@ -245,4 +250,5 @@ textarea:focus {
 .quran__translation {
   font-size: 1.5rem;
   text-align: center;
+  color: #039855;
 }

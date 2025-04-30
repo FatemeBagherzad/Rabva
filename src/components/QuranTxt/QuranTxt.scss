@@ -8,6 +8,8 @@
   margin: 1rem 0;
   font-family: 'inter', serif;
   direction: rtl;
+  margin-bottom: 15rem;
+
   &__ayah {
     font-family: 'noto-naskh-arabic';
     font-size: 2rem;
@@ -21,7 +23,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-top: 3rem;
+    margin: 3rem 0 2rem 0;
   }
   &__surah-name-back {
     width: 25rem;
@@ -37,7 +39,12 @@
     // margin: 1rem;
   }
   &__ayah-number {
-    font-weight: bold;
-    margin: 0 0.5rem;
+    width: 100%;
+    text-align: center;
+    font-size: 1.8rem;
+  }
+  &__ayah-number-translation {
+    font-size: 1.5rem;
+    color: $buttonbck-success-600;
   }
 }

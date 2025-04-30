@@ -28,6 +28,9 @@ const QuranTxtByWord = ({ quranData, surahs }) => {
     }
   }
 
+  const ifFirstNumberIsOne = (arr) =>
+    arr.find((item) => typeof item === 'number');
+
   if (!quranData || groupedPageAyahs.length === 0) {
     return <div>Loading Quran data...</div>;
   }
@@ -39,35 +42,39 @@ const QuranTxtByWord = ({ quranData, surahs }) => {
           ([surahNumber, content], index) => {
             const surahName = surahs[surahNumber]?.[0];
             return (
-              <div key={surahNumber}>
-                {/* Surah Name and Frame */}
-                <div className="quran__surah-name-container">
-                  <img
-                    src={besmBack}
-                    alt="border image"
-                    className="quran__surah-name-back"
-                  />
-                  <span className="quran__surah-name">{surahName}</span>
-                </div>
-
-                {/* Bismillah */}
-                {surahName !== 'التوبة' && surahName !== 'الفاتحة' && (
-                  <div className="quran__besm">
-                    بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
+              <div key={surahNumber} className="quran__ayah">
+                {ifFirstNumberIsOne(content) === 1 && (
+                  <div className="quran__surah-name-container">
+                    <img
+                      src={besmBack}
+                      alt="border image"
+                      className="quran__surah-name-back"
+                    />
+                    <span className="quran__surah-name">{surahName}</span>
                   </div>
                 )}
-
-                {/* Ayah Words + Ayah Number */}
+                {surahName !== 'التوبة' &&
+                  surahName !== 'الفاتحة' &&
+                  ifFirstNumberIsOne(content) === 1 && (
+                    <div className="quran__besm">
+                      بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
+                    </div>
+                  )}
                 <span className="quran__words">
                   {content.map((item, idx) => {
                     if (typeof item === 'number') {
-                      // Ayah number
                       return (
                         <span
                           key={`ayah-${surahNumber}-${idx}`}
-                          className="quran__ayah-number"
+                          className="quran__word-block"
                         >
-                          ﴿‏{convertToPersianNumber(item)}‎﴾ {'\u00A0'}
+                          <span className="quran__ayah-number">
+                            {' '}
+                            ﴿‏{convertToPersianNumber(item)}‎﴾ {'\u00A0'}
+                          </span>
+                          <span className="quran__ayah-number quran__ayah-number-translation">
+                            {convertToPersianNumber(item)}
+                          </span>
                         </span>
                       );
                     } else {

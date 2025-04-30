@@ -233,6 +233,7 @@ textarea:focus {
   margin: 1rem 0;
   font-family: "inter", serif;
   direction: rtl;
+  margin-bottom: 15rem;
 }
 .quran__ayah {
   font-family: "noto-naskh-arabic";
@@ -247,7 +248,7 @@ textarea:focus {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-top: 3rem;
+  margin: 3rem 0 2rem 0;
 }
 .quran__surah-name-back {
   width: 25rem;
@@ -262,6 +263,11 @@ textarea:focus {
   text-align: center;
 }
 .quran__ayah-number {
-  font-weight: bold;
-  margin: 0 0.5rem;
+  width: 100%;
+  text-align: center;
+  font-size: 1.8rem;
+}
+.quran__ayah-number-translation {
+  font-size: 1.5rem;
+  color: #039855;
 }

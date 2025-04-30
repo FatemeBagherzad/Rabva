@@ -2,13 +2,7 @@ import { useState, useEffect } from 'react';
 import convertToPersianNumber from '../../utils/convertToPersianNumber';
 import './QuranHeader.scss';
 
-const QuranHeader = ({
-  surahs,
-  setSelectedSurah,
-  setCurrentPage,
-  ayahPagesInfo,
-  fetchQuranPageData,
-}) => {
+const QuranHeader = ({ surahs, setSelectedSurah, goToPage, ayahPagesInfo }) => {
   const [showSurahList, setShowSurahList] = useState(false);
   const [showAyahList, setShowAyahList] = useState(false);
   const [selectedSurahId, setSelectedSurahId] = useState(
@@ -31,14 +25,13 @@ const QuranHeader = ({
 
   const handleSurahClick = async (id) => {
     setSelectedSurahId(id);
-    setSelectedSurah(surahs[id][0]);
+    // setSelectedSurah(surahs[id][0]);
     toggleLists(false, true);
 
     const matchingEntry = ayahPagesInfo[id][1];
     console.log(id, matchingEntry);
     if (matchingEntry) {
-      setCurrentPage(Number(matchingEntry));
-      await fetchQuranPageData(matchingEntry);
+      goToPage(Number(matchingEntry));
     }
   };
 
@@ -46,8 +39,7 @@ const QuranHeader = ({
     const page = ayahPagesInfo[selectedSurahId][ayahNumber];
 
     if (page) {
-      setCurrentPage(Number(page));
-      await fetchQuranPageData(Number(page));
+      goToPage(Number(page));
       toggleLists(false, false);
     }
   };
