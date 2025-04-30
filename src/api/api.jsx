@@ -13,3 +13,10 @@ export const wordApi = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+export const tranlationsApi = axios.create({
+  baseURL: '/translations',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});

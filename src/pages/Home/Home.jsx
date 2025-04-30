@@ -28,6 +28,7 @@ const Home = () => {
     pages,
     quranData,
     quranByWordData,
+    translationH,
     selectedSurah,
     setSelectedSurah,
   } = useQuranData(currentPage, showQuranByWords);
@@ -122,7 +123,11 @@ const Home = () => {
           {!showQuranByWords ? (
             <QuranTxt quranData={quranData} surahs={surahs} />
           ) : (
-            <QuranTxtByWord quranData={quranByWordData} surahs={surahs} />
+            <QuranTxtByWord
+              quranData={quranByWordData}
+              translationH={translationH}
+              surahs={surahs}
+            />
           )}
 
           <QuranPlayer

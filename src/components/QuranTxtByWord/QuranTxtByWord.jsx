@@ -3,98 +3,100 @@ import convertToPersianNumber from '../../utils/convertToPersianNumber';
 import '../QuranTxt/QuranTxt.scss';
 import './QuranTxtByWord.scss';
 
-const QuranTxtByWord = ({ quranData, surahs }) => {
-  // const pageAyahs = [];
+const QuranTxtByWord = ({ quranData, translationH, surahs }) => {
+  if (!quranData) return <div>Loading Quran data...</div>;
 
-  // for (const [surahNumber, ayahs] of Object.entries(quranData)) {
-  //   for (const [ayahNumber, ayahTextPair] of Object.entries(ayahs)) {
-  //     let firstArray = ayahTextPair[0];
-  //     pageAyahs.push([parseInt(surahNumber), parseInt(ayahNumber), firstArray]);
-  //   }
-  // }
-
-  const groupedPageAyahs = {};
-  for (const [surahNumber, ayahs] of Object.entries(quranData)) {
-    for (const [ayahNumber, ayahTextPair] of Object.entries(ayahs)) {
-      const firstArray = ayahTextPair[0];
-      const sn = parseInt(surahNumber);
-      const an = parseInt(ayahNumber);
-
-      if (!groupedPageAyahs[sn]) {
-        groupedPageAyahs[sn] = [];
+  const getGroupedAyahs = () => {
+    const result = {};
+    for (const [surah, ayahs] of Object.entries(quranData)) {
+      for (const [ayah, [words]] of Object.entries(ayahs)) {
+        const sn = parseInt(surah);
+        const an = parseInt(ayah);
+        if (!result[sn]) result[sn] = [];
+        result[sn].push(...words, an);
       }
-
-      groupedPageAyahs[sn].push(...firstArray, an);
     }
-  }
+    return result;
+  };
 
-  const ifFirstNumberIsOne = (arr) =>
-    arr.find((item) => typeof item === 'number');
+  const isFirstAyah = (arr) =>
+    arr.find((item) => typeof item === 'number') === 1;
 
-  if (!quranData || groupedPageAyahs.length === 0) {
-    return <div>Loading Quran data...</div>;
-  }
+  const groupedAyahs = getGroupedAyahs();
+
+  const besmTranslation = ['به نام', 'خدا', 'آسایش دار', 'آسایش ده'];
+
+  const renderWords = (content, surahNumber) => {
+    let ayahNum = 0;
+    let wordIndex = 0;
+    let translateIndex = content.find((ayaNum) => typeof ayaNum === 'number');
+
+    return content.map((item, i) => {
+      if (typeof item === 'number') {
+        ayahNum = item;
+        translateIndex = ayahNum + 1;
+        wordIndex = 0;
+        const num = convertToPersianNumber(item);
+        return (
+          <span key={`ayah-${surahNumber}-${i}`} className="quran__word-block">
+            <span className="quran__ayah-number">
+              {' '}
+              ﴿‏{num}‎﴾ {'\u00A0'}
+            </span>
+            <span className="quran__ayah-number quran__ayah-number-translation">
+              {num}
+            </span>
+          </span>
+        );
+      } else {
+        const translation =
+          translationH?.[surahNumber]?.[translateIndex]?.[0]?.[wordIndex] ||
+          '—';
+
+        const element = (
+          <span key={`word-${surahNumber}-${i}`} className="quran__word-block">
+            <span className="quran__word">{item}</span>
+            <span className="quran__translation">{translation}</span>
+          </span>
+        );
+
+        wordIndex++;
+        return element;
+      }
+    });
+  };
 
   return (
     <div className="quran">
       <div className="quran__ayahs">
-        {Object.entries(groupedPageAyahs).map(
-          ([surahNumber, content], index) => {
-            const surahName = surahs[surahNumber]?.[0];
-            return (
-              <div key={surahNumber} className="quran__ayah">
-                {ifFirstNumberIsOne(content) === 1 && (
-                  <div className="quran__surah-name-container">
-                    <img
-                      src={besmBack}
-                      alt="border image"
-                      className="quran__surah-name-back"
-                    />
-                    <span className="quran__surah-name">{surahName}</span>
-                  </div>
-                )}
-                {surahName !== 'التوبة' &&
-                  surahName !== 'الفاتحة' &&
-                  ifFirstNumberIsOne(content) === 1 && (
-                    <div className="quran__besm">
-                      بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
-                    </div>
-                  )}
-                <span className="quran__words">
-                  {content.map((item, idx) => {
-                    if (typeof item === 'number') {
-                      return (
-                        <span
-                          key={`ayah-${surahNumber}-${idx}`}
-                          className="quran__word-block"
-                        >
-                          <span className="quran__ayah-number">
-                            {' '}
-                            ﴿‏{convertToPersianNumber(item)}‎﴾ {'\u00A0'}
-                          </span>
-                          <span className="quran__ayah-number quran__ayah-number-translation">
-                            {convertToPersianNumber(item)}
-                          </span>
-                        </span>
-                      );
-                    } else {
-                      // Word
-                      return (
-                        <span
-                          key={`word-${surahNumber}-${idx}`}
-                          className="quran__word-block"
-                        >
-                          <span className="quran__word">{item}</span>
-                          <span className="quran__translation">معنی</span>
-                        </span>
-                      );
-                    }
-                  })}
-                </span>
-              </div>
-            );
-          }
-        )}
+        {Object.entries(groupedAyahs).map(([surahNumber, content]) => {
+          const name = surahs[surahNumber]?.[0];
+          const showBesm =
+            isFirstAyah(content) && name !== 'التوبة' && name !== 'الفاتحة';
+
+          return (
+            <div key={surahNumber} className="quran__ayah">
+              {isFirstAyah(content) && (
+                <div className="quran__surah-name-container">
+                  <img
+                    src={besmBack}
+                    alt="border"
+                    className="quran__surah-name-back"
+                  />
+                  <span className="quran__surah-name">{name}</span>
+                </div>
+              )}
+              {showBesm && (
+                <div className="quran__besm">
+                  بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
+                </div>
+              )}
+              <span className="quran__words">
+                {renderWords(content, surahNumber)}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

@@ -7,6 +7,10 @@ import {
   fetchAyahPagesInfo,
 } from '../services/mainService';
 import { fetchQuranWordByWord } from '../services/wordService';
+import {
+  fetchQuranTranslationH,
+  fetchQuranTranslationUniqueH,
+} from '../services/translationService';
 
 const useQuranData = (currentPage, showQuranByWords, pagesInfo) => {
   const [surahs, setSurahs] = useState([]);
@@ -15,6 +19,7 @@ const useQuranData = (currentPage, showQuranByWords, pagesInfo) => {
   const [quranData, setQuranData] = useState([]);
   const [quranByWordData, setQuranByWordData] = useState([]);
   const [selectedSurah, setSelectedSurah] = useState('');
+  const [translationH, setTranslationH] = useState([]);
 
   const trimQuranData = (data, startSurah, startAyah, endSurah, endAyah) => {
     const trimmed = {};
@@ -80,12 +85,43 @@ const useQuranData = (currentPage, showQuranByWords, pagesInfo) => {
     fetchPage();
   }, [currentPage, pages, showQuranByWords]);
 
+  useEffect(() => {
+    if (!showQuranByWords || !pages[currentPage]) {
+      setTranslationH([]);
+      return;
+    }
+    const [startSurah, startAyah, endSurah, endAyah] = pages[currentPage];
+    const fetchTranslation = async () => {
+      try {
+        const { data } = await fetchQuranTranslationH({
+          surah_number: startSurah,
+          ayah_number: startAyah,
+          per_page: 500,
+          page: 1,
+        });
+        const trimmed = trimQuranData(
+          data.data,
+          startSurah,
+          startAyah,
+          endSurah,
+          endAyah
+        );
+        setTranslationH(data ? trimmed : []);
+      } catch (error) {
+        console.error('Translation fetch error:', error);
+      }
+    };
+
+    fetchTranslation();
+  }, [currentPage, pages, showQuranByWords]);
+
   return {
     surahs,
     ayahPagesInfo,
     pages,
     quranData,
     quranByWordData,
+    translationH,
     selectedSurah,
     setSelectedSurah,
   };

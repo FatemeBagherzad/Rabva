@@ -13,6 +13,11 @@ export default defineConfig({
         target: 'http://10.0.0.18:8000', // same backend
         changeOrigin: true,
       },
+
+      '/translations': {
+        target: 'http://10.0.0.18:8000', // same backend
+        changeOrigin: true,
+      },
     },
   },
 });
