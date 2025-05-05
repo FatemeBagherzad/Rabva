@@ -10,22 +10,35 @@
     justify-items: center;
     justify-content: space-between;
     align-items: flex-end;
-    row-gap: 3rem;
+    row-gap: 1.5rem;
     column-gap: 0.5rem;
     line-height: 1.5;
     margin-top: 3rem;
   }
 
-  &__word {
-    text-align: center;
-  }
   &__word-block {
     display: flex;
     flex-direction: column;
   }
+  &__word {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+  }
   &__translation {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     text-align: center;
     color: $buttonbck-success-600;
   }
+}
+
+.quran__word-block.last-in-line {
+  align-items: flex-end;
+}
+.quran__word-block.first-in-line {
+  align-items: flex-start;
+}
+.edit-box {
+  display: inline-block;
+  width: 100%;
 }

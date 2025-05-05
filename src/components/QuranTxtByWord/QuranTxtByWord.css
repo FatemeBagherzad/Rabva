@@ -166,7 +166,8 @@ button {
   cursor: pointer;
   border: none;
   border-radius: 0.4rem;
-  padding: 0.8rem 1.2rem;
+  padding: 0.2rem 0.8rem;
+  font-size: 1.2rem;
   background-color: #039855;
   color: #fff;
   transition: background-color 0.3s;
@@ -234,21 +235,36 @@ textarea:focus {
   justify-items: center;
   justify-content: space-between;
   align-items: flex-end;
-  row-gap: 3rem;
+  row-gap: 1.5rem;
   -moz-column-gap: 0.5rem;
        column-gap: 0.5rem;
   line-height: 1.5;
   margin-top: 3rem;
 }
-.quran__word {
-  text-align: center;
-}
 .quran__word-block {
   display: flex;
   flex-direction: column;
 }
+.quran__word {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
 .quran__translation {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   text-align: center;
   color: #039855;
+}
+
+.quran__word-block.last-in-line {
+  align-items: flex-end;
+}
+
+.quran__word-block.first-in-line {
+  align-items: flex-start;
+}
+
+.edit-box {
+  display: inline-block;
+  width: 100%;
 }

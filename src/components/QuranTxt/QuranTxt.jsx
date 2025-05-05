@@ -10,7 +10,6 @@ const QuranTxt = ({ quranData, surahs }) => {
       pageAyahs.push([parseInt(surahNumber), parseInt(ayahNumber), ayahText]);
     }
   }
-
   if (!quranData || pageAyahs.length === 0) {
     return <div>Loading Quran data...</div>;
   }
@@ -18,7 +17,7 @@ const QuranTxt = ({ quranData, surahs }) => {
     <div className="quran">
       <div className="quran__ayahs">
         {pageAyahs.map((ayah) => (
-          <span key={ayah[0] / ayah[1]} className="quran__ayah">
+          <span key={`${ayah[0]}-${ayah[1]}`} className="quran__ayah">
             {ayah[1] === 1 && (
               <div className="quran__surah-name-container">
                 <img

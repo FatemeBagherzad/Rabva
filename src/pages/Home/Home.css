@@ -228,7 +228,7 @@ textarea:focus {
   }
 }
 
-.quran-page-header {
+.quran-page__header {
   display: grid;
   grid-template-columns: 2fr 1fr 2fr;
   align-items: center;
@@ -236,10 +236,10 @@ textarea:focus {
   background-color: #f9fafb;
   width: 100%;
 }
-.quran-page-header__chapter-navigation {
+.quran-page__header-chapter-navigation {
   cursor: pointer;
 }
-.quran-page-header__by-words {
+.quran-page__header-by-words {
   cursor: pointer;
   justify-self: center;
   width: 100%;
@@ -250,24 +250,27 @@ textarea:focus {
   border-inline: 1px solid #027a48;
   color: #027a48;
 }
-.quran-page-header__by-words:hover {
+.quran-page__header-by-words:hover {
   border-inline: 2px solid #027a48;
   font-weight: 600;
 }
-.quran-page-header__by-words-on {
+.quran-page__header-by-words-on {
   background-color: #027a48;
   color: #fff;
 }
-.quran-page-header__page-navigation {
+.quran-page__header-page-navigation {
   width: 100%;
   justify-content: flex-end;
   display: flex;
   gap: 1rem;
 }
-.quran-page-header__input {
+.quran-page__header-input {
   width: 5rem;
 }
-.quran-page-header__chevron {
+.quran-page__header-chevron {
   height: 2rem;
   cursor: pointer;
+}
+.quran-page__quran-txt {
+  max-width: 97vw;
 }

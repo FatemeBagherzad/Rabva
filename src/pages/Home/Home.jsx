@@ -61,30 +61,30 @@ const Home = () => {
   return (
     <>
       <TopNavigation />
-      <div ref={containerRef}>
-        <div className="quran-page-header container">
+      <div ref={containerRef} className="quran-page">
+        <div className="quran-page__header container">
           <div
-            className="quran-page-header__chapter-navigation"
+            className="quran-page__header-chapter-navigation"
             onClick={toggleQuranHeader}
           >
             {selectedSurah}
           </div>
 
           <div
-            className={`quran-page-header__by-words ${
-              showQuranByWords ? 'quran-page-header__by-words-on' : ''
+            className={`quran-page__header-by-words ${
+              showQuranByWords ? 'quran-page__header-by-words-on' : ''
             }`}
             onClick={toggleQuranTxt}
           >
             کلمه به کلمه
           </div>
 
-          <div className="quran-page-header__page-navigation">
+          <div className="quran-page__header-page-navigation">
             <img
               src={chevronLeft}
               alt="left chevron"
               onClick={() => goToPage(currentPage - 1)}
-              className="quran-page-header__chevron"
+              className="quran-page__header-chevron"
             />
             {isEditingPage ? (
               <input
@@ -93,7 +93,7 @@ const Home = () => {
                 onChange={(e) => setInputPage(e.target.value)}
                 onKeyDown={handlePageInputSubmit}
                 onBlur={() => setIsEditingPage(false)}
-                className={`quran-page-header__input ${
+                className={`quran-page__header-input ${
                   isInputError ? 'inputErrorStyle' : ''
                 }`}
               />
@@ -106,7 +106,7 @@ const Home = () => {
               src={chevronRight}
               alt="right chevron"
               onClick={() => goToPage(currentPage + 1)}
-              className="quran-page-header__chevron"
+              className="quran-page__header-chevron"
             />
           </div>
         </div>
@@ -119,7 +119,7 @@ const Home = () => {
             goToPage={goToPage}
           />
         )}
-        <div className="container">
+        <div className="container quran-page__quran-txt">
           {!showQuranByWords ? (
             <QuranTxt quranData={quranData} surahs={surahs} />
           ) : (

@@ -20,6 +20,7 @@ const useQuranData = (currentPage, showQuranByWords, pagesInfo) => {
   const [quranByWordData, setQuranByWordData] = useState([]);
   const [selectedSurah, setSelectedSurah] = useState('');
   const [translationH, setTranslationH] = useState([]);
+  const [visiblePages, setVisiblePages] = useState([currentPage]);
 
   const trimQuranData = (data, startSurah, startAyah, endSurah, endAyah) => {
     const trimmed = {};
@@ -39,6 +40,22 @@ const useQuranData = (currentPage, showQuranByWords, pagesInfo) => {
     }
     return trimmed;
   };
+  const getPageRange = (pages, currentPage, showQuranByWords) => {
+    if (!pages[currentPage]) return null;
+
+    const isLargeScreen = window.innerWidth >= 1200;
+    const extraPages = showQuranByWords ? 15 : 10;
+    const [startSurah, startAyah] = pages[currentPage];
+    let endSurah, endAyah;
+
+    if (isLargeScreen && pages[currentPage + extraPages]) {
+      [endSurah, endAyah] = pages[currentPage + extraPages];
+    } else {
+      [, , endSurah, endAyah] = pages[currentPage];
+    }
+
+    return { startSurah, startAyah, endSurah, endAyah };
+  };
 
   useEffect(() => {
     const loadInitial = async () => {
@@ -57,7 +74,11 @@ const useQuranData = (currentPage, showQuranByWords, pagesInfo) => {
 
   useEffect(() => {
     if (!pages[currentPage]) return;
-    const [startSurah, startAyah, endSurah, endAyah] = pages[currentPage];
+    // const [startSurah, startAyah, endSurah, endAyah] = pages[currentPage];
+
+    const pageRange = getPageRange(pages, currentPage, showQuranByWords);
+    if (!pageRange) return;
+    const { startSurah, startAyah, endSurah, endAyah } = pageRange;
 
     const fetchPage = async () => {
       try {
@@ -90,7 +111,11 @@ const useQuranData = (currentPage, showQuranByWords, pagesInfo) => {
       setTranslationH([]);
       return;
     }
-    const [startSurah, startAyah, endSurah, endAyah] = pages[currentPage];
+    // const [startSurah, startAyah, endSurah, endAyah] = pages[currentPage];
+    const pageRange = getPageRange(pages, currentPage, showQuranByWords);
+    if (!pageRange) return;
+    const { startSurah, startAyah, endSurah, endAyah } = pageRange;
+
     const fetchTranslation = async () => {
       try {
         const { data } = await fetchQuranTranslationH({
