@@ -8,19 +8,22 @@ import {
 } from '../services/mainService';
 import { fetchQuranWordByWord } from '../services/wordService';
 import {
+  fetchLanguages,
+  fetchTranslationNames,
+  fetchUiTranslation,
   fetchQuranTranslationH,
-  fetchQuranTranslationUniqueH,
 } from '../services/translationService';
 
-const useQuranData = (currentPage, showQuranByWords, pagesInfo) => {
+const useQuranData = (currentPage, showQuranByWords) => {
   const [surahs, setSurahs] = useState([]);
   const [ayahPagesInfo, setAyahPagesInfo] = useState([]);
   const [pages, setPages] = useState([]);
+  const [languages, setLanguages] = useState([]);
+  const [languageNames, setLanguageNames] = useState([]);
   const [quranData, setQuranData] = useState([]);
   const [quranByWordData, setQuranByWordData] = useState([]);
   const [selectedSurah, setSelectedSurah] = useState('');
   const [translationH, setTranslationH] = useState([]);
-  const [visiblePages, setVisiblePages] = useState([currentPage]);
 
   const trimQuranData = (data, startSurah, startAyah, endSurah, endAyah) => {
     const trimmed = {};
@@ -57,21 +60,32 @@ const useQuranData = (currentPage, showQuranByWords, pagesInfo) => {
     return { startSurah, startAyah, endSurah, endAyah };
   };
 
+  //fetch Surahs, Ayah pages info, Pages info,languages,tranlation names
   useEffect(() => {
     const loadInitial = async () => {
-      const [{ data: surahs }, { data: ayahs }, { data: pages }] =
-        await Promise.all([
-          fetchSurahNames(),
-          fetchAyahPagesInfo(),
-          fetchPagesInfo(),
-        ]);
+      const [
+        { data: surahs },
+        { data: ayahs },
+        { data: pages },
+        { data: languages },
+        { data: languageNames },
+      ] = await Promise.all([
+        fetchSurahNames(),
+        fetchAyahPagesInfo(),
+        fetchPagesInfo(),
+        fetchLanguages(),
+        fetchTranslationNames(),
+      ]);
       setSurahs(surahs.surahs);
       setAyahPagesInfo(ayahs.ayah_page);
       setPages(pages.pages);
+      setLanguages(languages.data);
+      setLanguageNames(languageNames.data);
     };
     loadInitial();
   }, []);
 
+  //fetch Quran by Ayahs and by Words
   useEffect(() => {
     if (!pages[currentPage]) return;
     // const [startSurah, startAyah, endSurah, endAyah] = pages[currentPage];
@@ -106,6 +120,7 @@ const useQuranData = (currentPage, showQuranByWords, pagesInfo) => {
     fetchPage();
   }, [currentPage, pages, showQuranByWords]);
 
+  //fetch Translation for H (word by word)
   useEffect(() => {
     if (!showQuranByWords || !pages[currentPage]) {
       setTranslationH([]);
@@ -144,6 +159,8 @@ const useQuranData = (currentPage, showQuranByWords, pagesInfo) => {
     surahs,
     ayahPagesInfo,
     pages,
+    languages,
+    languageNames,
     quranData,
     quranByWordData,
     translationH,

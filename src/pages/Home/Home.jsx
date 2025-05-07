@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import convertToPersianNumber from '../../utils/convertToPersianNumber';
 import { useOutsideClick } from '../../hooks/useOutsideClick';
 import useQuranData from '../../hooks/useQuranData';
 
 import TopNavigation from '../../components/TopNavigation/TopNavigation';
 import QuranHeader from '../../components/QuranHeader/QuranHeader';
+import TranslationList from '../../components/TranslationList/TranslationList';
 import QuranTxt from '../../components/QuranTxt/QuranTxt';
 import QuranTxtByWord from '../../components/QuranTxtByWord/QuranTxtByWord';
 import QuranPlayer from '../../components/QuranPlayer/QuranPlayer';
@@ -15,13 +16,15 @@ import chevronRight from '../../assets/icons/chevron-right.svg';
 import './Home.scss';
 
 const Home = () => {
+  const containerRef = useOutsideClick(() => setShowQuranHeader(false));
+
   const [currentPage, setCurrentPage] = useState(1);
   const [showQuranByWords, setShowQuranByWords] = useState(false);
   const [showQuranHeader, setShowQuranHeader] = useState(false);
+  const [showTranslationList, setTranslationList] = useState(false);
   const [inputPage, setInputPage] = useState(1);
   const [isEditingPage, setIsEditingPage] = useState(false);
   const [isInputError, setIsInputError] = useState(false);
-
   const {
     surahs,
     ayahPagesInfo,
@@ -33,13 +36,12 @@ const Home = () => {
     setSelectedSurah,
   } = useQuranData(currentPage, showQuranByWords);
 
-  const containerRef = useOutsideClick(() => setShowQuranHeader(false));
-
   const goToPage = (pageNumber) => {
     if (pageNumber < 1 || pageNumber > 604) {
       setIsInputError(true);
       return;
     }
+
     setCurrentPage(pageNumber);
     setInputPage(pageNumber);
     setIsInputError(false);
@@ -53,6 +55,7 @@ const Home = () => {
 
   const toggleQuranTxt = () => setShowQuranByWords((prev) => !prev);
   const toggleQuranHeader = () => setShowQuranHeader((prev) => !prev);
+  const toggleTranslation = () => setTranslationList((prev) => !prev);
 
   if (!surahs || !pages || !ayahPagesInfo) {
     return <h3>Loading ...</h3>;
@@ -71,19 +74,28 @@ const Home = () => {
           </div>
 
           <div
-            className={`quran-page__header-by-words ${
-              showQuranByWords ? 'quran-page__header-by-words-on' : ''
+            className={`quran-page__header-options ${
+              showQuranByWords ? 'quran-page__header-options-on' : ''
             }`}
             onClick={toggleQuranTxt}
           >
             کلمه به کلمه
           </div>
 
+          <div
+            className={`quran-page__header-options ${
+              showTranslationList ? 'quran-page__header-options-on' : ''
+            }`}
+            onClick={toggleTranslation}
+          >
+            آیه به آیه
+          </div>
+
           <div className="quran-page__header-page-navigation">
             <img
               src={chevronLeft}
               alt="left chevron"
-              onClick={() => goToPage(currentPage - 1)}
+              onClick={() => goToPage(currentPage + 1)}
               className="quran-page__header-chevron"
             />
             {isEditingPage ? (
@@ -105,7 +117,7 @@ const Home = () => {
             <img
               src={chevronRight}
               alt="right chevron"
-              onClick={() => goToPage(currentPage + 1)}
+              onClick={() => goToPage(currentPage - 1)}
               className="quran-page__header-chevron"
             />
           </div>
@@ -119,6 +131,9 @@ const Home = () => {
             goToPage={goToPage}
           />
         )}
+
+        {showTranslationList && <TranslationList />}
+
         <div className="container quran-page__quran-txt">
           {!showQuranByWords ? (
             <QuranTxt quranData={quranData} surahs={surahs} />
@@ -129,11 +144,11 @@ const Home = () => {
               surahs={surahs}
             />
           )}
-
-          <QuranPlayer
-            quranData={!showQuranByWords ? quranData : quranByWordData}
-          />
         </div>
+
+        <QuranPlayer
+          quranData={!showQuranByWords ? quranData : quranByWordData}
+        />
       </div>
     </>
   );

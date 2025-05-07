@@ -88,7 +88,7 @@ const QuranTxtByWord = ({ quranData, translationH, surahs }) => {
           <span
             key={`word-${surahNumber}-${i}`}
             className="quran__word-block"
-            onClick={(e) => editWord(e, surahNumber)}
+            // onClick={(e) => editWord(e, surahNumber)}
           >
             <span className="quran__word">{item}</span>
             <span className="quran__translation">{translation}</span>

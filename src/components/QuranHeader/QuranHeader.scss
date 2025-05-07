@@ -27,6 +27,9 @@
     position: absolute;
     top: 4rem;
     z-index: 999;
+    margin-top: -2px;
+    border: 1px solid $logo-success-700;
+    padding: 0 2rem;
   }
   &__surahs,
   &__ayahs {

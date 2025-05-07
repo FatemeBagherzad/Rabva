@@ -6,7 +6,8 @@
 .quran-page {
   &__header {
     display: grid;
-    grid-template-columns: 2fr 1fr 2fr;
+    grid-template-columns: 2fr 1fr 1fr 2fr;
+    gap: 1rem;
     align-items: center;
     height: 3rem;
     background-color: $setting-aya-background;
@@ -16,7 +17,7 @@
     cursor: pointer;
   }
 
-  &__header-by-words {
+  &__header-options {
     cursor: pointer;
     justify-self: center;
     width: 100%;
@@ -31,7 +32,7 @@
       font-weight: 600;
     }
   }
-  &__header-by-words-on {
+  &__header-options-on {
     background-color: $logo-success-700;
     color: $backgroundbody-btntxt;
   }
