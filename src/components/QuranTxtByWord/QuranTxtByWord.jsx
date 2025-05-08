@@ -91,7 +91,7 @@ const QuranTxtByWord = ({ quranData, translationH, surahs }) => {
             // onClick={(e) => editWord(e, surahNumber)}
           >
             <span className="quran__word">{item}</span>
-            <span className="quran__translation">{translation}</span>
+            <span className="quran__translation-word">{translation}</span>
           </span>
         );
 

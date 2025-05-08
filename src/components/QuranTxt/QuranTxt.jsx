@@ -2,21 +2,36 @@ import besmBack from '../../assets/img/quran-besm-frame-green.png';
 import convertToPersianNumber from '../../utils/convertToPersianNumber';
 import './QuranTxt.scss';
 
-const QuranTxt = ({ quranData, surahs }) => {
+const QuranTxt = ({
+  quranData,
+  surahs,
+  translationByAyah,
+  showTranslationByAyah,
+}) => {
   const pageAyahs = [];
+  const translationLookup = {};
 
   for (const [surahNumber, ayahs] of Object.entries(quranData)) {
     for (const [ayahNumber, ayahText] of Object.entries(ayahs)) {
       pageAyahs.push([parseInt(surahNumber), parseInt(ayahNumber), ayahText]);
     }
   }
+
+  for (const [surahNumber, ayahs] of Object.entries(translationByAyah)) {
+    for (const [ayahNumber, translateText] of Object.entries(ayahs)) {
+      translationLookup[`${surahNumber}-${ayahNumber}`] = translateText;
+    }
+  }
   if (!quranData || pageAyahs.length === 0) {
     return <div>Loading Quran data...</div>;
   }
+  if (showTranslationByAyah && !translationByAyah)
+    return <p>در حال بارگزاری ...</p>;
+
   return (
     <div className="quran">
       <div className="quran__ayahs">
-        {pageAyahs.map((ayah) => (
+        {pageAyahs.map((ayah, index) => (
           <span key={`${ayah[0]}-${ayah[1]}`} className="quran__ayah">
             {ayah[1] === 1 && (
               <div className="quran__surah-name-container">
@@ -40,8 +55,15 @@ const QuranTxt = ({ quranData, surahs }) => {
               )}
 
             {ayah[2] + '\u00A0'}
+
             <span className="quran__ayah-number">
               ﴿‏{convertToPersianNumber(ayah[1])}‎﴾ {'\u00A0'}
+              {showTranslationByAyah && (
+                <div className="quran__translation-ayah">
+                  {translationLookup[`${ayah[0]}-${ayah[1]}`]}
+                  <span>{ayah[1]}</span>
+                </div>
+              )}
             </span>
           </span>
         ))}

@@ -1,14 +1,14 @@
 import { tranlationsApi } from '../api/api';
 
 export const fetchLanguages = () => tranlationsApi.get('/languages/');
-export const fetchTranslationNames = () =>
+export const fetchTranslatorNames = () =>
   tranlationsApi.get('/translation_names/');
 
-export const fetchUiTranslation = ({ params }) => {
+export const fetchUiTranslation = (params) => {
   return tranlationsApi.get('/ui_translations/', { params });
 };
 
-export const fetchTranslationAyahs = ({ params }) => {
+export const fetchTranslationAyahs = (params) => {
   return tranlationsApi.get('/translate_ayahs/', { params });
 };
 

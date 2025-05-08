@@ -12,10 +12,11 @@
   direction: rtl;
   position: relative;
   height: 3rem;
+  font-size: 1.3rem;
   &__header {
     display: grid;
-    grid-template-columns: 0.5fr 0.5fr 1.5fr 1fr 1fr;
-    gap: 1rem;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem;
     align-items: center;
     justify-items: center;
     justify-content: center;
@@ -23,12 +24,13 @@
     background-color: $setting-aya-background;
     width: 100%;
     @include tablet {
-      grid-template-columns: 0.5fr 0.5fr 1.5fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
     }
   }
   &__header span {
     cursor: pointer;
   }
+
   &__translate-options {
     cursor: pointer;
     width: 100%;
@@ -63,15 +65,16 @@
     width: 5rem;
   }
   &__body {
-    background-color: white;
-    width: 100%;
+    background-color: rgb(255, 255, 255);
+    color: $maintxt-playbar;
+    width: 20rem;
+    max-height: 50rem;
+    overflow-y: auto;
     position: absolute;
-    top: 3rem;
+    top: 3.2rem;
     z-index: 999;
-    // margin-top: -1px;
-    // border: 1px solid $logo-success-700;
-    box-shadow: 0 1rem 1rem rgba(black, 0.075);
-    padding: 0 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 0 1rem;
   }
   &__surahs,
   &__ayahs {
@@ -81,7 +84,7 @@
   &__surah,
   &__ayah {
     border-bottom: 1px solid $player-border-grey-200;
-    padding: 1rem 0;
+    padding: 0.7rem 0;
     cursor: pointer;
   }
 }

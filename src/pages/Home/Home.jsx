@@ -13,45 +13,61 @@ import './Home.scss';
 const Home = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showQuranByWords, setShowQuranByWords] = useState(false);
-  const [showTranslationList, setTranslationList] = useState(false);
+  const [showTranslationList, setShowTranslationList] = useState(false);
+  const [showTranslationByAyah, setShowTranslationByAyah] = useState(false);
+  const [ayahTranslator, setAyahTranslator] = useState('');
+
+  const [language, setLanguage] = useState('en');
 
   const {
     surahs,
     ayahPagesInfo,
     pages,
+    languages,
     quranData,
     quranByWordData,
     translationH,
     selectedSurah,
     setSelectedSurah,
-  } = useQuranData(currentPage, showQuranByWords);
+    selectedLangTranslators,
+    translationByAyah,
+  } = useQuranData(currentPage, showQuranByWords, language, ayahTranslator);
 
   if (!surahs || !pages || !ayahPagesInfo) {
     return <h3>Loading ...</h3>;
   }
-
   return (
     <>
-      <TopNavigation />
+      <TopNavigation
+        languages={languages}
+        language={language}
+        setLanguage={setLanguage}
+      />
       <div className="quran-page">
         <QuranHeader
           surahs={surahs}
           ayahPagesInfo={ayahPagesInfo}
           selectedSurah={selectedSurah}
           showQuranByWords={showQuranByWords}
-          showTranslationList={showTranslationList}
           setShowQuranByWords={setShowQuranByWords}
-          setTranslationList={setTranslationList}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
           setSelectedSurah={setSelectedSurah}
+          showTranslationList={showTranslationList}
+          setShowTranslationList={setShowTranslationList}
+          selectedLangTranslators={selectedLangTranslators}
+          setAyahTranslator={setAyahTranslator}
+          setShowTranslationByAyah={setShowTranslationByAyah}
         />
-
-        {showTranslationList && <TranslationList />}
 
         <div className="container quran-page__quran-txt">
           {!showQuranByWords ? (
-            <QuranTxt quranData={quranData} surahs={surahs} />
+            <QuranTxt
+              quranData={quranData}
+              surahs={surahs}
+              translationByAyah={translationByAyah}
+              showTranslationByAyah={showTranslationByAyah}
+            />
           ) : (
             <QuranTxtByWord
               quranData={quranByWordData}

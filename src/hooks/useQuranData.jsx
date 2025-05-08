@@ -9,21 +9,29 @@ import {
 import { fetchQuranWordByWord } from '../services/wordService';
 import {
   fetchLanguages,
-  fetchTranslationNames,
-  fetchUiTranslation,
+  fetchTranslatorNames,
   fetchQuranTranslationH,
+  fetchTranslationAyahs,
 } from '../services/translationService';
 
-const useQuranData = (currentPage, showQuranByWords) => {
+const useQuranData = (
+  currentPage,
+  showQuranByWords,
+  language,
+  ayahTranslator
+) => {
   const [surahs, setSurahs] = useState([]);
   const [ayahPagesInfo, setAyahPagesInfo] = useState([]);
   const [pages, setPages] = useState([]);
   const [languages, setLanguages] = useState([]);
-  const [languageNames, setLanguageNames] = useState([]);
+  const [langCateTranslators, setLangCateTranslators] = useState([]);
+  const [allTranslatorsSpec, setAllTranslatorsSpec] = useState([]);
+  const [selectedLangTranslators, setSelectedLangTranslators] = useState([]);
   const [quranData, setQuranData] = useState([]);
   const [quranByWordData, setQuranByWordData] = useState([]);
   const [selectedSurah, setSelectedSurah] = useState('');
   const [translationH, setTranslationH] = useState([]);
+  const [translationByAyah, setTranslationByAyah] = useState([]);
 
   const trimQuranData = (data, startSurah, startAyah, endSurah, endAyah) => {
     const trimmed = {};
@@ -43,6 +51,7 @@ const useQuranData = (currentPage, showQuranByWords) => {
     }
     return trimmed;
   };
+
   const getPageRange = (pages, currentPage, showQuranByWords) => {
     if (!pages[currentPage]) return null;
 
@@ -60,27 +69,32 @@ const useQuranData = (currentPage, showQuranByWords) => {
     return { startSurah, startAyah, endSurah, endAyah };
   };
 
-  //fetch Surahs, Ayah pages info, Pages info,languages,tranlation names
+  //fetch Surahs, Ayah pages info, Pages info,languages,translators.
   useEffect(() => {
     const loadInitial = async () => {
-      const [
-        { data: surahs },
-        { data: ayahs },
-        { data: pages },
-        { data: languages },
-        { data: languageNames },
-      ] = await Promise.all([
-        fetchSurahNames(),
-        fetchAyahPagesInfo(),
-        fetchPagesInfo(),
-        fetchLanguages(),
-        fetchTranslationNames(),
-      ]);
-      setSurahs(surahs.surahs);
-      setAyahPagesInfo(ayahs.ayah_page);
-      setPages(pages.pages);
-      setLanguages(languages.data);
-      setLanguageNames(languageNames.data);
+      try {
+        const [
+          { data: surahs },
+          { data: ayahs },
+          { data: pages },
+          { data: languages },
+          { data: traslators },
+        ] = await Promise.all([
+          fetchSurahNames(),
+          fetchAyahPagesInfo(),
+          fetchPagesInfo(),
+          fetchLanguages(),
+          fetchTranslatorNames(),
+        ]);
+        setSurahs(surahs.surahs);
+        setAyahPagesInfo(ayahs.ayah_page);
+        setPages(pages.pages);
+        setLanguages(languages.data);
+        setLangCateTranslators(traslators.data.language_category);
+        setAllTranslatorsSpec(traslators.data);
+      } catch (error) {
+        console.error('Failed to load initial data:', error);
+      }
     };
     loadInitial();
   }, []);
@@ -111,7 +125,7 @@ const useQuranData = (currentPage, showQuranByWords) => {
           endAyah
         );
         showQuranByWords ? setQuranByWordData(trimmed) : setQuranData(trimmed);
-        setSelectedSurah(surahs[startSurah]?.[0]);
+        setSelectedSurah(startSurah);
       } catch (e) {
         console.error('Fetch page error', e);
       }
@@ -155,17 +169,71 @@ const useQuranData = (currentPage, showQuranByWords) => {
     fetchTranslation();
   }, [currentPage, pages, showQuranByWords]);
 
+  //fetch translation by ayah
+  useEffect(() => {
+    if (!languages || !langCateTranslators) return;
+    setSelectedLangTranslators(langCateTranslators[language]);
+    if (!ayahTranslator) return;
+
+    const result = Object.entries(allTranslatorsSpec).find(
+      ([name]) => name === ayahTranslator
+    );
+
+    if (!result) {
+      console.warn(`Translator "${ayahTranslator}" not found in the data.`);
+      return;
+    }
+
+    const translationCode = Number(result[1].translation_code);
+    const pageRange = getPageRange(pages, currentPage, showQuranByWords);
+    if (!pageRange) return;
+    const { startSurah, startAyah, endSurah, endAyah } = pageRange;
+
+    const getTranslationByAyah = async () => {
+      try {
+        const { data } = await fetchTranslationAyahs({
+          translation_code: translationCode,
+          surah_number: startSurah,
+          ayah_number: startAyah,
+          per_page: 500,
+          page: 1,
+        });
+        const trimmed = trimQuranData(
+          data.data,
+          startSurah,
+          startAyah,
+          endSurah,
+          endAyah
+        );
+        setTranslationByAyah(trimmed);
+      } catch (err) {
+        console.error('Error fetching translation by ayah:', err);
+      }
+    };
+
+    getTranslationByAyah();
+  }, [
+    language,
+    langCateTranslators,
+    ayahTranslator,
+    languages,
+    allTranslatorsSpec,
+    selectedSurah,
+    currentPage,
+  ]);
+
   return {
     surahs,
     ayahPagesInfo,
     pages,
     languages,
-    languageNames,
     quranData,
     quranByWordData,
     translationH,
     selectedSurah,
     setSelectedSurah,
+    selectedLangTranslators,
+    translationByAyah,
   };
 };
 

@@ -36,6 +36,26 @@
   box-sizing: border-box;
 }
 
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #aaa transparent;
+}
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: #aaa;
+  border-radius: 10px;
+  border: 2px solid transparent;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #888;
+}
+
 html {
   font-size: 50%; /* 1rem = 8px */
   scroll-behavior: smooth;
@@ -166,7 +186,8 @@ button {
   cursor: pointer;
   border: none;
   border-radius: 0.4rem;
-  padding: 0.8rem 1.2rem;
+  padding: 0.2rem 0.8rem;
+  font-size: 1.2rem;
   background-color: #039855;
   color: #fff;
   transition: background-color 0.3s;
@@ -269,5 +290,10 @@ textarea:focus {
 }
 .quran__ayah-number-translation {
   font-size: 1.5rem;
+  color: #039855;
+}
+.quran__translation-ayah {
+  border-bottom: 1px solid lightgray;
+  font-size: 1.2rem;
   color: #039855;
 }
