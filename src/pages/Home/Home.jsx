@@ -16,6 +16,7 @@ const Home = () => {
   const [showTranslationList, setShowTranslationList] = useState(false);
   const [showTranslationByAyah, setShowTranslationByAyah] = useState(false);
   const [ayahTranslator, setAyahTranslator] = useState('');
+  const [rtlDirection, setRtlDirection] = useState(false);
 
   const [language, setLanguage] = useState('en');
 
@@ -42,22 +43,27 @@ const Home = () => {
         languages={languages}
         language={language}
         setLanguage={setLanguage}
+        setRtlDirection={setRtlDirection}
+        setShowQuranByWords={setShowQuranByWords}
+        setShowTranslationByAyah={setShowTranslationByAyah}
       />
       <div className="quran-page">
         <QuranHeader
           surahs={surahs}
           ayahPagesInfo={ayahPagesInfo}
           selectedSurah={selectedSurah}
-          showQuranByWords={showQuranByWords}
-          setShowQuranByWords={setShowQuranByWords}
+          setSelectedSurah={setSelectedSurah}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
-          setSelectedSurah={setSelectedSurah}
+          showQuranByWords={showQuranByWords}
+          setShowQuranByWords={setShowQuranByWords}
+          showTranslationByAyah={showTranslationByAyah}
+          setShowTranslationByAyah={setShowTranslationByAyah}
           showTranslationList={showTranslationList}
           setShowTranslationList={setShowTranslationList}
           selectedLangTranslators={selectedLangTranslators}
           setAyahTranslator={setAyahTranslator}
-          setShowTranslationByAyah={setShowTranslationByAyah}
+          language={language}
         />
 
         <div className="container quran-page__quran-txt">
@@ -67,6 +73,7 @@ const Home = () => {
               surahs={surahs}
               translationByAyah={translationByAyah}
               showTranslationByAyah={showTranslationByAyah}
+              rtlDirection={rtlDirection}
             />
           ) : (
             <QuranTxtByWord

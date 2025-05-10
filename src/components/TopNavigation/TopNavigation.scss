@@ -14,24 +14,29 @@
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   align-items: center;
-  justify-content: space-between;
+  justify-items: center;
   gap: 1rem;
+  &__menuLogoContainer {
+    justify-self: flex-start;
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    justify-content: center;
+  }
   &__menuIcn,
   &__userIcn,
   &__languageIcn {
     height: 1.6rem;
     cursor: pointer;
   }
-  &__language {
-    display: flex;
-    align-items: flex-end;
-    gap: 0.5rem;
-    cursor: pointer;
-  }
   &__logoIcn {
     justify-self: center;
-    height: 3rem;
+    height: 2.5rem;
     color: white;
+  }
+  &__quranIcon {
+    height: 3rem;
+    cursor: pointer;
   }
   &__langAndUser {
     width: 100%;
@@ -40,6 +45,12 @@
     align-items: center;
     justify-content: flex-end;
     gap: 3rem;
+  }
+  &__language {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    cursor: pointer;
   }
   &__languages-list {
     display: flex;

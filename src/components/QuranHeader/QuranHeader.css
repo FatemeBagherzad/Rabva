@@ -255,7 +255,6 @@ textarea:focus {
 }
 
 .quran-header {
-  direction: rtl;
   position: relative;
   height: 3rem;
   font-size: 1.3rem;
@@ -286,6 +285,7 @@ textarea:focus {
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 1rem;
   color: #027a48;
 }
 .quran-header__translate-options:hover {
@@ -308,7 +308,10 @@ textarea:focus {
 .quran-header__page-input {
   width: 5rem;
 }
-.quran-header__body {
+.quran-header__surahs, .quran-header__ayahs, .quran-header__tranlation-list {
+  direction: rtl;
+  display: flex;
+  flex-direction: column;
   background-color: rgb(255, 255, 255);
   color: #101828;
   width: 20rem;
@@ -321,11 +324,25 @@ textarea:focus {
   padding: 0 1rem;
 }
 .quran-header__surahs, .quran-header__ayahs {
-  display: flex;
-  flex-direction: column;
+  right: 1rem;
 }
-.quran-header__surah, .quran-header__ayah {
+@media (min-width: 768px) {
+  .quran-header__surahs, .quran-header__ayahs {
+    right: 2rem;
+  }
+}
+@media (min-width: 1024px) {
+  .quran-header__surahs, .quran-header__ayahs {
+    right: 2.5rem;
+  }
+}
+.quran-header__surah, .quran-header__ayah, .quran-header__translation {
   border-bottom: 1px solid #e4e7ec;
   padding: 0.7rem 0;
   cursor: pointer;
+}
+.quran-header__translation-language {
+  background-color: grey;
+  text-align: center;
+  padding: 0.2rem 0;
 }

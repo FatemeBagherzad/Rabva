@@ -7,6 +7,7 @@ const QuranTxt = ({
   surahs,
   translationByAyah,
   showTranslationByAyah,
+  rtlDirection,
 }) => {
   const pageAyahs = [];
   const translationLookup = {};
@@ -59,7 +60,11 @@ const QuranTxt = ({
             <span className="quran__ayah-number">
               ﴿‏{convertToPersianNumber(ayah[1])}‎﴾ {'\u00A0'}
               {showTranslationByAyah && (
-                <div className="quran__translation-ayah">
+                <div
+                  className={`quran__translation-ayah ${
+                    rtlDirection ? 'rtl' : 'ltr'
+                  }`}
+                >
                   {translationLookup[`${ayah[0]}-${ayah[1]}`]}
                   <span>{ayah[1]}</span>
                 </div>

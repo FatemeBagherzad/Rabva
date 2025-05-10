@@ -33,7 +33,7 @@ const useQuranData = (
   const [translationH, setTranslationH] = useState([]);
   const [translationByAyah, setTranslationByAyah] = useState([]);
 
-  const trimQuranData = (data, startSurah, startAyah, endSurah, endAyah) => {
+  const trimData = (data, startSurah, startAyah, endSurah, endAyah) => {
     const trimmed = {};
     for (let s = startSurah; s <= endSurah; s++) {
       const ayahs = data[s];
@@ -78,7 +78,7 @@ const useQuranData = (
           { data: ayahs },
           { data: pages },
           { data: languages },
-          { data: traslators },
+          { data: translators },
         ] = await Promise.all([
           fetchSurahNames(),
           fetchAyahPagesInfo(),
@@ -90,8 +90,8 @@ const useQuranData = (
         setAyahPagesInfo(ayahs.ayah_page);
         setPages(pages.pages);
         setLanguages(languages.data);
-        setLangCateTranslators(traslators.data.language_category);
-        setAllTranslatorsSpec(traslators.data);
+        setLangCateTranslators(translators.data.language_category);
+        setAllTranslatorsSpec(translators.data);
       } catch (error) {
         console.error('Failed to load initial data:', error);
       }
@@ -117,7 +117,7 @@ const useQuranData = (
           per_page: 500,
           page: 1,
         });
-        const trimmed = trimQuranData(
+        const trimmed = trimData(
           data.data,
           startSurah,
           startAyah,
@@ -153,7 +153,7 @@ const useQuranData = (
           per_page: 500,
           page: 1,
         });
-        const trimmed = trimQuranData(
+        const trimmed = trimData(
           data.data,
           startSurah,
           startAyah,
@@ -175,21 +175,19 @@ const useQuranData = (
     setSelectedLangTranslators(langCateTranslators[language]);
     if (!ayahTranslator) return;
 
-    const result = Object.entries(allTranslatorsSpec).find(
-      ([name]) => name === ayahTranslator
-    );
-
-    if (!result) {
+    const translatorSpec = allTranslatorsSpec[ayahTranslator];
+    if (!translatorSpec) {
       console.warn(`Translator "${ayahTranslator}" not found in the data.`);
       return;
     }
 
-    const translationCode = Number(result[1].translation_code);
+    const translationCode = Number(translatorSpec.translation_code);
     const pageRange = getPageRange(pages, currentPage, showQuranByWords);
     if (!pageRange) return;
+
     const { startSurah, startAyah, endSurah, endAyah } = pageRange;
 
-    const getTranslationByAyah = async () => {
+    const fetchTranslationByAyah = async () => {
       try {
         const { data } = await fetchTranslationAyahs({
           translation_code: translationCode,
@@ -198,7 +196,7 @@ const useQuranData = (
           per_page: 500,
           page: 1,
         });
-        const trimmed = trimQuranData(
+        const trimmed = trimData(
           data.data,
           startSurah,
           startAyah,
@@ -211,7 +209,7 @@ const useQuranData = (
       }
     };
 
-    getTranslationByAyah();
+    fetchTranslationByAyah();
   }, [
     language,
     langCateTranslators,

@@ -20,7 +20,10 @@ const QuranHeader = ({
   setShowTranslationList,
   selectedLangTranslators,
   setAyahTranslator,
+  showTranslationByAyah,
   setShowTranslationByAyah,
+  language,
+  
 }) => {
   const [showSurahList, setShowSurahList] = useState(false);
   const [showAyahList, setShowAyahList] = useState(false);
@@ -108,10 +111,14 @@ const QuranHeader = ({
   );
 
   const renderTranslationList = () => (
-    <div>
-      <span onClick={() => setShowQuranByWords((prev) => !prev)}>
+    <div className="quran-header__tranlation-list">
+      <span
+        className="quran-header__translation"
+        onClick={() => setShowQuranByWords((prev) => !prev)}
+      >
         word by word
       </span>
+      <span className="quran-header__translation-language">{language}</span>
       <ul>
         {selectedLangTranslators?.map((translator, index) => (
           <li
@@ -119,8 +126,10 @@ const QuranHeader = ({
             onClick={() => {
               setAyahTranslator(translator);
               setShowTranslationByAyah(true);
+              setShowTranslationList(false);
               setShowQuranByWords(false);
             }}
+            className="quran-header__translation"
           >
             {translator}
           </li>
@@ -133,17 +142,26 @@ const QuranHeader = ({
     <div className="quran-header__back">
       <div className="quran-header container" ref={containerRef}>
         <header className="quran-header__header">
-          <span onClick={() => toggleLists(!showSurahList, false)}>
-            {surahs[selectedSurah][0]}
+          <span
+            className={`quran-header__translate-options ${
+              showTranslationByAyah && showQuranByWords
+                ? 'quran-header__translate-options-on'
+                : ''
+            }`}
+            onClick={() => setShowTranslationList((prev) => !prev)}
+          >
+            ترجمه
           </span>
 
           <span className="quran-header__page-navigation">
-            <img
-              src={chevronRight}
-              alt="prev"
-              onClick={() => goToPage(currentPage - 1)}
-              className="quran-header__chevron"
-            />
+            {currentPage < 604 && (
+              <img
+                src={chevronLeft}
+                alt="next"
+                onClick={() => goToPage(currentPage + 1)}
+                className="quran-header__chevron"
+              />
+            )}
 
             {isEditingPage ? (
               <input
@@ -161,22 +179,18 @@ const QuranHeader = ({
                 {convertToPersianNumber(currentPage)}
               </span>
             )}
-
-            <img
-              src={chevronLeft}
-              alt="next"
-              onClick={() => goToPage(currentPage + 1)}
-              className="quran-header__chevron"
-            />
+            {currentPage > 1 && (
+              <img
+                src={chevronRight}
+                alt="prev"
+                onClick={() => goToPage(currentPage - 1)}
+                className="quran-header__chevron"
+              />
+            )}
           </span>
 
-          <span
-            className={`quran-header__translate-options ${
-              showQuranByWords ? 'quran-header__translate-options-on' : ''
-            }`}
-            onClick={() => setShowTranslationList((prev) => !prev)}
-          >
-            ترجمه
+          <span onClick={() => toggleLists(!showSurahList, false)}>
+            {surahs[selectedSurah][0]}
           </span>
         </header>
 

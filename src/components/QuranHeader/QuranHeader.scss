@@ -9,7 +9,6 @@
   border-bottom: 1px solid $logo-success-700;
 }
 .quran-header {
-  direction: rtl;
   position: relative;
   height: 3rem;
   font-size: 1.3rem;
@@ -38,6 +37,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 1rem;
     color: $logo-success-700;
     &:hover {
       background-color: lightgray;
@@ -64,7 +64,13 @@
   &__page-input {
     width: 5rem;
   }
-  &__body {
+
+  &__surahs,
+  &__ayahs,
+  &__tranlation-list {
+    direction: rtl;
+    display: flex;
+    flex-direction: column;
     background-color: rgb(255, 255, 255);
     color: $maintxt-playbar;
     width: 20rem;
@@ -78,13 +84,25 @@
   }
   &__surahs,
   &__ayahs {
-    display: flex;
-    flex-direction: column;
+    right: 1rem;
+    @include tablet {
+      right: 2rem;
+    }
+    @include desktop {
+      right: 2.5rem;
+    }
   }
   &__surah,
-  &__ayah {
+  &__ayah,
+  &__translation {
     border-bottom: 1px solid $player-border-grey-200;
     padding: 0.7rem 0;
     cursor: pointer;
+  }
+
+  &__translation-language {
+    background-color: grey;
+    text-align: center;
+    padding: 0.2rem 0;
   }
 }

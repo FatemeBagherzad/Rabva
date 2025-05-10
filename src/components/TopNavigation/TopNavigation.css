@@ -36,6 +36,26 @@
   box-sizing: border-box;
 }
 
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #aaa transparent;
+}
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: #aaa;
+  border-radius: 10px;
+  border: 2px solid transparent;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #888;
+}
+
 html {
   font-size: 50%; /* 1rem = 8px */
   scroll-behavior: smooth;
@@ -241,23 +261,28 @@ textarea:focus {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   align-items: center;
-  justify-content: space-between;
+  justify-items: center;
   gap: 1rem;
+}
+.topNav__menuLogoContainer {
+  justify-self: flex-start;
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  justify-content: center;
 }
 .topNav__menuIcn, .topNav__userIcn, .topNav__languageIcn {
   height: 1.6rem;
   cursor: pointer;
 }
-.topNav__language {
-  display: flex;
-  align-items: flex-end;
-  gap: 0.5rem;
-  cursor: pointer;
-}
 .topNav__logoIcn {
   justify-self: center;
-  height: 3rem;
+  height: 2.5rem;
   color: white;
+}
+.topNav__quranIcon {
+  height: 3rem;
+  cursor: pointer;
 }
 .topNav__langAndUser {
   width: 100%;
@@ -266,6 +291,12 @@ textarea:focus {
   align-items: center;
   justify-content: flex-end;
   gap: 3rem;
+}
+.topNav__language {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  cursor: pointer;
 }
 .topNav__languages-list {
   display: flex;
