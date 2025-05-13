@@ -16,6 +16,7 @@ const Home = () => {
   const [showTranslationByAyah, setShowTranslationByAyah] = useState(false);
   const [ayahTranslator, setAyahTranslator] = useState('');
   const [rtlDirection, setRtlDirection] = useState(false);
+  const [selectedAyah, setSelectedAyah] = useState(null);
 
   const [language, setLanguage] = useState('en');
 
@@ -63,6 +64,7 @@ const Home = () => {
           selectedLangTranslators={selectedLangTranslators}
           setAyahTranslator={setAyahTranslator}
           language={language}
+          setSelectedAyah={setSelectedAyah}
         />
 
         <div className="container quran-page__quran-txt">
@@ -73,6 +75,9 @@ const Home = () => {
               translationByAyah={translationByAyah}
               showTranslationByAyah={showTranslationByAyah}
               rtlDirection={rtlDirection}
+              selectedAyah={selectedAyah}
+              setSelectedAyah={setSelectedAyah}
+              language={language}
             />
           ) : (
             <QuranTxtByWord

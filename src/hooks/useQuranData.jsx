@@ -1,4 +1,3 @@
-// hooks/useQuranData.js
 import { useState, useEffect } from 'react';
 import {
   fetchQuran,
@@ -174,7 +173,7 @@ const useQuranData = (
     if (!languages || !langCateTranslators) return;
     setSelectedLangTranslators(langCateTranslators[language]);
     if (!ayahTranslator) return;
-
+    console.log(language);
     const translatorSpec = allTranslatorsSpec[ayahTranslator];
     if (!translatorSpec) {
       console.warn(`Translator "${ayahTranslator}" not found in the data.`);
@@ -203,6 +202,7 @@ const useQuranData = (
           endSurah,
           endAyah
         );
+        console.log(trimmed);
         setTranslationByAyah(trimmed);
       } catch (err) {
         console.error('Error fetching translation by ayah:', err);

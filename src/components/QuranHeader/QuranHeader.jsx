@@ -23,6 +23,7 @@ const QuranHeader = ({
   showTranslationByAyah,
   setShowTranslationByAyah,
   language,
+  setSelectedAyah,
 }) => {
   const [showSurahList, setShowSurahList] = useState(false);
   const [showAyahList, setShowAyahList] = useState(false);
@@ -73,6 +74,7 @@ const QuranHeader = ({
     if (page) {
       goToPage(Number(page));
       toggleLists(false, false);
+      setSelectedAyah({ surah: selectedSurah, ayah: ayah });
     }
   };
 

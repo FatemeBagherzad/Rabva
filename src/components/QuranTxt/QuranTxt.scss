@@ -16,6 +16,9 @@
     font-weight: 400;
     line-height: 2;
     display: inline;
+    &--selected {
+      background-color: $selected;
+    }
   }
   &__surah-name-container {
     position: relative;
