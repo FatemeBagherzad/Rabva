@@ -3,7 +3,6 @@ import useQuranData from '../../hooks/useQuranData';
 
 import TopNavigation from '../../components/TopNavigation/TopNavigation';
 import QuranHeader from '../../components/QuranHeader/QuranHeader';
-import TranslationList from '../../components/TranslationList/TranslationList';
 import QuranTxt from '../../components/QuranTxt/QuranTxt';
 import QuranTxtByWord from '../../components/QuranTxtByWord/QuranTxtByWord';
 import QuranPlayer from '../../components/QuranPlayer/QuranPlayer';

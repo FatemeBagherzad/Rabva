@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useOutsideClick } from '../../hooks/useOutsideClick';
+import MainMenu from '../MainMenu/MainMenu';
 
 import menuIcon from '../../assets/icons/menu.svg';
 import logoIcon from '../../assets/logo/logo-hefz-app-white.svg';
@@ -20,17 +21,30 @@ const TopNavigation = ({
 }) => {
   const containerRef = useOutsideClick(() => {
     setShowLanguagesList(false);
+    setShowMenu(false);
   });
   const navigate = useNavigate();
   const [showLanguagesList, setShowLanguagesList] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   const toggleLanguageShow = () => setShowLanguagesList((prev) => !prev);
+  const toggleMenuShow = () => setShowMenu((prev) => !prev);
 
   return (
     <div className="topNav__back">
       <div className="topNav container" ref={containerRef}>
         <div className="topNav__menuLogoContainer">
-          <img src={menuIcon} alt="menu icon" className="topNav__menuIcn" />
+          <img
+            src={menuIcon}
+            alt="menu icon"
+            className="icon"
+            onClick={() => toggleMenuShow()}
+          />
+          {showMenu && (
+            <span className="topNav__menu-container">
+              <MainMenu />
+            </span>
+          )}
           <img
             src={logoIcon}
             alt="hifdth logo"
@@ -56,22 +70,18 @@ const TopNavigation = ({
             className="topNav__language"
             onClick={() => toggleLanguageShow()}
           >
-            <img
-              src={languageIcon}
-              alt="user icon"
-              className="topNav__languageIcn"
-            />
+            <img src={languageIcon} alt="user icon" className="icon" />
             {language}
           </span>
-          <img src={userIcon} alt="user icon" className="topNav__userIcn" />
+          <img src={userIcon} alt="user icon" className="icon" />
         </div>
 
         {showLanguagesList && (
-          <ul className="topNav__languages-list">
+          <ul className="menu topNav__languages-list">
             {Object.entries(languages).map(([key, value]) => (
               <li
                 key={key}
-                className="topNav__languages-item"
+                className="menu__option"
                 onClick={() => {
                   setLanguage(key);
                   setShowLanguagesList(false);

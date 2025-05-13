@@ -39,6 +39,7 @@
     align-items: center;
     gap: 1rem;
     color: $logo-success-700;
+
     &:hover {
       background-color: lightgray;
     }
@@ -69,18 +70,8 @@
   &__ayahs,
   &__tranlation-list {
     direction: rtl;
-    display: flex;
-    flex-direction: column;
-    background-color: rgb(255, 255, 255);
-    color: $maintxt-playbar;
-    width: 20rem;
-    max-height: 50rem;
-    overflow-y: auto;
     position: absolute;
     top: 3.2rem;
-    z-index: 999;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    padding: 0 1rem;
   }
   &__surahs,
   &__ayahs {
@@ -92,13 +83,13 @@
       right: 2.5rem;
     }
   }
-  &__surah,
-  &__ayah,
-  &__translation {
-    border-bottom: 1px solid $player-border-grey-200;
-    padding: 0.7rem 0;
-    cursor: pointer;
-  }
+  // &__surah,
+  // &__ayah,
+  // &__translation {
+  //   border-bottom: 1px solid $player-border-grey-200;
+  //   padding: 0.7rem 0;
+  //   cursor: pointer;
+  // }
 
   &__translation-language {
     background-color: grey;

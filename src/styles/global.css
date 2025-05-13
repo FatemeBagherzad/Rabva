@@ -248,3 +248,28 @@ textarea:focus {
     padding-right: 2.5rem;
   }
 }
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  background-color: rgb(255, 255, 255);
+  color: #101828;
+  width: 20rem;
+  max-height: 50rem;
+  overflow-y: auto;
+  z-index: 9999;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 0 1rem;
+}
+.menu__option {
+  display: flex;
+  gap: 1rem;
+  border-bottom: 1px solid #e4e7ec;
+  padding: 0.7rem 0;
+  cursor: pointer;
+}
+
+.icon {
+  height: 1.6rem;
+  cursor: pointer;
+}

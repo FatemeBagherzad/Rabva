@@ -16,6 +16,7 @@
   align-items: center;
   justify-items: center;
   gap: 1rem;
+  z-index: 99;
   &__menuLogoContainer {
     justify-self: flex-start;
     display: flex;
@@ -23,12 +24,17 @@
     align-items: center;
     justify-content: center;
   }
-  &__menuIcn,
-  &__userIcn,
-  &__languageIcn {
-    height: 1.6rem;
-    cursor: pointer;
+  &__menu-container {
+    position: absolute;
+    top: 4.5rem;
+    left: 0;
   }
+  // &__menuIcn,
+  // &__userIcn,
+  // &__languageIcn {
+  //   height: 1.6rem;
+  //   cursor: pointer;
+  // }
   &__logoIcn {
     justify-self: center;
     height: 2.5rem;
@@ -53,24 +59,13 @@
     cursor: pointer;
   }
   &__languages-list {
-    display: flex;
-    flex-direction: column;
-    color: black;
-    background-color: rgb(255, 255, 255);
-    color: $maintxt-playbar;
-    width: 30rem;
-    max-height: 50rem;
-    overflow-y: scroll;
     position: absolute;
     top: 4.7rem;
     right: 0;
-    z-index: 999;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    padding: 0 2rem;
   }
-  &__languages-item {
-    border-bottom: 1px solid $player-border-grey-200;
-    padding: 1rem 0;
-    cursor: pointer;
-  }
+  // &__languages-item {
+  //   border-bottom: 1px solid $player-border-grey-200;
+  //   padding: 1rem 0;
+  //   cursor: pointer;
+  // }
 }

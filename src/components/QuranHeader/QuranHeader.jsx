@@ -23,7 +23,6 @@ const QuranHeader = ({
   showTranslationByAyah,
   setShowTranslationByAyah,
   language,
-  
 }) => {
   const [showSurahList, setShowSurahList] = useState(false);
   const [showAyahList, setShowAyahList] = useState(false);
@@ -83,12 +82,12 @@ const QuranHeader = ({
   };
 
   const renderSurahList = () => (
-    <ul className="quran-header__surahs">
+    <ul className="menu quran-header__surahs">
       {Object.entries(surahs).map(([id, [name]]) => (
         <li
           key={id}
           onClick={() => handleSurahClick(id, name)}
-          className="quran-header__surah"
+          className="menu__option"
         >
           {convertToPersianNumber(id)} - {name}
         </li>
@@ -97,12 +96,12 @@ const QuranHeader = ({
   );
 
   const renderAyahList = () => (
-    <ul className="quran-header__ayahs">
+    <ul className="menu quran-header__ayahs">
       {Array.from({ length: totalAyahs }, (_, i) => (
         <li
           key={i + 1}
           onClick={() => handleAyahClick(i + 1)}
-          className="quran-header__ayah"
+          className="menu__option "
         >
           {convertToPersianNumber(i + 1)}
         </li>
@@ -111,7 +110,7 @@ const QuranHeader = ({
   );
 
   const renderTranslationList = () => (
-    <div className="quran-header__tranlation-list">
+    <div className="menu quran-header__tranlation-list">
       <span
         className="quran-header__translation"
         onClick={() => setShowQuranByWords((prev) => !prev)}
@@ -129,7 +128,7 @@ const QuranHeader = ({
               setShowTranslationList(false);
               setShowQuranByWords(false);
             }}
-            className="quran-header__translation"
+            className="menu__option"
           >
             {translator}
           </li>
