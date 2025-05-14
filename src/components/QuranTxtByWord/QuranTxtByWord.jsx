@@ -4,11 +4,13 @@ import convertToPersianNumber from '../../utils/convertToPersianNumber';
 import '../QuranTxt/QuranTxt.scss';
 import './QuranTxtByWord.scss';
 
-const QuranTxtByWord = ({ quranData, translationH, surahs }) => {
-  const [activeSurah, setActiveSurah] = useState(null);
-  const [showEdit, setShowEdit] = useState(false);
-  const [editAnchorIndex, setEditAnchorIndex] = useState(null);
-  const [editedWordValue, setEditedWordValue] = useState('');
+const QuranTxtByWord = ({
+  quranData,
+  translationH,
+  surahs,
+  selectedAyah,
+  setSelectedAyah,
+}) => {
   const wordContainerRef = useRef();
 
   if (!quranData) return <div>Loading Quran data...</div>;
@@ -30,39 +32,12 @@ const QuranTxtByWord = ({ quranData, translationH, surahs }) => {
   const isFirstAyah = (arr) =>
     arr.find((item) => typeof item === 'number') === 1;
 
-  const editWord = (e, surahNumber, word) => {
-    setActiveSurah(surahNumber);
-    setShowEdit(true);
-    setEditedWordValue(word);
-    console.log(e, surahNumber, word);
-
-    const clickedTop = Math.round(e.currentTarget.getBoundingClientRect().top);
-    const allBlocks = Array.from(
-      wordContainerRef.current.querySelectorAll('.quran__word-block')
-    );
-
-    const lineBlocks = allBlocks.filter(
-      (el) => Math.round(el.getBoundingClientRect().top) === clickedTop
-    );
-
-    const lastInLine = lineBlocks[lineBlocks.length - 1];
-    const index = allBlocks.indexOf(lastInLine);
-    setEditAnchorIndex(index);
-  };
-
-  const handleEditSubmit = () => {
-    // Handle saving the edited word
-    console.log('Edited word:', editedWordValue);
-    setShowEdit(false);
-  };
   const renderWords = (content, surahNumber) => {
     let ayahNum = 0;
     let wordIndex = 0;
     let translateIndex = content.find((ayaNum) => typeof ayaNum === 'number');
-    let globalIndex = 0;
 
     return content.map((item, i) => {
-      const elements = [];
       if (typeof item === 'number') {
         ayahNum = item;
         translateIndex = ayahNum + 1;
@@ -80,15 +55,27 @@ const QuranTxtByWord = ({ quranData, translationH, surahs }) => {
           </span>
         );
       } else {
+        const currentAyahNum = ayahNum + 1;
         const translation =
           translationH?.[surahNumber]?.[translateIndex]?.[0]?.[wordIndex] ||
           '—';
+        const isSelected =
+          selectedAyah?.surah === parseInt(surahNumber) &&
+          selectedAyah?.ayah === currentAyahNum;
+
+        const handleClick = () => {
+          console.log(surahNumber, currentAyahNum);
+          setSelectedAyah({
+            surah: parseInt(surahNumber),
+            ayah: currentAyahNum,
+          });
+        };
 
         const element = (
           <span
             key={`word-${surahNumber}-${i}`}
-            className="quran__word-block"
-            // onClick={(e) => editWord(e, surahNumber)}
+            className={`quran__word-block ${isSelected ? 'selected' : ''}`}
+            onClick={handleClick}
           >
             <span className="quran__word">{item}</span>
             <span className="quran__translation-word">{translation}</span>
@@ -100,76 +87,6 @@ const QuranTxtByWord = ({ quranData, translationH, surahs }) => {
       }
     });
   };
-
-  // const renderWords = (content, surahNumber) => {
-  //   let ayahNum = 0;
-  //   let wordIndex = 0;
-  //   let translateIndex = content.find((ayaNum) => typeof ayaNum === 'number');
-  //   let globalIndex = 0;
-
-  //   return content.flatMap((item, i) => {
-  //     const elements = [];
-
-  //     if (typeof item === 'number') {
-  //       ayahNum = item;
-  //       translateIndex = ayahNum + 1;
-  //       wordIndex = 0;
-
-  //       const num = convertToPersianNumber(item);
-
-  //       const ayahElement = (
-  //         <span key={`ayah-${surahNumber}-${i}`} className="quran__word-block">
-  //           <span className="quran__ayah-number">﴿‏{num}‎﴾</span>
-  //           <span className="quran__ayah-number quran__ayah-number-translation">
-  //             {num}
-  //           </span>
-  //         </span>
-  //       );
-
-  //       elements.push(ayahElement);
-  //     } else {
-  //       const translation =
-  //         translationH?.[surahNumber]?.[translateIndex]?.[0]?.[wordIndex] ||
-  //         '—';
-
-  //       const wordElement = (
-  //         <span
-  //           key={`word-${surahNumber}-${i}`}
-  //           className="quran__word-block"
-  //           onClick={(e) => editWord(e, surahNumber, item)}
-  //         >
-  //           <span className="quran__word">{item}</span>
-  //           <span className="quran__translation">{translation}</span>
-  //         </span>
-  //       );
-
-  //       elements.push(wordElement);
-
-  //       if (surahNumber === activeSurah && globalIndex === editAnchorIndex) {
-  //         elements.push(
-  //           <span key={`edit-box-${surahNumber}-${i}`} className="edit-box">
-  //             {showEdit && (
-  //               <div className="quran__edit-container">
-  //                 <input
-  //                   placeholder="Edit something..."
-  //                   value={editedWordValue}
-  //                   onChange={(e) => setEditedWordValue(e.target.value)}
-  //                 />
-  //                 <button onClick={handleEditSubmit}>Save</button>
-  //                 <button onClick={() => setShowEdit(false)}>Cancel</button>
-  //               </div>
-  //             )}
-  //           </span>
-  //         );
-  //       }
-
-  //       wordIndex++;
-  //       globalIndex++;
-  //     }
-
-  //     return elements;
-  //   });
-  // };
 
   //for justify content to find the first and last in each row
   useEffect(() => {

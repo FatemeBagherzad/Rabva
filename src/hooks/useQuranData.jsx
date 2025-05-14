@@ -173,7 +173,7 @@ const useQuranData = (
     if (!languages || !langCateTranslators) return;
     setSelectedLangTranslators(langCateTranslators[language]);
     if (!ayahTranslator) return;
-    console.log(language);
+
     const translatorSpec = allTranslatorsSpec[ayahTranslator];
     if (!translatorSpec) {
       console.warn(`Translator "${ayahTranslator}" not found in the data.`);

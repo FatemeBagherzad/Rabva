@@ -32,8 +32,6 @@ const QuranTxt = ({
   if (showTranslationByAyah && !translationByAyah)
     return <p>در حال بارگزاری ...</p>;
 
-  console.log(translationLookup);
-
   return (
     <div className="quran">
       <div className="quran__ayahs">
@@ -64,7 +62,7 @@ const QuranTxt = ({
                   </div>
                 )}
               <span
-                className={`${isSelected ? 'quran__ayah--selected' : ''}`}
+                className={`${isSelected ? 'selected' : ''}`}
                 onClick={() =>
                   setSelectedAyah({ surah: ayah[0], ayah: ayah[1] })
                 }

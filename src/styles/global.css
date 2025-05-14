@@ -273,3 +273,7 @@ textarea:focus {
   height: 1.6rem;
   cursor: pointer;
 }
+
+.selected {
+  background-color: #c4ecbd;
+}

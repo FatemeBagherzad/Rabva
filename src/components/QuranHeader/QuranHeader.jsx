@@ -24,6 +24,7 @@ const QuranHeader = ({
   setShowTranslationByAyah,
   language,
   setSelectedAyah,
+  rtlDirection,
 }) => {
   const [showSurahList, setShowSurahList] = useState(false);
   const [showAyahList, setShowAyahList] = useState(false);
@@ -120,7 +121,7 @@ const QuranHeader = ({
         word by word
       </span>
       <span className="quran-header__translation-language">{language}</span>
-      <ul>
+      <ul className={` ${rtlDirection ? 'rtl' : 'ltr'}`}>
         {selectedLangTranslators?.map((translator, index) => (
           <li
             key={index}
