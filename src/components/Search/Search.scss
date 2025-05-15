@@ -1,0 +1,24 @@
+@use '../../styles/partials/variables' as *;
+@use '../../styles/partials/typography' as *;
+@use '../../styles/partials/mixins' as *;
+@use '../../styles/global.scss' as *;
+
+.search {
+  position: absolute;
+  top: 4.5rem;
+  right: 0;
+  color: $header-quran-txt-grey-900;
+  background-color: $backgroundbody-btntxt;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+  border-radius: 0.4rem;
+  z-index: 9999;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+  &__options {
+    display: flex;
+    flex-direction: column;
+  }
+}

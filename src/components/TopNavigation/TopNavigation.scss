@@ -38,12 +38,13 @@
   &__logoIcn {
     justify-self: center;
     height: 2.5rem;
-    color: white;
+    color: $backgroundbody-btntxt;
   }
   &__quranIcon {
     height: 3rem;
     cursor: pointer;
   }
+
   &__langAndUser {
     width: 100%;
     display: flex;

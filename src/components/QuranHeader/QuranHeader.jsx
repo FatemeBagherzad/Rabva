@@ -144,15 +144,8 @@ const QuranHeader = ({
     <div className="quran-header__back">
       <div className="quran-header container" ref={containerRef}>
         <header className="quran-header__header">
-          <span
-            className={`quran-header__translate-options ${
-              showTranslationByAyah && showQuranByWords
-                ? 'quran-header__translate-options-on'
-                : ''
-            }`}
-            onClick={() => setShowTranslationList((prev) => !prev)}
-          >
-            ترجمه
+          <span onClick={() => toggleLists(!showSurahList, false)}>
+            {surahs[selectedSurah][0]}
           </span>
 
           <span className="quran-header__page-navigation">
@@ -190,9 +183,15 @@ const QuranHeader = ({
               />
             )}
           </span>
-
-          <span onClick={() => toggleLists(!showSurahList, false)}>
-            {surahs[selectedSurah][0]}
+          <span
+            className={`quran-header__translate-options ${
+              showTranslationByAyah && showQuranByWords
+                ? 'quran-header__translate-options-on'
+                : ''
+            }`}
+            onClick={() => setShowTranslationList((prev) => !prev)}
+          >
+            ترجمه
           </span>
         </header>
 

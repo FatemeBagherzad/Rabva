@@ -274,6 +274,10 @@ textarea:focus {
   cursor: pointer;
 }
 
+.selected {
+  background-color: #c4ecbd;
+}
+
 .quran-header__back {
   width: 100vw;
   border-bottom: 1px solid #027a48;
@@ -338,16 +342,16 @@ textarea:focus {
   position: absolute;
   top: 3.2rem;
 }
-.quran-header__surahs, .quran-header__ayahs {
+.quran-header__tranlation-list {
   right: 1rem;
 }
 @media (min-width: 768px) {
-  .quran-header__surahs, .quran-header__ayahs {
+  .quran-header__tranlation-list {
     right: 2rem;
   }
 }
 @media (min-width: 1024px) {
-  .quran-header__surahs, .quran-header__ayahs {
+  .quran-header__tranlation-list {
     right: 2.5rem;
   }
 }
