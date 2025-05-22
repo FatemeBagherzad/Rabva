@@ -202,7 +202,7 @@ const useQuranData = (
           endSurah,
           endAyah
         );
-        console.log(trimmed);
+
         setTranslationByAyah(trimmed);
       } catch (err) {
         console.error('Error fetching translation by ayah:', err);

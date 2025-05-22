@@ -1,66 +1,189 @@
 import { useState } from 'react';
 import './Search.scss';
 
-const Search = ({ surahs }) => {
-  const [surahNumber, setSurahNumber] = useState('');
-  const totalAyahs =
-    surahNumber && surahs[surahNumber] ? surahs[surahNumber][1] : null;
+const Search = ({ setShowSearchInput }) => {
+  const [inputRoot, setInputRoot] = useState('');
+  const [isInputError, setIsInputError] = useState(false);
 
-  const handleSurahSelect = (e) => {
-    const selected = e.target.value;
-    setSurahNumber(selected);
+  const handleRootInputSubmit = (e) => {
+    console.log(e);
   };
 
-  const handleSurahNumberChange = (e) => {
-    const input = e.target.value;
-    // Only allow numbers between 1 and 114
-    if (!input || (Number(input) >= 1 && Number(input) <= 114)) {
-      setSurahNumber(input);
-    }
-  };
-
+  const root = [
+    'آدم',
+    'آزر',
+    'ا',
+    'أبابيل',
+    'ابب',
+    'ابد',
+    'ابراهيم',
+    'ابريق',
+    'ابق',
+    'ابل',
+    'إبليس',
+    'ابو',
+    'ابى',
+    'اتى',
+    'اثث',
+    'اثر',
+    'اثل',
+    'اثم',
+    'اجج',
+    'اجر',
+    'اجل',
+    'احد',
+    'احزاب',
+    'احقاف',
+    'احمد',
+    'اخذ',
+    'اخر',
+    'اخو',
+    'ادد',
+    'ادريس',
+    'ادى',
+    'اذ',
+    'اذا',
+    'اذن',
+    'اذى',
+    'ارب',
+    'ارث',
+    'ارض',
+    'ارك',
+    'ارم',
+    'ازر',
+    'ازز',
+    'ازف',
+    'اسباط',
+    'استبرق',
+    'اسحاق',
+    'اسر',
+    'اسرائيل',
+    'اسس',
+    'اسف',
+    'اسلام',
+    'اسماعيل',
+    'اسن',
+    'اسو',
+    'اسى',
+    'اشر',
+    'اصر',
+    'اصل',
+    'أعراف',
+    'افف',
+    'افق',
+    'افك',
+    'افل',
+    'اقصو',
+    'اكل',
+    'الا',
+    'التى',
+    'الذان',
+    'الذى',
+    'الذين',
+    'الف',
+    'الك',
+    'اللاتى',
+    'اللائى',
+    'الل',
+    'الله',
+    'الم',
+    'اله',
+    'الو',
+    'الى',
+    'الياس',
+    'الياسين',
+    'ياسين',
+    'اليسع',
+    'ام',
+    'اما',
+    'أما',
+    'امت',
+    'امد',
+    'امر',
+    'امس',
+    'امل',
+    'امم',
+    'امن',
+    'امو',
+    'ان',
+    'انا',
+    'انت',
+    'انتم',
+    'انتما',
+    'انث',
+    'انجيل',
+    'انس',
+    'انف',
+    'انم',
+    'انن',
+    'اننى',
+    'انى',
+    'اهل',
+    'او',
+    'اوب',
+    'اود',
+    'اولاء',
+    'اول',
+    'اولى',
+    'اون',
+    'اوه',
+    'اوى',
+    'اى',
+    'اياك',
+    'اياكم',
+    'ايان',
+    'ايانا',
+    'اياه',
+    'اياهم',
+    'اياى',
+    'ايد',
+  ];
   return (
     <div className="search">
-      <label className="search__options">
-        Surah Name:
-        <select value={surahNumber} onChange={handleSurahSelect}>
-          <option value="">-- Select Surah --</option>
-          {Object.entries(surahs).map(([number, [name]]) => (
-            <option key={number} value={number}>
-              {name}
-            </option>
-          ))}
-        </select>
-      </label>
+      <input
+        type="text"
+        value={inputRoot}
+        onChange={(e) => setInputRoot(e.target.value)}
+        onKeyDown={handleRootInputSubmit}
+        onBlur={() => setShowSearchInput(false)}
+        className={`${isInputError ? 'inputErrorStyle' : ''}`}
+      />
 
-      <label className="search__options">
-        Surah Number:
-        <input
-          type="number"
-          placeholder="Select from 1 to 114"
-          value={surahNumber}
-          onChange={handleSurahNumberChange}
-        />
-      </label>
-
-      <label className="search__options">
-        Ayah Number:
-        <input
-          type="number"
-          placeholder={
-            totalAyahs
-              ? `Select between 1 and ${totalAyahs}`
-              : 'Select a surah first'
-          }
-        />
-      </label>
-
-      <label className="search__options">
-        Root:
-        <input />
-      </label>
-
-      <button>find it!</button>
+      <div className="search__options">
+        <div className="search__letter-group">
+          <span>ا</span>
+          <span>ب</span>
+          <span>ت</span>
+          <span>ث</span>
+          <span>ج</span>
+          <span>ح</span>
+          <span>خ</span>
+          <span>د</span>
+          <span>ذ</span>
+          <span>ر</span>
+          <span>ز</span>
+          <span>س</span>
+          <span>ش</span>
+          <span>ص</span>
+        </div>
+        <div className="search__letter-group">
+          <span>ض</span>
+          <span>ط</span>
+          <span>ظ</span>
+          <span>ع</span>
+          <span>غ</span>
+          <span>ف</span>
+          <span>ق</span>
+          <span>ک</span>
+          <span>گ</span>
+          <span>ل</span>
+          <span>م</span>
+          <span>ن</span>
+          <span>و</span>
+          <span>ه</span>
+          <span>ی</span>
+        </div>
+      </div>
     </div>
   );
 };

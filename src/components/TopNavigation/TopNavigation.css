@@ -208,7 +208,8 @@ img {
 }
 
 input,
-textarea {
+textarea,
+option {
   font-family: inherit;
   font-size: 1.2rem;
   padding: 0.2rem;
@@ -217,7 +218,8 @@ textarea {
   outline: none;
 }
 input:focus,
-textarea:focus {
+textarea:focus,
+option:focus {
   border-color: #667085;
 }
 
@@ -288,7 +290,7 @@ textarea:focus {
   width: 100%;
   height: 4.5rem;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 2fr;
   align-items: center;
   justify-items: center;
   gap: 1rem;
@@ -308,20 +310,26 @@ textarea:focus {
 }
 .topNav__logoIcn {
   justify-self: center;
-  height: 2.5rem;
+  font-size: 2rem;
+  font-weight: 900;
+  font-family: monospace;
   color: #fff;
 }
 .topNav__quranIcon {
   height: 3rem;
   cursor: pointer;
 }
-.topNav__langAndUser {
+.topNav__lang-search-User {
   width: 100%;
   display: flex;
   justify-items: center;
   align-items: center;
   justify-content: flex-end;
   gap: 3rem;
+}
+.topNav__search-container {
+  display: flex;
+  gap: 1rem;
 }
 .topNav__language {
   display: flex;

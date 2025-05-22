@@ -22,9 +22,6 @@
     height: 3rem;
     background-color: $setting-aya-background;
     width: 100%;
-    @include tablet {
-      grid-template-columns: 1fr 1fr 1fr;
-    }
   }
   &__header span {
     cursor: pointer;

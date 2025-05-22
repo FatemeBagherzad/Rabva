@@ -4,6 +4,7 @@ import { useOutsideClick } from '../../hooks/useOutsideClick';
 
 import chevronLeft from '../../assets/icons/chevron-left.svg';
 import chevronRight from '../../assets/icons/chevron-right.svg';
+import searchIcon from '../../assets/icons/search.svg';
 
 import './QuranHeader.scss';
 
@@ -32,6 +33,7 @@ const QuranHeader = ({
   const [isEditingPage, setIsEditingPage] = useState(false);
   const [isInputError, setIsInputError] = useState(false);
   const [totalAyahs, setTotalAyahs] = useState(7);
+  const [showSearchBox, setShowSearchBox] = useState(false);
 
   const containerRef = useOutsideClick(() => {
     setShowAyahList(false);
@@ -83,6 +85,7 @@ const QuranHeader = ({
     setShowSurahList(surah);
     setShowAyahList(ayah);
   };
+  const toggleSearch = () => setShowSearchBox((prev) => !prev);
 
   const renderSurahList = () => (
     <ul className="menu quran-header__surahs">
@@ -183,6 +186,7 @@ const QuranHeader = ({
               />
             )}
           </span>
+
           <span
             className={`quran-header__translate-options ${
               showTranslationByAyah && showQuranByWords

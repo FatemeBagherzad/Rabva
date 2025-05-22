@@ -208,7 +208,8 @@ img {
 }
 
 input,
-textarea {
+textarea,
+option {
   font-family: inherit;
   font-size: 1.2rem;
   padding: 0.2rem;
@@ -217,7 +218,8 @@ textarea {
   outline: none;
 }
 input:focus,
-textarea:focus {
+textarea:focus,
+option:focus {
   border-color: #667085;
 }
 
@@ -279,20 +281,30 @@ textarea:focus {
 }
 
 .search {
-  position: absolute;
-  top: 4.5rem;
-  right: 0;
+  display: flex;
+  position: relative;
+}
+.search__options {
   color: #101828;
   background-color: #fff;
+  width: 22rem;
+  position: absolute;
+  top: 3.5rem;
+  right: -2rem;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  padding: 2rem;
+  gap: 1rem;
+  padding: 1rem 5rem;
   border-radius: 0.4rem;
   z-index: 9999;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
-.search__options {
+.search__letter-group {
   display: flex;
-  flex-direction: column;
+  gap: 0.5rem;
+  direction: rtl;
+  justify-content: center;
+}
+.search__letter-group span {
+  cursor: pointer;
 }

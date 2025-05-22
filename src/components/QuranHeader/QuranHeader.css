@@ -208,7 +208,8 @@ img {
 }
 
 input,
-textarea {
+textarea,
+option {
   font-family: inherit;
   font-size: 1.2rem;
   padding: 0.2rem;
@@ -217,7 +218,8 @@ textarea {
   outline: none;
 }
 input:focus,
-textarea:focus {
+textarea:focus,
+option:focus {
   border-color: #667085;
 }
 
@@ -298,11 +300,6 @@ textarea:focus {
   height: 3rem;
   background-color: #f9fafb;
   width: 100%;
-}
-@media (min-width: 768px) {
-  .quran-header__header {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
 }
 .quran-header__header span {
   cursor: pointer;

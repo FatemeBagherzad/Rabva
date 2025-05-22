@@ -46,7 +46,6 @@ const Home = () => {
         setRtlDirection={setRtlDirection}
         setShowQuranByWords={setShowQuranByWords}
         setShowTranslationByAyah={setShowTranslationByAyah}
-        surahs={surahs}
       />
       <div className="quran-page">
         <QuranHeader

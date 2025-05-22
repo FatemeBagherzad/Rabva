@@ -15,7 +15,6 @@ import searchIcon from '../../assets/icons/search.svg';
 import './TopNavigation.scss';
 
 const TopNavigation = ({
-  surahs,
   languages,
   language,
   setLanguage,
@@ -26,16 +25,16 @@ const TopNavigation = ({
   const containerRef = useOutsideClick(() => {
     setShowLanguagesList(false);
     setShowMenu(false);
-    setShowSearchBox(false);
+    setShowSearchInput(false);
   });
   const navigate = useNavigate();
   const [showLanguagesList, setShowLanguagesList] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-  const [showSearchBox, setShowSearchBox] = useState(false);
+  const [showSearchInput, setShowSearchInput] = useState(false);
 
   const toggleLanguageShow = () => setShowLanguagesList((prev) => !prev);
   const toggleMenuShow = () => setShowMenu((prev) => !prev);
-  const toggleSearch = () => setShowSearchBox((prev) => !prev);
+  const toggleSearch = () => setShowSearchInput((prev) => !prev);
 
   return (
     <div className="topNav__back">
@@ -52,14 +51,22 @@ const TopNavigation = ({
               <MainMenu />
             </span>
           )}
-          <img
+          {/* <img
             src={logoIcon}
             alt="hifdth logo"
             className="topNav__logoIcn"
             onClick={() => {
               navigate('/');
             }}
-          />
+          /> */}
+          <span
+            className="topNav__logoIcn"
+            onClick={() => {
+              navigate('/');
+            }}
+          >
+            Rabva
+          </span>
         </div>
 
         <img
@@ -72,15 +79,17 @@ const TopNavigation = ({
           }}
         />
 
-        <div className="topNav__langAndUser">
-          <span>
+        <div className="topNav__lang-search-User">
+          <span className="topNav__search-container">
             <img
               src={searchIcon}
               className="icon"
               alt="search icon"
               onClick={() => toggleSearch()}
             />
-            {showSearchBox && <Search surahs={surahs} />}
+            {showSearchInput && (
+              <Search setShowSearchInput={setShowSearchInput} />
+            )}
           </span>
 
           <span
