@@ -257,7 +257,7 @@ option:focus {
   background-color: rgb(255, 255, 255);
   color: #101828;
   width: 20rem;
-  max-height: 50rem;
+  max-height: 30rem;
   overflow-y: auto;
   z-index: 9999;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -283,6 +283,7 @@ option:focus {
 .quran-header__back {
   width: 100vw;
   border-bottom: 1px solid #027a48;
+  margin-top: 4.5rem;
 }
 
 .quran-header {

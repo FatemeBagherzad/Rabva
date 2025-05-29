@@ -257,7 +257,7 @@ option:focus {
   background-color: rgb(255, 255, 255);
   color: #101828;
   width: 20rem;
-  max-height: 50rem;
+  max-height: 30rem;
   overflow-y: auto;
   z-index: 9999;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -284,27 +284,56 @@ option:focus {
   display: flex;
   position: relative;
 }
-.search__options {
+.search input {
+  direction: rtl;
+}
+.search__letters {
   color: #101828;
   background-color: #fff;
-  width: 22rem;
+  width: 20rem;
   position: absolute;
   top: 3.5rem;
   right: -2rem;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 1rem;
-  padding: 1rem 5rem;
-  border-radius: 0.4rem;
+  padding: 1rem;
+  border-radius: 0.3rem;
   z-index: 9999;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-.search__letter-group {
   display: flex;
   gap: 0.5rem;
   direction: rtl;
   justify-content: center;
 }
-.search__letter-group span {
+.search__letters span {
   cursor: pointer;
+}
+.search__suggestions {
+  direction: rtl;
+  color: #101828;
+  background-color: #fff;
+  border-right: 2px solid red;
+  position: absolute;
+  width: 10rem;
+  top: 3.5rem;
+  right: 19rem;
+  max-height: 20rem;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  z-index: 9999;
+  padding: 0.5rem;
+  border-radius: 0.4rem;
+  overflow-y: auto;
+}
+.search__suggestions li {
+  padding: 0.5rem;
+  background-color: #f1f1f1;
+  border-radius: 0.3rem;
+  cursor: pointer;
+}
+.search__suggestions li:hover {
+  background-color: #e3e2e2;
 }

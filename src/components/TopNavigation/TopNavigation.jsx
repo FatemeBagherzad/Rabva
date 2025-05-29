@@ -21,6 +21,9 @@ const TopNavigation = ({
   setRtlDirection,
   setShowQuranByWords,
   setShowTranslationByAyah,
+  setShowSearchRes,
+  setShowQuran,
+  setSelectedRoot,
 }) => {
   const containerRef = useOutsideClick(() => {
     setShowLanguagesList(false);
@@ -74,8 +77,10 @@ const TopNavigation = ({
           alt="holy book icon"
           className="topNav__quranIcon"
           onClick={() => {
+            setShowQuran(true);
             setShowQuranByWords(false);
             setShowTranslationByAyah(false);
+            setShowSearchRes(false);
           }}
         />
 
@@ -88,7 +93,12 @@ const TopNavigation = ({
               onClick={() => toggleSearch()}
             />
             {showSearchInput && (
-              <Search setShowSearchInput={setShowSearchInput} />
+              <Search
+                setShowSearchInput={setShowSearchInput}
+                setShowSearchRes={setShowSearchRes}
+                setShowQuran={setShowQuran}
+                setSelectedRoot={setSelectedRoot}
+              />
             )}
           </span>
 

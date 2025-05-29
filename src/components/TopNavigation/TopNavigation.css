@@ -283,6 +283,11 @@ option:focus {
 .topNav__back {
   background-color: #027a48;
   color: white;
+  height: 4.5rem;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  z-index: 9999;
 }
 
 .topNav {

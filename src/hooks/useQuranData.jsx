@@ -5,7 +5,7 @@ import {
   fetchPagesInfo,
   fetchAyahPagesInfo,
 } from '../services/mainService';
-import { fetchQuranWordByWord } from '../services/wordService';
+import { fetchQuranWordByWord, fetchAyahByRoot } from '../services/wordService';
 import {
   fetchLanguages,
   fetchTranslatorNames,
@@ -17,7 +17,8 @@ const useQuranData = (
   currentPage,
   showQuranByWords,
   language,
-  ayahTranslator
+  ayahTranslator,
+  root
 ) => {
   const [surahs, setSurahs] = useState([]);
   const [ayahPagesInfo, setAyahPagesInfo] = useState([]);
@@ -31,6 +32,7 @@ const useQuranData = (
   const [selectedSurah, setSelectedSurah] = useState('');
   const [translationH, setTranslationH] = useState([]);
   const [translationByAyah, setTranslationByAyah] = useState([]);
+  const [ayahByRoot, setAyahByRoot] = useState([]);
 
   const trimData = (data, startSurah, startAyah, endSurah, endAyah) => {
     const trimmed = {};
@@ -220,6 +222,58 @@ const useQuranData = (
     currentPage,
   ]);
 
+  useEffect(() => {
+    if (!root) return;
+
+    let isCancelled = false;
+
+    const loadFirstPage = async () => {
+      try {
+        const perPage = 100;
+        const firstPage = 1;
+
+        const { data } = await fetchAyahByRoot({
+          root,
+          per_page: perPage,
+          page: firstPage,
+        });
+
+        if (!data?.data) return;
+
+        // Set first page
+        setAyahByRoot(data.data);
+
+        const totalPages = data.pagination?.total_pages || 1;
+
+        // Load remaining pages in background
+        for (let page = 2; page <= totalPages; page++) {
+          if (isCancelled) break;
+
+          const { data: nextPageData } = await fetchAyahByRoot({
+            root,
+            per_page: perPage,
+            page,
+          });
+
+          if (!nextPageData?.data) break;
+
+          setAyahByRoot((prev) => [...prev, ...nextPageData.data]);
+
+          // Optional: slow it down a bit to avoid hammering the server
+          await new Promise((res) => setTimeout(res, 100));
+        }
+      } catch (error) {
+        console.error('Failed to progressively fetch ayahs by root:', error);
+      }
+    };
+
+    loadFirstPage();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [root]);
+
   return {
     surahs,
     ayahPagesInfo,
@@ -232,6 +286,7 @@ const useQuranData = (
     setSelectedSurah,
     selectedLangTranslators,
     translationByAyah,
+    ayahByRoot,
   };
 };
 

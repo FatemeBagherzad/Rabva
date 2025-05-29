@@ -1,0 +1,57 @@
+@use '../../styles/partials/variables' as *;
+@use '../../styles/partials/typography' as *;
+@use '../../styles/partials/mixins' as *;
+@use '../../styles/global.scss' as *;
+
+.search-page {
+  direction: rtl;
+  margin-top: 8rem;
+  & h4 {
+    text-align: center;
+    background-color: $input-border;
+  }
+}
+.search-group {
+  padding: 1rem 0;
+  // border-bottom: 1px solid grey;
+  & h5 {
+    background-color: $selected;
+  }
+  &__withSourahName {
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: 1fr 11fr;
+    align-items: center;
+    border-bottom: 1px solid grey;
+  }
+}
+.search-res-container {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.search-res {
+  display: flex;
+  overflow-x: auto;
+  // scroll-snap-type: x mandatory;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  &__ayah {
+    flex: 0 0 auto;
+    padding: 0.5rem;
+
+    // scroll-snap-align: center;
+  }
+  &__main {
+    background-color: $checkbox-btnhover-success-50;
+    border: 2px solid $buttonbck-success-600;
+  }
+}
+
+.highlighted {
+  background-color: $warning-500;
+  font-weight: bold;
+}

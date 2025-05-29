@@ -1,14 +1,47 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './Search.scss';
 
-const Search = ({ setShowSearchInput }) => {
+const Search = ({
+  setShowSearchInput,
+  setShowSearchRes,
+  setShowQuran,
+  setSelectedRoot,
+}) => {
   const [inputRoot, setInputRoot] = useState('');
   const [isInputError, setIsInputError] = useState(false);
+  const [filteredRoots, setFilteredRoots] = useState([]);
 
-  const handleRootInputSubmit = (e) => {
-    console.log(e);
-  };
-
+  const letters = [
+    'ا',
+    'ب',
+    'ت',
+    'ث',
+    'ج',
+    'ح',
+    'خ',
+    'د',
+    'ذ',
+    'ر',
+    'ز',
+    'س',
+    'ش',
+    'ص',
+    'ض',
+    'ط',
+    'ظ',
+    'ع',
+    'غ',
+    'ف',
+    'ق',
+    'ک',
+    'گ',
+    'ل',
+    'م',
+    'ن',
+    'و',
+    'ه',
+    'ی',
+  ];
   const root = [
     'آدم',
     'آزر',
@@ -137,53 +170,155 @@ const Search = ({ setShowSearchInput }) => {
     'اياهم',
     'اياى',
     'ايد',
+    'ايكه',
+    'ايم',
+    'اين',
+    'ايوب',
+    'ائى',
+    'ايى',
+    'ب',
+    'بابل',
+    'بتر',
+    'امن',
+    'اكل',
+    'اتي',
+    'اخذ',
+    'امر',
+    'اذن',
+    'بدء',
+    'بسم',
+    'بلغ',
+    'بشر',
+    'بعث',
+    'بصر',
+    'بين',
+    'ترك',
+    'توب',
+    'جعل',
+    'جمع',
+    'جنن',
+    'حمد',
+    'حبب',
+    'حدث',
+    'حدي',
+    'حفظ',
+    'حسب',
+    'حكم',
+    'خرج',
+    'خلق',
+    'خوف',
+    'دخل',
+    'ذكر',
+    'رزق',
+    'رسل',
+    'سجد',
+    'سلم',
+    'سمع',
+    'شهد',
+    'صبر',
+    'صدق',
+    'صرف',
+    'صلو',
+    'ضرب',
+    'طهر',
+    'علم',
+    'عبد',
+    'عقل',
+    'غفر',
+    'قتل',
+    'قول',
+    'كتب',
+    'كفر',
+    'ملك',
+    'نجو',
+    'نصر',
+    'نظر',
+    'نزل',
+    'هدي',
+    'وعد',
+    'وضع',
+    'وكل',
+    'ولي',
+    'يسر',
+    'يوم',
   ];
+
+  // Update filtered roots based on input
+  useEffect(() => {
+    const searchTerm = inputRoot.trim();
+    if (searchTerm === '') {
+      setFilteredRoots([]);
+    } else {
+      const filtered = root.filter((word) => word.startsWith(searchTerm));
+      setFilteredRoots(filtered);
+    }
+  }, [inputRoot]);
+
+  const handleLetterClick = (letter) => {
+    setInputRoot((prev) => prev + letter);
+  };
+
+  const handleChange = (e) => {
+    setInputRoot(e.target.value);
+  };
+  const handleRootClick = (word) => {
+    setSelectedRoot(word);
+    console.log(word);
+    setShowQuran(false);
+    setShowSearchRes(true);
+    setShowSearchInput(false);
+  };
+
   return (
     <div className="search">
       <input
         type="text"
         value={inputRoot}
-        onChange={(e) => setInputRoot(e.target.value)}
-        onKeyDown={handleRootInputSubmit}
+        onChange={handleChange}
         onBlur={() => setShowSearchInput(false)}
         className={`${isInputError ? 'inputErrorStyle' : ''}`}
       />
 
-      <div className="search__options">
-        <div className="search__letter-group">
-          <span>ا</span>
-          <span>ب</span>
-          <span>ت</span>
-          <span>ث</span>
-          <span>ج</span>
-          <span>ح</span>
-          <span>خ</span>
-          <span>د</span>
-          <span>ذ</span>
-          <span>ر</span>
-          <span>ز</span>
-          <span>س</span>
-          <span>ش</span>
-          <span>ص</span>
-        </div>
-        <div className="search__letter-group">
-          <span>ض</span>
-          <span>ط</span>
-          <span>ظ</span>
-          <span>ع</span>
-          <span>غ</span>
-          <span>ف</span>
-          <span>ق</span>
-          <span>ک</span>
-          <span>گ</span>
-          <span>ل</span>
-          <span>م</span>
-          <span>ن</span>
-          <span>و</span>
-          <span>ه</span>
-          <span>ی</span>
-        </div>
+      <div className="search__letters">
+        {inputRoot.length === 0
+          ? letters.map((letter) => (
+              <span key={letter} onClick={() => handleLetterClick(letter)}>
+                {letter}
+              </span>
+            ))
+          : (() => {
+              const nextLetters = Array.from(
+                new Set(
+                  root
+                    .filter((r) => r.startsWith(inputRoot))
+                    .map((r) => r[inputRoot.length])
+                    .filter(Boolean)
+                )
+              );
+
+              return nextLetters.length > 0 ? (
+                nextLetters.map((letter) => (
+                  <span key={letter} onClick={() => handleLetterClick(letter)}>
+                    {letter}
+                  </span>
+                ))
+              ) : (
+                <div className="search__no-letters">
+                  هیچ حرفی برای ادامه یافت نشد
+                </div>
+              );
+            })()}
       </div>
+
+      {filteredRoots.length > 0 && (
+        <ul className="search__suggestions">
+          {filteredRoots.map((word, index) => (
+            <li key={index} onClick={() => handleRootClick(word)}>
+              {word}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };
