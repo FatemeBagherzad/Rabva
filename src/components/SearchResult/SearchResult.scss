@@ -5,53 +5,84 @@
 
 .search-page {
   direction: rtl;
-  margin-top: 8rem;
+  margin: 8rem auto 12rem auto;
+  font-family: 'noto-naskh-arabic';
+
   & h4 {
     text-align: center;
     background-color: $input-border;
   }
-}
-.search-group {
-  padding: 1rem 0;
-  // border-bottom: 1px solid grey;
-  & h5 {
-    background-color: $selected;
+  &__group-by-root {
+    // padding: 1rem 0;
+    // border-bottom: 1px solid grey;
+    & h5 {
+      background-color: $selected;
+    }
   }
-  &__withSourahName {
+  &__ayah-with-sourah-name {
     display: grid;
-    gap: 0.5rem;
-    grid-template-columns: 1fr 11fr;
+    // gap: 0.5rem;
+    grid-template-columns: 4rem 1fr;
     align-items: center;
     border-bottom: 1px solid grey;
   }
-}
-.search-res-container {
-  overflow-x: auto;
-  width: 100%;
-}
-
-.search-res {
-  display: flex;
-  overflow-x: auto;
-  // scroll-snap-type: x mandatory;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
+  &__sourah-name {
+    font-size: 1rem;
+  }
+  &__ayah-container {
+    display: grid;
+    grid-template-columns: 1rem 1fr 1rem;
+    overflow-x: auto;
+    width: 100%;
+    font-size: 1.5rem;
+  }
+  &__load-btn {
+    height: 100%;
+    width: 1rem;
+    // &:hover {
+    //   cursor: pointer;
+    // }
+  }
+  &__load-btn-before {
+    background: linear-gradient(
+      to right,
+      rgba(200, 200, 200, 0.1),
+      rgb(206, 206, 206)
+    );
+  }
+  &__load-btn-after {
+    background: linear-gradient(
+      to left,
+      rgba(200, 200, 200, 0.1),
+      rgb(206, 206, 206)
+    );
+  }
+  &__scroll-container {
+    display: flex;
+    overflow-x: auto;
+    cursor: grab;
+    scroll-snap-type: x mandatory;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    &.user-select-none {
+      cursor: grabbing;
+    }
   }
   &__ayah {
     flex: 0 0 auto;
     padding: 0.5rem;
-
     // scroll-snap-align: center;
-  }
-  &__main {
-    background-color: $checkbox-btnhover-success-50;
-    border: 2px solid $buttonbck-success-600;
   }
 }
 
 .highlighted {
-  background-color: $warning-500;
+  background-color: rgb(227, 227, 227);
   font-weight: bold;
+}
+
+.user-select-none {
+  user-select: none;
 }

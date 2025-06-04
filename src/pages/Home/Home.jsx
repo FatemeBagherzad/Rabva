@@ -17,12 +17,12 @@ const Home = () => {
   const [showTranslationList, setShowTranslationList] = useState(false);
   const [showTranslationByAyah, setShowTranslationByAyah] = useState(false);
   const [ayahTranslator, setAyahTranslator] = useState('');
-  const [rtlDirection, setRtlDirection] = useState(null);
+  const [rtlDirection, setRtlDirection] = useState(true);
   const [selectedAyah, setSelectedAyah] = useState(null);
   const [showSearchRes, setShowSearchRes] = useState(false);
   const [selectedRoot, setSelectedRoot] = useState(null);
 
-  const [language, setLanguage] = useState('en');
+  const [language, setLanguage] = useState('fa');
 
   const {
     surahs,
@@ -37,6 +37,7 @@ const Home = () => {
     selectedLangTranslators,
     translationByAyah,
     ayahByRoot,
+    roots,
   } = useQuranData(
     currentPage,
     showQuranByWords,
@@ -60,6 +61,7 @@ const Home = () => {
         setShowSearchRes={setShowSearchRes}
         setShowQuran={setShowQuran}
         setSelectedRoot={setSelectedRoot}
+        roots={roots}
       />
       {showQuran && (
         <div className="quran-page">
@@ -94,6 +96,7 @@ const Home = () => {
                 selectedAyah={selectedAyah}
                 setSelectedAyah={setSelectedAyah}
                 language={language}
+                setCurrentPage={setCurrentPage}
               />
             ) : (
               <QuranTxtByWord

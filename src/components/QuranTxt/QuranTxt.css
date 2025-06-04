@@ -77,7 +77,7 @@ body {
   background-color: #fff;
   color: #101828;
   min-height: 100vh;
-  font-size: 1.4rem;
+  font-size: 2rem;
   overflow-x: hidden;
 }
 
@@ -208,7 +208,8 @@ img {
 }
 
 input,
-textarea {
+textarea,
+option {
   font-family: inherit;
   font-size: 1.2rem;
   padding: 0.2rem;
@@ -217,7 +218,8 @@ textarea {
   outline: none;
 }
 input:focus,
-textarea:focus {
+textarea:focus,
+option:focus {
   border-color: #667085;
 }
 
@@ -255,7 +257,7 @@ textarea:focus {
   background-color: rgb(255, 255, 255);
   color: #101828;
   width: 20rem;
-  max-height: 50rem;
+  max-height: 30rem;
   overflow-y: auto;
   z-index: 9999;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -274,6 +276,10 @@ textarea:focus {
   cursor: pointer;
 }
 
+.selected {
+  background-color: #c4ecbd;
+}
+
 .quran {
   text-align: justify;
   margin: 1rem 0;
@@ -283,13 +289,15 @@ textarea:focus {
 }
 .quran__ayah {
   font-family: "noto-naskh-arabic";
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 400;
   line-height: 2;
   display: inline;
 }
-.quran__ayah--selected {
-  background-color: #c4ecbd;
+@media (min-width: 768px) {
+  .quran__ayah {
+    font-size: 2rem;
+  }
 }
 .quran__surah-name-container {
   position: relative;

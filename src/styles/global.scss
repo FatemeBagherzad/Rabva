@@ -51,7 +51,7 @@ body {
   background-color: $backgroundbody-btntxt;
   color: $maintxt-playbar;
   min-height: 100vh;
-  font-size: 1.4rem;
+  font-size: 1.8rem;
   overflow-x: hidden;
 }
 .ltr {
@@ -178,7 +178,9 @@ option {
     border-color: $input-placeholder-focus;
   }
 }
-
+input {
+  width: 12rem;
+}
 .inputErrorStyle {
   &:focus {
     border-color: $error-500;
@@ -218,7 +220,7 @@ option {
     display: flex;
     gap: 1rem;
     border-bottom: 1px solid $player-border-grey-200;
-    padding: 0.7rem 0;
+    padding: 1rem 0;
     cursor: pointer;
   }
 }

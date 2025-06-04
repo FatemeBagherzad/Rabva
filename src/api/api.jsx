@@ -20,3 +20,10 @@ export const tranlationsApi = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+export const grammarApi = axios.create({
+  baseURL: '/grammar',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});

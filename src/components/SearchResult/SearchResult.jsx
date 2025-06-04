@@ -5,119 +5,128 @@ import { fetchQuran } from '../../services/mainService';
 import './SearchResult.scss';
 
 const SearchResult = ({ ayahByRoot, selectedRoot, surahs }) => {
-  const allRootWords = ayahByRoot.map((arr) => arr[5]);
-  console.log(allRootWords);
+  const [contextMap, setContextMap] = useState({});
 
-  const NearbyAyahs = ({ surahNumber, ayahNumber, highlightWord }) => {
-    const [contextAyahs, setContextAyahs] = useState({
-      before: [],
-      main: null,
-      after: [],
-    });
-    const mainRef = useRef(null);
-    const containerRef = useRef(null);
+  const removeDiacritics = (str) =>
+    str
+      .normalize('NFD')
+      .replace(/[\u064B-\u0652]/g, '')
+      .replaceAll('ٱ', 'ا');
 
-    useEffect(() => {
-      if (mainRef.current && containerRef.current) {
-        const mainEl = mainRef.current;
-        const containerEl = containerRef.current;
-        const offsetLeft = mainEl.offsetLeft;
-        containerEl.scrollLeft =
-          offsetLeft - containerEl.clientWidth / 2 + mainEl.clientWidth / 2;
+  const highlightWordInText = (text, word) => {
+    if (!word) return text;
+
+    const plainWord = removeDiacritics(word);
+
+    // Split by words + keep spaces and punctuation
+    const parts = text.split(/(\s+|[.,؛،؟!])/);
+
+    return parts.map((part, i) => {
+      const plainPart = removeDiacritics(part);
+      if (plainPart.includes(plainWord)) {
+        return (
+          <mark key={i} className="highlighted">
+            {part}
+          </mark>
+        );
+      } else {
+        return <span key={i}>{part}</span>;
       }
-    }, [contextAyahs.main]);
-
-    const removeDiacritics = (str) =>
-      str
-        .normalize('NFD')
-        .replace(/[\u064B-\u0652]/g, '')
-        .replaceAll('ٱ', 'ا');
-
-    const highlightWordInText = (text, word) => {
-      if (!word) return text;
-
-      const plainWord = removeDiacritics(word);
-
-      // Split by words + keep spaces and punctuation
-      const parts = text.split(/(\s+|[.,؛،؟!])/);
-
-      return parts.map((part, i) => {
-        const plainPart = removeDiacritics(part);
-        if (plainPart.includes(plainWord)) {
-          return (
-            <mark key={i} className="highlighted">
-              {part}
-            </mark>
-          );
-        } else {
-          return <span key={i}>{part}</span>;
-        }
-      });
-    };
-
-    useEffect(() => {
-      const fetchContextAyahs = async () => {
-        const start = Math.max(ayahNumber - 2, 1);
-        try {
-          const { data } = await fetchQuran({
-            surah_number: surahNumber,
-            ayah_number: start,
-            per_page: 5,
-            page: 1,
-          });
-
-          const ayahs = data.data[surahNumber];
-          const ayahNumbers = Object.keys(ayahs)
-            .map(Number)
-            .sort((a, b) => a - b);
-
-          const result = { before: [], main: null, after: [] };
-
-          ayahNumbers.forEach((num) => {
-            const text = ayahs[num];
-            if (num < ayahNumber) result.before.push({ number: num, text });
-            else if (num === ayahNumber) result.main = { number: num, text };
-            else result.after.push({ number: num, text });
-          });
-
-          setContextAyahs(result);
-        } catch (e) {
-          console.error('Failed to fetch context ayahs:', e);
-        }
-      };
-
-      fetchContextAyahs();
-    }, [surahNumber, ayahNumber]);
-
-    return (
-      <div className="search-res-container" ref={containerRef}>
-        <div className="search-res">
-          {contextAyahs.before.map((ayah) => (
-            <span key={ayah.number} className="search-res__ayah">
-              {ayah.text} ({convertToPersianNumber(ayah.number)})
-            </span>
-          ))}
-
-          {contextAyahs.main && (
-            <span
-              ref={mainRef}
-              key={contextAyahs.main.number}
-              className="search-res__ayah search-res__main"
-            >
-              {highlightWordInText(contextAyahs.main.text, highlightWord)}(
-              {convertToPersianNumber(contextAyahs.main.number)})
-            </span>
-          )}
-
-          {contextAyahs.after.map((ayah) => (
-            <span key={ayah.number} className="search-res__ayah">
-              {ayah.text} ({convertToPersianNumber(ayah.number)})
-            </span>
-          ))}
-        </div>
-      </div>
-    );
+    });
   };
+
+  const loadContextAyahs = async (item, direction) => {
+    const surahNumber = parseInt(item[0]);
+    const ayahNumber = parseInt(item[1]);
+    const uniqueKey = `${surahNumber}:${ayahNumber}`;
+
+    let start, limit;
+    if (direction === 'before') {
+      limit = Math.min(10, ayahNumber - 1);
+      if (limit <= 0) return;
+      start = ayahNumber - limit;
+    } else {
+      const totalAyahs = surahs[surahNumber]?.[1] || 286;
+      limit = Math.min(10, totalAyahs - ayahNumber);
+      if (limit <= 0) return;
+      start = ayahNumber + 1;
+    }
+
+    const { data } = await fetchQuran({
+      surah_number: surahNumber,
+      ayah_number: start,
+      per_page: limit,
+      page: 1,
+    });
+
+    const ayahObj = data?.data || {};
+    const ayahs = Object.values(ayahObj)[0];
+
+    setContextMap((prev) => {
+      const updated = { ...prev };
+      if (!updated[uniqueKey]) updated[uniqueKey] = { before: {}, after: {} };
+
+      if (direction === 'before') {
+        updated[uniqueKey].before = {
+          ...ayahs,
+          ...updated[uniqueKey].before,
+        };
+      } else {
+        updated[uniqueKey].after = {
+          ...updated[uniqueKey].after,
+          ...ayahs,
+        };
+      }
+
+      return updated;
+    });
+  };
+
+  // const loadContextAyahs = async (item, index, direction) => {
+  //   const surahNumber = parseInt(item[0]);
+  //   const ayahNumber = parseInt(item[1]);
+  //   let start, limit;
+
+  //   if (direction === 'before') {
+  //     limit = Math.min(10, ayahNumber - 1);
+  //     if (limit <= 0) return;
+  //     start = ayahNumber - limit;
+  //   } else {
+  //     const totalAyahs = surahs[surahNumber]?.[1] || 286;
+  //     limit = Math.min(10, totalAyahs - ayahNumber);
+  //     if (limit <= 0) return;
+  //     start = ayahNumber + 1;
+  //   }
+
+  //   const { data } = await fetchQuran({
+  //     surah_number: surahNumber,
+  //     ayah_number: start,
+  //     per_page: limit,
+  //     page: 1,
+  //   });
+
+  //   const ayahObj = data?.data || {};
+  //   const ayahs = Object.values(ayahObj)[0];
+
+  //   setContextMap((prev) => {
+  //     const updated = { ...prev };
+  //     if (!updated[index]) updated[index] = { before: {}, after: {} };
+
+  //     if (direction === 'before') {
+  //       updated[index].before = {
+  //         ...ayahs,
+  //         ...updated[index].before,
+  //       };
+  //     } else {
+  //       updated[index].after = {
+  //         ...updated[index].after,
+  //         ...ayahs,
+  //       };
+  //     }
+
+  //     return updated;
+  //   });
+  // };
 
   // Group by arr[4]
   const groupedByWordForm = ayahByRoot.reduce((acc, curr) => {
@@ -134,19 +143,56 @@ const SearchResult = ({ ayahByRoot, selectedRoot, surahs }) => {
       <div className="search-page">
         <h4>{selectedRoot}</h4>
         {Object.entries(groupedByWordForm).map(([form, ayahGroup]) => (
-          <div key={form} className="search-group">
+          <div key={form} className="search-page__group-by-root">
             <h5>{form}</h5>
-            {ayahGroup.map((item, index) => (
-              <div key={index} className="search-group__withSourahName">
-                {/* {item[1]}-{item[6]}{' '} */}
-                <span>{surahs[item[0]][0]}:</span>
-                <NearbyAyahs
-                  surahNumber={item[0]}
-                  ayahNumber={item[1]}
-                  highlightWord={item[5]}
-                />{' '}
-              </div>
-            ))}
+            {ayahGroup.map((item, index) => {
+              const uniqueKey = `${item[0]}:${item[1]}`;
+              return (
+                <div key={index} className="search-page__ayah-with-sourah-name">
+                  <span className="search-page__sourah-name">
+                    {surahs[item[0]][0]}:
+                  </span>
+                  <div className="search-page__ayah-container">
+                    <div
+                      className="search-page__load-btn search-page__load-btn-before"
+                      onClick={() => loadContextAyahs(item, 'before')}
+                    ></div>
+                    <div className="search-page__scroll-container">
+                      {Object.entries(contextMap[uniqueKey]?.before || {}).map(
+                        ([ayahNum, text]) => (
+                          <span
+                            key={`before-${ayahNum}`}
+                            className="search-page__ayah"
+                          >
+                            {text} ({convertToPersianNumber(ayahNum)})
+                          </span>
+                        )
+                      )}
+
+                      <span className="search-page__ayah">
+                        {highlightWordInText(item[6], item[5])} (
+                        {convertToPersianNumber(item[1])})
+                      </span>
+
+                      {Object.entries(contextMap[uniqueKey]?.after || {}).map(
+                        ([ayahNum, text]) => (
+                          <span
+                            key={`after-${ayahNum}`}
+                            className="search-page__ayah"
+                          >
+                            {text} ({convertToPersianNumber(ayahNum)})
+                          </span>
+                        )
+                      )}
+                    </div>
+                    <div
+                      className="search-page__load-btn search-page__load-btn-after"
+                      onClick={() => loadContextAyahs(item, 'after')}
+                    ></div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         ))}
       </div>

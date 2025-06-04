@@ -12,10 +12,13 @@
 
   &__ayah {
     font-family: 'noto-naskh-arabic';
-    font-size: 2rem;
+    font-size: 2.5rem;
     font-weight: 400;
     line-height: 2;
     display: inline;
+    @include tablet {
+      font-size: 2rem;
+    }
   }
   &__surah-name-container {
     position: relative;

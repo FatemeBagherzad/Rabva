@@ -77,7 +77,7 @@ body {
   background-color: #fff;
   color: #101828;
   min-height: 100vh;
-  font-size: 1.4rem;
+  font-size: 1.8rem;
   overflow-x: hidden;
 }
 
@@ -223,6 +223,10 @@ option:focus {
   border-color: #667085;
 }
 
+input {
+  width: 12rem;
+}
+
 .inputErrorStyle {
   border: 1px solid #f04438;
   background-color: #fda29b;
@@ -267,7 +271,7 @@ option:focus {
   display: flex;
   gap: 1rem;
   border-bottom: 1px solid #e4e7ec;
-  padding: 0.7rem 0;
+  padding: 1rem 0;
   cursor: pointer;
 }
 
@@ -282,51 +286,68 @@ option:focus {
 
 .search-page {
   direction: rtl;
-  margin-top: 8rem;
+  margin: 8rem auto 12rem auto;
+  font-family: "noto-naskh-arabic";
 }
 .search-page h4 {
   text-align: center;
   background-color: #d0d5dd;
 }
-
-.search-group {
-  padding: 1rem 0;
-}
-.search-group h5 {
+.search-page__group-by-root h5 {
   background-color: #c4ecbd;
 }
-.search-group__withSourahName {
+.search-page__ayah-with-sourah-name {
   display: grid;
-  gap: 0.5rem;
-  grid-template-columns: 1fr 11fr;
+  grid-template-columns: 4rem 1fr;
   align-items: center;
   border-bottom: 1px solid grey;
 }
-
-.search-res-container {
+.search-page__sourah-name {
+  font-size: 1rem;
+}
+.search-page__ayah-container {
+  display: grid;
+  grid-template-columns: 1rem 1fr 1rem;
   overflow-x: auto;
   width: 100%;
+  font-size: 1.5rem;
 }
-
-.search-res {
+.search-page__load-btn {
+  height: 100%;
+  width: 1rem;
+}
+.search-page__load-btn-before {
+  background: linear-gradient(to right, rgba(200, 200, 200, 0.1), rgb(206, 206, 206));
+}
+.search-page__load-btn-after {
+  background: linear-gradient(to left, rgba(200, 200, 200, 0.1), rgb(206, 206, 206));
+}
+.search-page__scroll-container {
   display: flex;
   overflow-x: auto;
+  cursor: grab;
+  scroll-snap-type: x mandatory;
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-.search-res::-webkit-scrollbar {
+.search-page__scroll-container::-webkit-scrollbar {
   display: none;
 }
-.search-res__ayah {
+.search-page__scroll-container.user-select-none {
+  cursor: grabbing;
+}
+.search-page__ayah {
   flex: 0 0 auto;
   padding: 0.5rem;
 }
-.search-res__main {
-  background-color: #ecfdf3;
-  border: 2px solid #039855;
-}
 
 .highlighted {
-  background-color: #f79009;
+  background-color: rgb(227, 227, 227);
   font-weight: bold;
+}
+
+.user-select-none {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
 }

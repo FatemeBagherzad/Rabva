@@ -7,6 +7,8 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     server: {
+      host: '0.0.0.0', // Listen on all network interfaces
+      port: 3001, // Change to your preferred port
       proxy: {
         '/main': {
           target: backendUrl,
@@ -16,8 +18,11 @@ export default defineConfig(({ mode }) => {
           target: backendUrl,
           changeOrigin: true,
         },
-
         '/translations': {
+          target: backendUrl,
+          changeOrigin: true,
+        },
+        '/grammar': {
           target: backendUrl,
           changeOrigin: true,
         },

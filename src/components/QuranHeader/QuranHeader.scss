@@ -12,7 +12,7 @@
 .quran-header {
   position: relative;
   height: 3rem;
-  font-size: 1.3rem;
+  // font-size: 1.3rem;
   &__header {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -89,8 +89,9 @@
   // }
 
   &__translation-language {
-    background-color: grey;
+    background-color: rgb(199, 199, 199);
     text-align: center;
     padding: 0.2rem 0;
+    font-size: 2rem;
   }
 }

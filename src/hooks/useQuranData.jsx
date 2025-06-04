@@ -12,6 +12,7 @@ import {
   fetchQuranTranslationH,
   fetchTranslationAyahs,
 } from '../services/translationService';
+import { fetchRoots } from '../services/grammarService';
 
 const useQuranData = (
   currentPage,
@@ -33,6 +34,7 @@ const useQuranData = (
   const [translationH, setTranslationH] = useState([]);
   const [translationByAyah, setTranslationByAyah] = useState([]);
   const [ayahByRoot, setAyahByRoot] = useState([]);
+  const [roots, setRoots] = useState([]);
 
   const trimData = (data, startSurah, startAyah, endSurah, endAyah) => {
     const trimmed = {};
@@ -70,7 +72,7 @@ const useQuranData = (
     return { startSurah, startAyah, endSurah, endAyah };
   };
 
-  //fetch Surahs, Ayah pages info, Pages info,languages,translators.
+  //fetch Surahs, Ayah pages info, Pages info,languages,translators,roots.
   useEffect(() => {
     const loadInitial = async () => {
       try {
@@ -80,12 +82,14 @@ const useQuranData = (
           { data: pages },
           { data: languages },
           { data: translators },
+          { data: roots },
         ] = await Promise.all([
           fetchSurahNames(),
           fetchAyahPagesInfo(),
           fetchPagesInfo(),
           fetchLanguages(),
           fetchTranslatorNames(),
+          fetchRoots(),
         ]);
         setSurahs(surahs.surahs);
         setAyahPagesInfo(ayahs.ayah_page);
@@ -93,6 +97,7 @@ const useQuranData = (
         setLanguages(languages.data);
         setLangCateTranslators(translators.data.language_category);
         setAllTranslatorsSpec(translators.data);
+        setRoots(roots.data);
       } catch (error) {
         console.error('Failed to load initial data:', error);
       }
@@ -287,6 +292,7 @@ const useQuranData = (
     selectedLangTranslators,
     translationByAyah,
     ayahByRoot,
+    roots,
   };
 };
 

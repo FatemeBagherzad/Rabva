@@ -24,6 +24,7 @@ const TopNavigation = ({
   setShowSearchRes,
   setShowQuran,
   setSelectedRoot,
+  roots,
 }) => {
   const containerRef = useOutsideClick(() => {
     setShowLanguagesList(false);
@@ -98,6 +99,7 @@ const TopNavigation = ({
                 setShowSearchRes={setShowSearchRes}
                 setShowQuran={setShowQuran}
                 setSelectedRoot={setSelectedRoot}
+                roots={roots}
               />
             )}
           </span>

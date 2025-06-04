@@ -1,5 +1,8 @@
 import besmBack from '../../assets/img/quran-besm-frame-green.png';
 import convertToPersianNumber from '../../utils/convertToPersianNumber';
+
+import { useSwipeable } from 'react-swipeable';
+
 import './QuranTxt.scss';
 
 const QuranTxt = ({
@@ -11,6 +14,7 @@ const QuranTxt = ({
   language,
   selectedAyah,
   setSelectedAyah,
+  setCurrentPage,
 }) => {
   const pageAyahs = [];
   const translationLookup = {};
@@ -26,6 +30,15 @@ const QuranTxt = ({
       translationLookup[`${surahNumber}-${ayahNumber}`] = translateText;
     }
   }
+
+  const handlers = useSwipeable({
+    onSwipedLeft: () => setCurrentPage((prev) => prev + 1),
+    onSwipedRight: () => setCurrentPage((prev) => prev - 1),
+    preventDefaultTouchmoveEvent: true,
+    trackTouch: true,
+    trackMouse: false,
+  });
+
   if (!quranData || pageAyahs.length === 0) {
     return <div>Loading Quran data...</div>;
   }
@@ -34,7 +47,7 @@ const QuranTxt = ({
 
   return (
     <div className="quran">
-      <div className="quran__ayahs">
+      <div className="quran__ayahs" {...handlers}>
         {pageAyahs.map((ayah, index) => {
           const isSelected =
             selectedAyah?.surah === ayah[0] && selectedAyah?.ayah === ayah[1];

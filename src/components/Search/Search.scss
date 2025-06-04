@@ -19,7 +19,7 @@
     right: -2rem;
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: 2rem;
     padding: 1rem;
     border-radius: 0.3rem;
     z-index: 9999;
@@ -30,6 +30,9 @@
     justify-content: center;
     & span {
       cursor: pointer;
+    }
+    @include tablet {
+      font-size: inherit;
     }
   }
   &__suggestions {

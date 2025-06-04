@@ -118,7 +118,7 @@ const QuranHeader = ({
   const renderTranslationList = () => (
     <div className="menu quran-header__tranlation-list">
       <span
-        className="quran-header__translation"
+        className="quran-header__translation menu__option"
         onClick={() => setShowQuranByWords((prev) => !prev)}
       >
         word by word
