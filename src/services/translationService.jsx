@@ -17,7 +17,7 @@ export const fetchQuranTranslationH = (params = {}) => {
 };
 
 export const fetchQuranTranslationUniqueH = (params = {}) => {
-  return tranlationsApi.get('/quran_h_translate_word_by_word_uniq/', {
+  return tranlationsApi.get('/quran_h_translate_word_by_word/', {
     params,
   });
 };

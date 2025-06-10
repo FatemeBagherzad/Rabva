@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import useQuranData from '../../hooks/useQuranData';
+import { useSwipeable } from 'react-swipeable';
 
 import TopNavigation from '../../components/TopNavigation/TopNavigation';
 import QuranHeader from '../../components/QuranHeader/QuranHeader';
@@ -46,6 +47,23 @@ const Home = () => {
     selectedRoot
   );
 
+  const [flipClass, setFlipClass] = useState(null);
+  const handlers = useSwipeable({
+    onSwipedLeft: () => {
+      setCurrentPage((prev) => (prev === 1 ? prev : prev - 1));
+      setFlipClass('flipped-left');
+      setTimeout(() => setFlipClass(null), 800); // Match this with your animation duration
+    },
+    onSwipedRight: () => {
+      setCurrentPage((prev) => (prev === 604 ? prev : prev + 1));
+      setFlipClass('flipped-right');
+      setTimeout(() => setFlipClass(null), 800);
+    },
+    preventDefaultTouchmoveEvent: true,
+    trackTouch: true,
+    trackMouse: false,
+  });
+
   if (!surahs || !pages || !ayahPagesInfo) {
     return <h3>Loading ...</h3>;
   }
@@ -85,7 +103,7 @@ const Home = () => {
             rtlDirection={rtlDirection}
           />
 
-          <div className="container quran-page__quran-txt">
+          <div className="container quran-page__quran-txt" {...handlers}>
             {!showQuranByWords ? (
               <QuranTxt
                 quranData={quranData}
@@ -97,6 +115,7 @@ const Home = () => {
                 setSelectedAyah={setSelectedAyah}
                 language={language}
                 setCurrentPage={setCurrentPage}
+                flipClass={flipClass}
               />
             ) : (
               <QuranTxtByWord

@@ -55,16 +55,39 @@ const useQuranData = (
     return trimmed;
   };
 
+  // Calculate how many pages fit on screen
+  const calculatePagesPerView = () => {
+    const screenWidth = window.innerWidth;
+    if (screenWidth >= 1920) return 15; // Extra large screens
+    if (screenWidth >= 1440) return 10; // Large desktop
+    if (screenWidth >= 1024) return 5; // Desktop
+    return 1; // Mobile/tablet
+  };
+
   const getPageRange = (pages, currentPage, showQuranByWords) => {
     if (!pages[currentPage]) return null;
 
-    const isLargeScreen = window.innerWidth >= 1200;
-    const extraPages = showQuranByWords ? 15 : 10;
+    // const isLargeScreen = window.innerWidth >= 1200;
+    // const extraPages = showQuranByWords ? 15 : 10;
+    // const [startSurah, startAyah] = pages[currentPage];
+    // let endSurah, endAyah;
+
+    // if (isLargeScreen && pages[currentPage + extraPages]) {
+    //   [endSurah, endAyah] = pages[currentPage + extraPages];
+    // } else {
+    //   [, , endSurah, endAyah] = pages[currentPage];
+    // }
+
+    const pagesPerView = calculatePagesPerView();
     const [startSurah, startAyah] = pages[currentPage];
     let endSurah, endAyah;
 
-    if (isLargeScreen && pages[currentPage + extraPages]) {
-      [endSurah, endAyah] = pages[currentPage + extraPages];
+    let viewEndPage = currentPage + pagesPerView - 1;
+
+    if (viewEndPage > 604) viewEndPage = 604;
+
+    if (pages[viewEndPage]) {
+      [endSurah, endAyah] = pages[viewEndPage];
     } else {
       [, , endSurah, endAyah] = pages[currentPage];
     }
@@ -120,7 +143,7 @@ const useQuranData = (
         const { data } = await fetchFn({
           surah_number: startSurah,
           ayah_number: startAyah,
-          per_page: 500,
+          per_page: 1000,
           page: 1,
         });
         const trimmed = trimData(
