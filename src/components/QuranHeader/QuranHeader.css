@@ -209,7 +209,8 @@ img {
 
 input,
 textarea,
-option {
+option,
+select {
   font-family: inherit;
   font-size: 1.2rem;
   padding: 0.2rem;
@@ -219,8 +220,13 @@ option {
 }
 input:focus,
 textarea:focus,
-option:focus {
+option:focus,
+select:focus {
   border-color: #667085;
+}
+
+input {
+  width: 12rem;
 }
 
 .inputErrorStyle {
@@ -282,8 +288,12 @@ option:focus {
 
 .quran-header__back {
   width: 100vw;
+  background-color: white;
   border-bottom: 1px solid #027a48;
   margin-top: 4.5rem;
+  position: fixed;
+  top: 0;
+  z-index: 100;
 }
 
 .quran-header {

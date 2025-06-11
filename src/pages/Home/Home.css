@@ -288,6 +288,7 @@ input {
 
 .quran-page__quran-txt {
   max-width: 97vw;
+  margin-top: 7.5rem;
   display: flex;
   justify-content: center;
 }

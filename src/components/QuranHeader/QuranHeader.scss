@@ -6,8 +6,12 @@
 .quran-header__back {
   // background-color: $logo-success-700;
   width: 100vw;
+  background-color: white;
   border-bottom: 1px solid $logo-success-700;
   margin-top: 4.5rem;
+  position: fixed;
+  top: 0;
+  z-index: 100;
 }
 .quran-header {
   position: relative;
