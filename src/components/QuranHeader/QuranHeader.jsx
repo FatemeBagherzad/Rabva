@@ -26,6 +26,8 @@ const QuranHeader = ({
   language,
   setSelectedAyah,
   rtlDirection,
+  nextPageCount,
+  setRequestedSurah,
 }) => {
   const [showSurahList, setShowSurahList] = useState(false);
   const [showAyahList, setShowAyahList] = useState(false);
@@ -46,11 +48,18 @@ const QuranHeader = ({
     if (total) setTotalAyahs(total);
   }, [selectedSurah, surahs]);
 
+  useEffect(() => {
+    setRequestedSurah(null);
+  }, [currentPage]);
+
   if (!selectedSurah)
     return <div className="quran-header__loading">در حال بارگذاری...</div>;
 
   const goToPage = (page) => {
+    // console.log('from goToPage', page);
     if (page < 1 || page > 604) return setIsInputError(true);
+    if (page === currentPage) return;
+
     const matched = Object.entries(ayahPagesInfo).find(([, ayahs]) =>
       Object.values(ayahs).includes(page)
     );
@@ -66,14 +75,16 @@ const QuranHeader = ({
   };
 
   const handleSurahClick = (id, name) => {
-    setSelectedSurah(id);
+    setRequestedSurah(id);
     toggleLists(false, true);
     const page = ayahPagesInfo[id][1];
     if (page) goToPage(Number(page));
+    setSelectedSurah(id);
   };
 
   const handleAyahClick = (ayah) => {
     const page = ayahPagesInfo[selectedSurah][ayah];
+
     if (page) {
       goToPage(Number(page));
       toggleLists(false, false);
@@ -159,7 +170,7 @@ const QuranHeader = ({
               <img
                 src={chevronLeft}
                 alt="next"
-                onClick={() => goToPage(currentPage + 1)}
+                onClick={() => goToPage(currentPage + nextPageCount)}
                 className="quran-header__chevron"
               />
             )}
@@ -184,7 +195,7 @@ const QuranHeader = ({
               <img
                 src={chevronRight}
                 alt="prev"
-                onClick={() => goToPage(currentPage - 1)}
+                onClick={() => goToPage(currentPage - nextPageCount)}
                 className="quran-header__chevron"
               />
             )}

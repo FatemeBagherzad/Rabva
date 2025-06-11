@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import useQuranData from '../../hooks/useQuranData';
 import { useSwipeable } from 'react-swipeable';
 
@@ -22,8 +22,9 @@ const Home = () => {
   const [selectedAyah, setSelectedAyah] = useState(null);
   const [showSearchRes, setShowSearchRes] = useState(false);
   const [selectedRoot, setSelectedRoot] = useState(null);
-
   const [language, setLanguage] = useState('fa');
+  const [nextPageCount, setNextPageCount] = useState(1);
+  const [requestedSurah, setRequestedSurah] = useState(null);
 
   const {
     surahs,
@@ -44,25 +45,43 @@ const Home = () => {
     showQuranByWords,
     language,
     ayahTranslator,
-    selectedRoot
+    selectedRoot,
+    setNextPageCount,
+    requestedSurah
   );
 
   const [flipClass, setFlipClass] = useState(null);
+
   const handlers = useSwipeable({
     onSwipedLeft: () => {
-      setCurrentPage((prev) => (prev === 1 ? prev : prev - 1));
-      setFlipClass('flipped-left');
-      setTimeout(() => setFlipClass(null), 800); // Match this with your animation duration
+      setCurrentPage((prev) => {
+        const newPage = Math.max(1, prev - nextPageCount);
+        return newPage < 1 ? 1 : newPage;
+      });
+      setFlipClass('right');
+      setTimeout(() => setFlipClass(null), 600);
     },
     onSwipedRight: () => {
-      setCurrentPage((prev) => (prev === 604 ? prev : prev + 1));
-      setFlipClass('flipped-right');
-      setTimeout(() => setFlipClass(null), 800);
+      setCurrentPage((prev) => {
+        const newPage = Math.min(604, prev + nextPageCount);
+        return newPage > 604 ? 604 : newPage;
+      });
+      setFlipClass('left');
+      setTimeout(() => setFlipClass(null), 600);
     },
     preventDefaultTouchmoveEvent: true,
     trackTouch: true,
     trackMouse: false,
   });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setCurrentPage((prev) => prev);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   if (!surahs || !pages || !ayahPagesInfo) {
     return <h3>Loading ...</h3>;
@@ -101,6 +120,8 @@ const Home = () => {
             language={language}
             setSelectedAyah={setSelectedAyah}
             rtlDirection={rtlDirection}
+            nextPageCount={nextPageCount}
+            setRequestedSurah={setRequestedSurah}
           />
 
           <div className="container quran-page__quran-txt" {...handlers}>

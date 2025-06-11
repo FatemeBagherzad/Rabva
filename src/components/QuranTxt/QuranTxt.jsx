@@ -38,7 +38,7 @@ const QuranTxt = ({
 
   return (
     <div className="quran">
-      <div className={`quran__ayahs ${flipClass || ''}`}>
+      <div className="quran__ayahs" data-direction={flipClass}>
         {pageAyahs.map((ayah, index) => {
           const isSelected =
             selectedAyah?.surah === ayah[0] && selectedAyah?.ayah === ayah[1];
