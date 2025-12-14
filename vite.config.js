@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     server: {
       host: '0.0.0.0', // Listen on all network interfaces
-      port: 3001, // Change to your preferred port
+      port: 3004, // Change to your preferred port
       proxy: {
         '/main': {
           target: backendUrl,
