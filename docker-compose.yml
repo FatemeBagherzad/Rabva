@@ -3,7 +3,7 @@ version: '3.9'
 services:
   rabva-ui:
     image: ${DOCKER_REGISTRY}/rabva-ui:1.0.0
-    container_name: rabva-ui
+    container_name: ${RABVA_ENV}_rabva-ui
     ports:
       - '$RABVA_UI_PORT:3004'
     volumes:
