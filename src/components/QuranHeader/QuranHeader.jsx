@@ -119,6 +119,19 @@ const QuranHeader = ({
 
   const renderTranslationList = () => (
     <div className="menu quran-header__tranlation-list">
+      <span
+        className="quran-header__translation menu__option"
+        onClick={() => {
+          setShowTranslationByAyah(false);
+          setShowQuranByWords(false);
+          setAyahTranslator('');
+          setShowTranslationList(false);
+        }}
+      >
+        No translation
+      </span>
+      <span className="quran-header__translation-language">{language}</span>
+
       {language === 'fa' && (
         <span
           className="quran-header__translation menu__option"
@@ -127,10 +140,9 @@ const QuranHeader = ({
             setShowTranslationList(false);
           }}
         >
-          کلمه به کلمه
+          کلمه به کلمه (میریحیی)
         </span>
       )}
-      <span className="quran-header__translation-language">{language}</span>
       <ul className={` ${rtlDirection ? 'rtl' : 'ltr'}`}>
         {selectedLangTranslators?.map((translator, index) => (
           <li

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useOutsideClick } from '../../hooks/useOutsideClick';
 
 import MainMenu from '../MainMenu/MainMenu';
@@ -35,10 +35,47 @@ const TopNavigation = ({
   const [showLanguagesList, setShowLanguagesList] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showSearchInput, setShowSearchInput] = useState(false);
+  const languageItemRefs = useRef({});
 
   const toggleLanguageShow = () => setShowLanguagesList((prev) => !prev);
   const toggleMenuShow = () => setShowMenu((prev) => !prev);
   const toggleSearch = () => setShowSearchInput((prev) => !prev);
+
+  useEffect(() => {
+    if (!showLanguagesList) return;
+
+    const handleLanguageListKeyDown = (event) => {
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+
+      const targetTagName = event.target?.tagName;
+      if (targetTagName === 'INPUT' || targetTagName === 'TEXTAREA') return;
+
+      const key = event.key?.toLowerCase();
+      if (!key || key.length !== 1 || !/[a-z]/i.test(key)) return;
+
+      const languageEntries = Object.entries(languages || {});
+      const matchedEntry = languageEntries.find(([langCode, langValue]) => {
+        const displayName = String(langValue?.[0] || '').toLowerCase();
+        return (
+          String(langCode).toLowerCase().startsWith(key) ||
+          displayName.startsWith(key)
+        );
+      });
+
+      if (!matchedEntry) return;
+
+      const targetElement = languageItemRefs.current[matchedEntry[0]];
+      if (!targetElement) return;
+
+      event.preventDefault();
+      targetElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    };
+
+    document.addEventListener('keydown', handleLanguageListKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleLanguageListKeyDown);
+    };
+  }, [showLanguagesList, languages]);
 
   return (
     <div className="topNav__back">
@@ -120,6 +157,9 @@ const TopNavigation = ({
             {Object.entries(languages).map(([key, value]) => (
               <li
                 key={key}
+                ref={(element) => {
+                  languageItemRefs.current[key] = element;
+                }}
                 className="menu__option"
                 onClick={() => {
                   setLanguage(key);
