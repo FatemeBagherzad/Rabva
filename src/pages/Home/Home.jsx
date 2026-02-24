@@ -47,7 +47,7 @@ const Home = () => {
     ayahTranslator,
     selectedRoot,
     setNextPageCount,
-    requestedSurah
+    requestedSurah,
   );
 
   const [flipClass, setFlipClass] = useState(null);
