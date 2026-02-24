@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import useQuranData from '../../hooks/useQuranData';
+import { useLocalStorageState } from '../../hooks/useLocalStorageState';
 import { useSwipeable } from 'react-swipeable';
+import useQuranData from '../../hooks/useQuranData';
 
 import TopNavigation from '../../components/TopNavigation/TopNavigation';
 import QuranHeader from '../../components/QuranHeader/QuranHeader';
@@ -12,17 +13,35 @@ import SearchResult from '../../components/SearchResult/SearchResult';
 import './Home.scss';
 
 const Home = () => {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [storedPage, setStoredPage] = useLocalStorageState(1, 'currentPage');
+  const safeStoredPage = Number(storedPage);
+  const [currentPage, setCurrentPage] = useState(
+    Number.isFinite(safeStoredPage) &&
+      safeStoredPage >= 1 &&
+      safeStoredPage <= 604
+      ? safeStoredPage
+      : 1,
+  );
   const [showQuran, setShowQuran] = useState(true);
-  const [showQuranByWords, setShowQuranByWords] = useState(false);
+  const [showQuranByWords, setShowQuranByWords] = useLocalStorageState(
+    false,
+    'showQuranByWords',
+  );
   const [showTranslationList, setShowTranslationList] = useState(false);
-  const [showTranslationByAyah, setShowTranslationByAyah] = useState(false);
-  const [ayahTranslator, setAyahTranslator] = useState('');
-  const [rtlDirection, setRtlDirection] = useState(true);
+  const [showTranslationByAyah, setShowTranslationByAyah] =
+    useLocalStorageState(false, 'showTranslationByAyah');
+  const [ayahTranslator, setAyahTranslator] = useLocalStorageState(
+    '',
+    'ayahTranslator',
+  );
+  const [rtlDirection, setRtlDirection] = useLocalStorageState(
+    true,
+    'rtlDirection',
+  );
   const [selectedAyah, setSelectedAyah] = useState(null);
   const [showSearchRes, setShowSearchRes] = useState(false);
   const [selectedRoot, setSelectedRoot] = useState(null);
-  const [language, setLanguage] = useState('fa');
+  const [language, setLanguage] = useLocalStorageState('fa', 'language');
   const [nextPageCount, setNextPageCount] = useState(1);
   const [requestedSurah, setRequestedSurah] = useState(null);
 
@@ -82,6 +101,10 @@ const Home = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  useEffect(() => {
+    setStoredPage(currentPage);
+  }, [currentPage, setStoredPage]);
 
   if (!surahs || !pages || !ayahPagesInfo) {
     return <h3>Loading ...</h3>;
