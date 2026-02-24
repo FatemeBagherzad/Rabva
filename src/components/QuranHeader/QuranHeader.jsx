@@ -58,7 +58,7 @@ const QuranHeader = ({
     if (page === currentPage) return;
 
     const matched = Object.entries(ayahPagesInfo).find(([, ayahs]) =>
-      Object.values(ayahs).includes(page)
+      Object.values(ayahs).includes(page),
     );
     if (matched) setSelectedSurah(matched[0]);
 
@@ -119,15 +119,17 @@ const QuranHeader = ({
 
   const renderTranslationList = () => (
     <div className="menu quran-header__tranlation-list">
-      <span
-        className="quran-header__translation menu__option"
-        onClick={() => {
-          setShowQuranByWords((prev) => !prev);
-          setShowTranslationList(false);
-        }}
-      >
-        word by word
-      </span>
+      {language === 'fa' && (
+        <span
+          className="quran-header__translation menu__option"
+          onClick={() => {
+            setShowQuranByWords((prev) => !prev);
+            setShowTranslationList(false);
+          }}
+        >
+          کلمه به کلمه
+        </span>
+      )}
       <span className="quran-header__translation-language">{language}</span>
       <ul className={` ${rtlDirection ? 'rtl' : 'ltr'}`}>
         {selectedLangTranslators?.map((translator, index) => (
