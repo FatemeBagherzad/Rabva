@@ -28,11 +28,14 @@
     text-align: center;
     display: flex;
     justify-content: center;
+    font-family: 'hafs-uthmanic', 'uthmanic', 'Noto Naskh Arabic', 'Scheherazade New', serif;
+    font-feature-settings: 'ccmp', 'rlig', 'liga', 'mark', 'mkmk';
   }
   &__translation-word {
     font-size: 1.2rem;
     text-align: center;
     color: $buttonbck-success-600;
+    font-family: 'inter', sans-serif;
   }
 }
 
