@@ -23,6 +23,17 @@
   font-display: swap;
 }
 
+/* Ensure Arabic punctuation falls back to Noto if missing in primary font */
+@font-face {
+  font-family: 'hafs-uthmanic';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../../assets/font/Noto_Naskh_Arabic/NotoNaskhArabic-VariableFont_wght.ttf')
+    format('truetype');
+  unicode-range: U+060C, U+061B, U+061F;
+  font-display: swap;
+}
+
 @font-face {
   font-family: 'uthmanic';
   font-style: normal;
@@ -33,6 +44,16 @@
       format('opentype'),
     url('../../assets/font/uthmanic/KfgqpcHafsUthmanicScriptRegular-nARZ1.ttf')
       format('truetype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'uthmanic';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../../assets/font/Noto_Naskh_Arabic/NotoNaskhArabic-VariableFont_wght.ttf')
+    format('truetype');
+  unicode-range: U+060C, U+061B, U+061F;
   font-display: swap;
 }
 
