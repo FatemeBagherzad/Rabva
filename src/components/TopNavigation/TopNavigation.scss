@@ -6,7 +6,7 @@
 .topNav__back {
   background-color: $logo-success-700;
   color: white;
-  height: 4.5rem;
+  height: 3.5rem;
   position: fixed;
   top: 0;
   width: 100vw;
@@ -15,7 +15,7 @@
 .topNav {
   position: relative;
   width: 100%;
-  height: 4.5rem;
+  height: 100%;
   display: grid;
   grid-template-columns: 2fr 1fr 2fr;
   align-items: center;
@@ -37,7 +37,7 @@
   }
   &__menu-container {
     position: absolute;
-    top: 4.5rem;
+    top: 100%;
     left: 0;
   }
   // &__menuIcn,
@@ -90,7 +90,7 @@
   }
   &__languages-list {
     position: absolute;
-    top: 4.7rem;
+    top: calc(100% + 0.2rem);
     right: 0;
   }
 
