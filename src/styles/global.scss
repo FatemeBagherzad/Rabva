@@ -50,8 +50,8 @@ html {
 
 body {
   font-family: 'inter', sans-serif;
-  background-color: $backgroundbody-btntxt;
-  color: $maintxt-playbar;
+  background-color: var(--rabva-bg, $backgroundbody-btntxt);
+  color: var(--rabva-text, $maintxt-playbar);
   min-height: 100vh;
   font-size: 2rem;
   line-height: 1.5;
@@ -81,7 +81,7 @@ body {
 
 a {
   text-decoration: none;
-  color: $maintxt-playbar;
+  color: var(--rabva-text, $maintxt-playbar);
   transition: color 0.3s ease;
   padding: 0;
   &:hover {

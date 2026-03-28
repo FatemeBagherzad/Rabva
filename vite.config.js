@@ -26,6 +26,14 @@ export default defineConfig(({ mode }) => {
           target: backendUrl,
           changeOrigin: true,
         },
+        '/rabva-accounts': {
+          target: backendUrl,
+          changeOrigin: true,
+        },
+        '/media': {
+          target: backendUrl,
+          changeOrigin: true,
+        },
       },
     },
   };

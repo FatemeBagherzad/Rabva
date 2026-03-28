@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocalStorageState } from '../../hooks/useLocalStorageState';
 import { useSwipeable } from 'react-swipeable';
 import useQuranData from '../../hooks/useQuranData';
+import { useAuth } from '../../context/AuthContext';
 
 import TopNavigation from '../../components/TopNavigation/TopNavigation';
 import QuranHeader from '../../components/QuranHeader/QuranHeader';
@@ -9,10 +10,12 @@ import QuranTxt from '../../components/QuranTxt/QuranTxt';
 import QuranTxtByWord from '../../components/QuranTxtByWord/QuranTxtByWord';
 import QuranPlayer from '../../components/QuranPlayer/QuranPlayer';
 import SearchResult from '../../components/SearchResult/SearchResult';
+import UserProfileOverlay from '../../components/UserProfileOverlay/UserProfileOverlay';
 
 import './Home.scss';
 
 const Home = () => {
+  const { preferences } = useAuth();
   const [storedPage, setStoredPage] = useLocalStorageState(1, 'currentPage');
   const safeStoredPage = Number(storedPage);
   const [currentPage, setCurrentPage] = useState(
@@ -44,6 +47,7 @@ const Home = () => {
   const [language, setLanguage] = useLocalStorageState('fa', 'language');
   const [nextPageCount, setNextPageCount] = useState(1);
   const [requestedSurah, setRequestedSurah] = useState(null);
+  const [showUserOverlay, setShowUserOverlay] = useState(false);
 
   const {
     surahs,
@@ -106,6 +110,22 @@ const Home = () => {
     setStoredPage(currentPage);
   }, [currentPage, setStoredPage]);
 
+  useEffect(() => {
+    if (preferences?.language_code && preferences.language_code !== language) {
+      setLanguage(preferences.language_code);
+    }
+  }, [preferences?.language_code, language, setLanguage]);
+
+  const quranPreviewStyles = {
+    '--quran-font-family': preferences?.quran_font_family || 'hafs-django',
+    '--quran-font-size': `${preferences?.quran_font_size || 2.5}rem`,
+    '--translation-font-family': preferences?.translation_font_family || 'inter',
+    '--translation-font-size': `${preferences?.translation_font_size || 1.2}rem`,
+    '--quran-translation-gap': `${preferences?.quran_translation_gap || 1}rem`,
+    '--quran-line-height': preferences?.line_height_quran || 2,
+    '--translation-line-height': preferences?.line_height_translation || 1.5,
+  };
+
   if (!surahs || !pages || !ayahPagesInfo) {
     return <h3>Loading ...</h3>;
   }
@@ -122,9 +142,10 @@ const Home = () => {
         setShowQuran={setShowQuran}
         setSelectedRoot={setSelectedRoot}
         roots={roots}
+        onUserIconClick={() => setShowUserOverlay((prev) => !prev)}
       />
       {showQuran && (
-        <div className="quran-page">
+        <div className="quran-page" style={quranPreviewStyles}>
           <QuranHeader
             surahs={surahs}
             ayahPagesInfo={ayahPagesInfo}
@@ -183,6 +204,14 @@ const Home = () => {
 
       <QuranPlayer
         quranData={!showQuranByWords ? quranData : quranByWordData}
+      />
+
+      <UserProfileOverlay
+        isOpen={showUserOverlay}
+        onClose={() => setShowUserOverlay(false)}
+        languages={languages}
+        setLanguage={setLanguage}
+        language={language}
       />
     </>
   );

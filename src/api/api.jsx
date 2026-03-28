@@ -27,3 +27,10 @@ export const grammarApi = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+export const rabvaAccountApi = axios.create({
+  baseURL: '/rabva-accounts',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});

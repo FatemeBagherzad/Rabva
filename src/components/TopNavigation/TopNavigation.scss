@@ -25,9 +25,15 @@
   &__menuLogoContainer {
     justify-self: flex-start;
     display: flex;
-    gap: 2rem;
+    gap: 1.4rem;
     align-items: center;
     justify-content: center;
+  }
+
+  .icon {
+    height: 1.35rem;
+    width: auto;
+    display: block;
   }
   &__menu-container {
     position: absolute;
@@ -43,14 +49,19 @@
   &__logoIcn {
     justify-self: center;
     // height: 2.5rem;
+    display: inline-flex;
+    align-items: center;
     font-size: 2.6rem;
+    line-height: 1;
     font-weight: 900;
     font-family: 'hafs-uthmanic', 'uthmanic', 'Noto Naskh Arabic', serif;
     color: $backgroundbody-btntxt;
+    transform: translateY(-0.06em);
   }
   &__quranIcon {
-    height: 3rem;
+    height: 2.2rem;
     cursor: pointer;
+    display: block;
   }
 
   &__lang-search-User {
@@ -59,22 +70,42 @@
     justify-items: center;
     align-items: center;
     justify-content: flex-end;
-    gap: 3rem;
+    gap: 1.4rem;
   }
   &__search-container {
     display: flex;
+    align-items: center;
     gap: 1rem;
   }
   &__language {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     gap: 0.5rem;
+    line-height: 1;
     cursor: pointer;
+
+    .icon {
+      display: block;
+    }
   }
   &__languages-list {
     position: absolute;
     top: 4.7rem;
     right: 0;
+  }
+
+  &__user-icon {
+    display: block;
+    flex: 0 0 auto;
+    cursor: pointer;
+    align-self: center;
+  }
+
+  &__avatar {
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    cursor: pointer;
   }
   // &__languages-item {
   //   border-bottom: 1px solid $player-border-grey-200;

@@ -7,71 +7,99 @@
   // background-color: $logo-success-700;
   width: 100vw;
   background-color: white;
-  border-bottom: 1px solid $logo-success-700;
   margin-top: 4.5rem;
   position: fixed;
   top: 0;
   z-index: 100;
+  height: 4.5rem;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background-color: $logo-success-700;
+    pointer-events: none;
+    z-index: 2;
+  }
 }
 .quran-header {
   position: relative;
-  height: 3rem;
+  height: 4.5rem;
   // font-size: 1.3rem;
   font-family: 'hafs-uthmanic', 'uthmanic', 'Noto Naskh Arabic', serif;
   &__header {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 2rem;
-    align-items: center;
+    gap: 0;
+    align-items: stretch;
     justify-items: center;
     justify-content: center;
-    height: 3rem;
-    background-color: $setting-aya-background;
+    height: 100%;
+    background-color: white;
     width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
   }
   &__header span {
     cursor: pointer;
   }
 
+  &__surah-trigger,
+  &__page-navigation,
   &__translate-options {
-    cursor: pointer;
     width: 100%;
-    height: 90%;
+    height: calc(100% - 2px);
     display: flex;
     justify-content: center;
     align-items: center;
+    align-self: start;
+    background-color: white;
+    box-sizing: border-box;
+    margin-bottom: 2px;
+  }
+
+  &__translate-options {
+    cursor: pointer;
     gap: 1rem;
     color: $logo-success-700;
-    font-family: 'inter', sans-serif;
+    font-family: 'hafs-uthmanic', 'uthmanic', 'Noto Naskh Arabic', serif;
 
     &:hover {
-      background-color: lightgray;
+      background-color: #f1f1f1;
     }
   }
   &__translate-options-on {
     // background-color: $logo-success-700;
     // color: $backgroundbody-btntxt;
     // background-color: rgb(203, 203, 203);
-    transform: scale(0.96);
+    transform: none;
     box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
   }
 
   &__page-navigation {
-    width: 100%;
-    display: flex;
-    justify-content: center;
     gap: 1rem;
+    line-height: 1;
   }
   &__page-navigation span,
   &__page-input {
     font-family: 'inter', sans-serif;
   }
+  &__page-navigation span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
   &__chevron {
-    height: 2rem;
+    height: 1.5rem;
     cursor: pointer;
   }
   &__page-input {
     width: 5rem;
+    line-height: 1;
   }
 
   &__surahs,
@@ -79,9 +107,28 @@
   &__tranlation-list {
     direction: rtl;
     position: absolute;
-    top: 3.2rem;
+    top: 4.7rem;
     font-family: 'inter', sans-serif;
   }
+
+  &__surahs {
+    .menu__option {
+      font-family: 'hafs-uthmanic', 'uthmanic', 'Noto Naskh Arabic', serif;
+      display: flex;
+      align-items: center;
+      gap: 0.15rem;
+    }
+  }
+
+  &__surah-number,
+  &__surah-divider {
+    font-family: 'inter', sans-serif;
+  }
+
+  &__surah-name {
+    font-family: 'hafs-uthmanic', 'uthmanic', 'Noto Naskh Arabic', serif;
+  }
+
   &__tranlation-list {
     right: 1rem;
     @include tablet {

@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { useOutsideClick } from '../../hooks/useOutsideClick';
+import { useAuth } from '../../context/AuthContext';
 
 import MainMenu from '../MainMenu/MainMenu';
 import Search from '../Search/Search';
@@ -14,6 +15,16 @@ import searchIcon from '../../assets/icons/search.svg';
 
 import './TopNavigation.scss';
 
+const TOP_RIGHT_USER_ICON_SIZE = '1.7rem';
+
+const normalizeAvatarUrl = (url) => {
+  if (!url) return '';
+  if (/^(https?:)?\/\//i.test(url) || url.startsWith('blob:') || url.startsWith('data:')) {
+    return url;
+  }
+  return url.startsWith('/') ? url : `/${url}`;
+};
+
 const TopNavigation = ({
   languages,
   language,
@@ -25,7 +36,9 @@ const TopNavigation = ({
   setShowQuran,
   setSelectedRoot,
   roots,
+  onUserIconClick,
 }) => {
+  const { userInfo } = useAuth();
   const containerRef = useOutsideClick(() => {
     setShowLanguagesList(false);
     setShowMenu(false);
@@ -36,6 +49,7 @@ const TopNavigation = ({
   const [showMenu, setShowMenu] = useState(false);
   const [showSearchInput, setShowSearchInput] = useState(false);
   const languageItemRefs = useRef({});
+  const avatarUrl = normalizeAvatarUrl(userInfo?.profile?.avatar_cropped || '');
 
   const toggleLanguageShow = () => setShowLanguagesList((prev) => !prev);
   const toggleMenuShow = () => setShowMenu((prev) => !prev);
@@ -149,7 +163,22 @@ const TopNavigation = ({
             {language}
           </span>
 
-          <img src={userIcon} alt="user icon" className="icon" />
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt="profile avatar"
+              className="topNav__avatar topNav__user-icon"
+              style={{ width: TOP_RIGHT_USER_ICON_SIZE, height: TOP_RIGHT_USER_ICON_SIZE }}
+              onClick={onUserIconClick}
+            />
+          ) : (
+            <img
+              src={userIcon}
+              alt="user icon"
+              className="icon topNav__user-icon"
+              onClick={onUserIconClick}
+            />
+          )}
         </div>
 
         {showLanguagesList && (

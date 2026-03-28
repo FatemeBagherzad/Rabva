@@ -97,7 +97,11 @@ const QuranHeader = ({
           onClick={() => handleSurahClick(id, name)}
           className="menu__option"
         >
-          {convertToPersianNumber(id)} - {name}
+          <span className="quran-header__surah-number">
+            {convertToPersianNumber(id)}
+          </span>
+          <span className="quran-header__surah-divider"> - </span>
+          <span className="quran-header__surah-name">{name}</span>
         </li>
       ))}
     </ul>
@@ -171,7 +175,10 @@ const QuranHeader = ({
     <div className="quran-header__back">
       <div className="quran-header container" ref={containerRef}>
         <header className="quran-header__header">
-          <span onClick={() => toggleLists(!showSurahList, false)}>
+          <span
+            className="quran-header__surah-trigger"
+            onClick={() => toggleLists(!showSurahList, false)}
+          >
             {surahs[selectedSurah][0]}
           </span>
 

@@ -13,7 +13,7 @@
     row-gap: 1.5rem;
     column-gap: 0.5rem;
     line-height: 1.5;
-    margin-top: 3rem;
+    margin-top: 0.9rem;
     &::after {
       content: '';
       flex: auto;
@@ -28,14 +28,42 @@
     text-align: center;
     display: flex;
     justify-content: center;
-    font-family: 'hafs-uthmanic', 'uthmanic', 'Noto Naskh Arabic', 'Scheherazade New', serif;
+    font-family: var(--quran-font-family), 'hafs-django', 'hafs-uthmanic',
+      'uthmanic', 'Noto Naskh Arabic', 'Scheherazade New', serif;
     font-feature-settings: 'ccmp', 'rlig', 'liga', 'mark', 'mkmk';
+    font-size: var(--quran-font-size, 2.5rem);
+    line-height: var(--quran-line-height, 2);
   }
   &__translation-word {
-    font-size: 1.2rem;
+    margin-top: var(--quran-translation-gap, 1rem);
+    font-size: var(--translation-font-size, 1.2rem);
+    line-height: var(--translation-line-height, 1.5);
     text-align: center;
-    color: $buttonbck-success-600;
-    font-family: 'inter', sans-serif;
+    color: var(--rabva-translation, $buttonbck-success-600);
+    font-family: var(--translation-font-family), 'inter', sans-serif;
+  }
+
+  // Word-by-word specific ayah marker tuning.
+  // Keeps Quran marker vertically aligned with Quran words and prevents
+  // translation marker from being larger than translation text.
+  &__words .quran__word-block > .quran__ayah-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(var(--quran-font-size, 2.5rem) * 0.9);
+    line-height: var(--quran-line-height, 2);
+    vertical-align: baseline;
+    transform: translateY(-0.08em);
+    min-width: 2.2em;
+  }
+
+  &__words .quran__word-block > .quran__ayah-number.quran__ayah-number-translation {
+    margin-top: var(--quran-translation-gap, 1rem);
+    font-size: var(--translation-font-size, 1.2rem);
+    line-height: var(--translation-line-height, 1.5);
+    color: var(--rabva-translation, $buttonbck-success-600);
+    font-family: var(--translation-font-family), 'inter', sans-serif;
+    transform: none;
   }
 }
 

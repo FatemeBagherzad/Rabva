@@ -85,11 +85,12 @@ const QuranTxt = ({
                 >
                   {translationLookup[`${ayah[0]}-${ayah[1]}`]}
 
-                  <span>
-                    {' '}
+                  <span className="quran__ayah-number quran__ayah-number-translation">
+                    {' ﴿'}
                     {language === 'fa'
                       ? convertToPersianNumber(ayah[1])
                       : ayah[1]}
+                    {'﴾'}
                   </span>
                 </div>
               )}

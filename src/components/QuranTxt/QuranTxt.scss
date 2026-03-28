@@ -4,7 +4,7 @@
 @use '../../styles/global.scss' as *;
 
 .quran {
-  font-family: 'hafs-django', 'hafs-uthmanic', 'uthmanic',
+  font-family: var(--quran-font-family), 'hafs-django', 'hafs-uthmanic', 'uthmanic',
     'KFGQPC Hafs Uthmanic Script',
     'Scheherazade New', 'Noto Naskh Arabic', serif;
   margin: 1rem 0;
@@ -29,15 +29,15 @@
   }
 
   &__ayah {
-    font-family: 'hafs-django', 'hafs-uthmanic', 'uthmanic', 'Noto Naskh Arabic',
+    font-family: var(--quran-font-family), 'hafs-django', 'hafs-uthmanic', 'uthmanic', 'Noto Naskh Arabic',
       'Scheherazade New', serif;
     font-feature-settings: 'ccmp', 'rlig', 'liga', 'mark', 'mkmk';
-    font-size: 2.5rem;
+    font-size: var(--quran-font-size, 2.5rem);
     font-weight: 400;
-    line-height: 2;
+    line-height: var(--quran-line-height, 2);
     display: inline;
     @include tablet {
-      font-size: 2rem;
+      font-size: var(--quran-font-size, 2.2rem);
     }
   }
   &__surah-name-container {
@@ -62,21 +62,38 @@
     // margin: 1rem;
   }
   &__ayah-number {
-    width: 100%;
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: center;
+    width: auto;
+    min-width: 2.4em;
+    margin-inline: 0.15em;
     text-align: center;
-    font-size: 1.8rem;
-    font-family: 'inter', sans-serif;
+    font-size: 0.72em;
+    line-height: 1;
+    vertical-align: 0.18em;
+    white-space: nowrap;
+    font-family: 'inter', 'Segoe UI Symbol', 'Noto Sans Arabic', sans-serif;
   }
   &__ayah-number-translation {
-    font-size: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95em;
+    line-height: 1;
+    vertical-align: middle;
+    margin-inline-start: 0.35rem;
+    white-space: nowrap;
     color: $buttonbck-success-600;
     font-family: 'inter', sans-serif;
   }
   &__translation-ayah {
     border-bottom: 1px solid lightgray;
-    font-size: 1.2rem;
-    color: $buttonbck-success-600;
-    font-family: 'inter', sans-serif;
+    margin-top: var(--quran-translation-gap, 1rem);
+    font-size: var(--translation-font-size, 1.2rem);
+    line-height: var(--translation-line-height, 1.5);
+    color: var(--rabva-translation, $buttonbck-success-600);
+    font-family: var(--translation-font-family), 'inter', sans-serif;
   }
 }
 
