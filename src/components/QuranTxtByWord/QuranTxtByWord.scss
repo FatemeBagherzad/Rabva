@@ -4,6 +4,8 @@
 @use '../../styles/global.scss' as *;
 
 .quran {
+  margin-top: 0.2rem;
+
   &__words {
     display: flex;
     flex-wrap: wrap;
@@ -13,7 +15,7 @@
     row-gap: 1.5rem;
     column-gap: 0.5rem;
     line-height: 1.5;
-    margin-top: 0.9rem;
+    margin-top: 0.2rem;
     &::after {
       content: '';
       flex: auto;
