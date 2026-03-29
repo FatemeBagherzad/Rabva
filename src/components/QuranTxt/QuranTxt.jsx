@@ -80,8 +80,9 @@ const QuranTxt = ({
               {showTranslationByAyah && (
                 <div
                   className={`quran__translation-ayah ${
-                    rtlDirection ? 'rtl' : 'ltr'
+                    language === 'fa' || rtlDirection ? 'rtl' : 'ltr'
                   }`}
+                  dir={language === 'fa' || rtlDirection ? 'rtl' : 'ltr'}
                 >
                   {translationLookup[`${ayah[0]}-${ayah[1]}`]}
 
