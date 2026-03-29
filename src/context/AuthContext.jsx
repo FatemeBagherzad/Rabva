@@ -187,21 +187,32 @@ export const AuthProvider = ({ children }) => {
   const updateUserPreferences = useCallback(
     async (payload) => {
       if (!token) throw new Error('No auth token found');
-      const updated = await updatePreferences(token, payload);
-      setPreferences((prev) => ({ ...prev, ...updated }));
+      const normalizedPayload = {
+        ...defaultPreferences,
+        ...preferences,
+        ...(userInfo?.preferences || {}),
+        ...payload,
+      };
+      const updated = await updatePreferences(token, normalizedPayload);
+      const nextPreferences = {
+        ...normalizedPayload,
+        ...(updated || {}),
+      };
+
+      setPreferences((prev) => ({ ...prev, ...nextPreferences }));
       setUserInfo((prev) => {
         if (!prev) return prev;
         return {
           ...prev,
           preferences: {
             ...(prev.preferences || {}),
-            ...updated,
+            ...nextPreferences,
           },
         };
       });
-      return updated;
+      return nextPreferences;
     },
-    [token],
+    [token, preferences, userInfo],
   );
 
   const setPreviewPreferences = useCallback((partialPayload) => {

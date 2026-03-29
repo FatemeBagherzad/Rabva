@@ -314,12 +314,14 @@ const UserProfileOverlay = ({
       bio: userInfo?.profile?.bio || '',
       visibility: userInfo?.profile?.visibility || 'private',
     });
-    setPrefDraft(userInfo?.preferences || preferences);
+    setPrefDraft({
+      ...preferences,
+      ...(userInfo?.preferences || {}),
+    });
   }, [
     isOpen,
     isLoggedIn,
     userInfo,
-    preferences,
     fetchCaptcha,
     fetchTodayAyah,
   ]);
@@ -542,7 +544,11 @@ const UserProfileOverlay = ({
 
     try {
       await updateUserProfile(profileDraft);
-      await updateUserPreferences(prefDraft);
+      const normalizedPreferences = {
+        ...preferences,
+        ...prefDraft,
+      };
+      await updateUserPreferences(normalizedPreferences);
 
       if (avatarFile) {
         const frameWidth = avatarFrameRef.current?.clientWidth || 192;
@@ -602,9 +608,44 @@ const UserProfileOverlay = ({
         {!isLoggedIn ? (
           <section>
             <div className="user-overlay__tabs">
-              <button type="button" onClick={() => setAuthTab('login')}>Login</button>
-              <button type="button" onClick={() => setAuthTab('create')}>Create User</button>
-              <button type="button" onClick={() => setAuthTab('recovery')}>Recover Password</button>
+              <button
+                type="button"
+                className={`user-overlay__tab-btn user-overlay__tab-btn--login ${
+                  authTab === 'login' ? 'user-overlay__tab-btn--active' : ''
+                }`}
+                onClick={() => setAuthTab('login')}
+                aria-label="Login"
+                title="Login"
+              >
+                <span className="user-overlay__tab-icon" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                className={`user-overlay__tab-btn user-overlay__tab-btn--create ${
+                  authTab === 'create' ? 'user-overlay__tab-btn--active' : ''
+                }`}
+                onClick={() => setAuthTab('create')}
+                aria-label="Create user"
+                title="Create user"
+              >
+                <span className="user-overlay__tab-icon" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                className={`user-overlay__tab-btn user-overlay__tab-btn--recovery ${
+                  authTab === 'recovery' ? 'user-overlay__tab-btn--active' : ''
+                }`}
+                onClick={() => setAuthTab('recovery')}
+                aria-label="Recover password"
+                title="Recover password"
+              >
+                <span className="user-overlay__tab-icon" aria-hidden="true">
+                  <span className="lock-top-1" />
+                  <span className="lock-top-2" />
+                  <span className="lock-body" />
+                  <span className="lock-hole" />
+                </span>
+              </button>
             </div>
 
             {authTab === 'login' && (
