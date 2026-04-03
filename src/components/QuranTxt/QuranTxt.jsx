@@ -8,6 +8,7 @@ const QuranTxt = ({
   surahs,
   translationByAyah,
   showTranslationByAyah,
+  isTranslationRtl,
   rtlDirection,
   language,
   selectedAyah,
@@ -80,18 +81,26 @@ const QuranTxt = ({
               {showTranslationByAyah && (
                 <div
                   className={`quran__translation-ayah ${
-                    language === 'fa' || rtlDirection ? 'rtl' : 'ltr'
+                    isTranslationRtl ? 'rtl' : 'ltr'
                   }`}
-                  dir={language === 'fa' || rtlDirection ? 'rtl' : 'ltr'}
+                  dir={isTranslationRtl ? 'rtl' : 'ltr'}
                 >
                   {translationLookup[`${ayah[0]}-${ayah[1]}`]}
 
                   <span className="quran__ayah-number quran__ayah-number-translation">
-                    {' ﴿'}
-                    {language === 'fa'
-                      ? convertToPersianNumber(ayah[1])
-                      : ayah[1]}
-                    {'﴾'}
+                    {isTranslationRtl ? (
+                      <>
+                        {' ﴿'}
+                        {language === 'fa'
+                          ? convertToPersianNumber(ayah[1])
+                          : ayah[1]}
+                        {'﴾'}
+                      </>
+                    ) : (
+                      <span className="quran__ayah-marker-ltr" dir="ltr">
+                        {` ﴿${ayah[1]}﴾`}
+                      </span>
+                    )}
                   </span>
                 </div>
               )}

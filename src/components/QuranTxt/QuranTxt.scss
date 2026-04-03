@@ -87,6 +87,13 @@
     color: $buttonbck-success-600;
     font-family: 'inter', sans-serif;
   }
+
+  &__ayah-marker-ltr {
+    direction: ltr;
+    unicode-bidi: isolate;
+    display: inline-block;
+  }
+
   &__translation-ayah {
     border-bottom: 1px solid lightgray;
     margin-top: var(--quran-translation-gap, 1rem);

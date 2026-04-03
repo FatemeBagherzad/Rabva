@@ -61,6 +61,7 @@ const Home = () => {
     setSelectedSurah,
     selectedLangTranslators,
     translationByAyah,
+    translationIsRtl,
     ayahByRoot,
     roots,
   } = useQuranData(
@@ -109,12 +110,6 @@ const Home = () => {
   useEffect(() => {
     setStoredPage(currentPage);
   }, [currentPage, setStoredPage]);
-
-  useEffect(() => {
-    if (preferences?.language_code && preferences.language_code !== language) {
-      setLanguage(preferences.language_code);
-    }
-  }, [preferences?.language_code, language, setLanguage]);
 
   const quranPreviewStyles = {
     '--quran-font-family': preferences?.quran_font_family || 'hafs-django',
@@ -175,6 +170,7 @@ const Home = () => {
                 surahs={surahs}
                 translationByAyah={translationByAyah}
                 showTranslationByAyah={showTranslationByAyah}
+                isTranslationRtl={translationIsRtl}
                 rtlDirection={rtlDirection}
                 selectedAyah={selectedAyah}
                 setSelectedAyah={setSelectedAyah}

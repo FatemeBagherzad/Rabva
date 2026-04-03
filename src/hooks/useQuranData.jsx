@@ -41,6 +41,7 @@ const useQuranData = (
   const [selectedSurah, setSelectedSurah] = useState('');
   const [translationH, setTranslationH] = useState([]);
   const [translationByAyah, setTranslationByAyah] = useState([]);
+  const [translationIsRtl, setTranslationIsRtl] = useState(true);
   const [ayahByRoot, setAyahByRoot] = useState([]);
   const [roots, setRoots] = useState([]);
 
@@ -207,13 +208,20 @@ const useQuranData = (
   useEffect(() => {
     const translatorsForLanguage = langCateTranslators?.[language] || [];
     setSelectedLangTranslators(translatorsForLanguage);
-    if (!ayahTranslator) return;
+    if (!ayahTranslator) {
+      setTranslationIsRtl(Boolean(languages?.[language]?.[1]));
+      return;
+    }
 
     const translatorSpec = allTranslatorsSpec[ayahTranslator];
     if (!translatorSpec) {
       console.warn(`Translator "${ayahTranslator}" not found in the data.`);
+      setTranslationIsRtl(Boolean(languages?.[language]?.[1]));
       return;
     }
+
+    const translatorLanguageCode = translatorSpec.language_code;
+    setTranslationIsRtl(Boolean(languages?.[translatorLanguageCode]?.[1]));
 
     const translationCode = Number(translatorSpec.translation_code);
     const pageRange = getPageRange(pages, currentPage);
@@ -316,6 +324,7 @@ const useQuranData = (
     setSelectedSurah,
     selectedLangTranslators,
     translationByAyah,
+    translationIsRtl,
     ayahByRoot,
     roots,
   };
