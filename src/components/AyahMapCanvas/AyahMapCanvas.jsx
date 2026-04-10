@@ -1,7 +1,8 @@
 import { MAP_NODE_TYPES, useAyahMapCanvas } from '../../hooks/useAyahMapCanvas';
+import { useMemo, useState } from 'react';
 import './AyahMapCanvas.scss';
 
-const AyahMapCanvas = ({ preferences }) => {
+const AyahMapCanvas = ({ preferences, surahs }) => {
   const {
     viewportRef,
     pan,
@@ -10,40 +11,61 @@ const AyahMapCanvas = ({ preferences }) => {
     startPanDrag,
     movePanDrag,
     stopPanDrag,
-    panBy,
     onTemplateDragStart,
     onDropToSurface,
     onAllowDrop,
+    placeNodeAtClientPoint,
     updateNode,
     onPlaceholderKeyDown,
+    onPlaceholderFocus,
+    onPlaceholderBlur,
     onNodePointerDown,
     onResizeHandlePointerDown,
   } = useAyahMapCanvas(preferences);
+  const [tapDropMode, setTapDropMode] = useState(false);
+
+  const isMobileLike = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(pointer: coarse), (max-width: 900px)').matches;
+  }, []);
 
   return (
     <div className="ayah-map" style={canvasStyles}>
       <div className="ayah-map__toolbar">
-        <button type="button" className="ayah-map__arrow" onClick={() => panBy(0, 80)}>
-          ↑
-        </button>
-        <button type="button" className="ayah-map__arrow" onClick={() => panBy(0, -80)}>
-          ↓
-        </button>
-        <button type="button" className="ayah-map__arrow" onClick={() => panBy(80, 0)}>
-          ←
-        </button>
-        <button type="button" className="ayah-map__arrow" onClick={() => panBy(-80, 0)}>
-          →
+        <button type="button" className="ayah-map__arrow" title="Future edge tool" aria-label="Future edge tool">
+          ↗
         </button>
 
-        <div className="ayah-map__seed" draggable onDragStart={onTemplateDragStart}>
-          1:1
-        </div>
+        {isMobileLike ? (
+          <button
+            type="button"
+            className={`ayah-map__seed ${tapDropMode ? 'is-active' : ''}`}
+            onClick={() => setTapDropMode((prev) => !prev)}
+            title="Tap and then choose location"
+            aria-label="Tap-to-place ayah input"
+          >
+            1:1
+          </button>
+        ) : (
+          <div className="ayah-map__seed" draggable onDragStart={onTemplateDragStart}>
+            1:1
+          </div>
+        )}
       </div>
 
       <div
         ref={viewportRef}
         className="ayah-map__viewport"
+        onPointerDownCapture={(event) => {
+          if (!isMobileLike || !tapDropMode) return;
+          if (event.target.closest('.ayah-map__toolbar') || event.target.closest('.ayah-map__node')) return;
+          const placed = placeNodeAtClientPoint(event.clientX, event.clientY);
+          if (placed) {
+            setTapDropMode(false);
+            event.preventDefault();
+            event.stopPropagation();
+          }
+        }}
         onPointerDown={startPanDrag}
         onPointerMove={movePanDrag}
         onPointerUp={stopPanDrag}
@@ -68,6 +90,8 @@ const AyahMapCanvas = ({ preferences }) => {
                     value={node.address}
                     onChange={(event) => updateNode(node.id, { address: event.target.value })}
                     onKeyDown={(event) => onPlaceholderKeyDown(event, node.id)}
+                    onFocus={() => onPlaceholderFocus(node.id)}
+                    onBlur={() => onPlaceholderBlur(node.id)}
                     className="ayah-map__address-input"
                   />
                   {node.error ? <div className="ayah-map__error">{node.error}</div> : null}
@@ -128,8 +152,11 @@ const AyahMapCanvas = ({ preferences }) => {
                         </span>
                       </span>
                     ))}
+                    <span className="ayah-map__meta-trail">
+                      <span className="ayah-map__address-label">{node.address}</span>
+                      <span className="ayah-map__surah-label">{surahs?.[node.surahNumber]?.[0] || ''}</span>
+                    </span>
                   </div>
-                  <div className="ayah-map__address-label">{node.address}</div>
                 </div>
               )}
             </div>

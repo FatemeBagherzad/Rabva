@@ -1,7 +1,15 @@
 import { fetchQuranWordByWord } from './wordService';
 
+const MAP_AYAH_PER_PAGE = 500;
+
+const normalizeDigits = (value) =>
+  String(value || '')
+    .replace(/[٠-٩]/g, (digit) => String(digit.charCodeAt(0) - 1632))
+    .replace(/[۰-۹]/g, (digit) => String(digit.charCodeAt(0) - 1776));
+
 const parseAddress = (value) => {
-  const match = String(value || '')
+  const normalized = normalizeDigits(value);
+  const match = normalized
     .trim()
     .match(/^(\d+)\s*:\s*(\d+)$/);
   if (!match) return null;
@@ -40,7 +48,7 @@ export const resolveAyahAddressToWords = async (addressValue) => {
   const response = await fetchQuranWordByWord({
     surah_number: surah,
     ayah_number: ayah,
-    per_page: 50,
+    per_page: MAP_AYAH_PER_PAGE,
     page: 1,
   });
 
@@ -52,6 +60,8 @@ export const resolveAyahAddressToWords = async (addressValue) => {
   return {
     ok: true,
     words,
+    surahNumber: surah,
+    ayahNumber: ayah,
     normalizedAddress: `${surah}:${ayah}`,
   };
 };

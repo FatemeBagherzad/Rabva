@@ -55,6 +55,32 @@ export const useAyahMapCanvas = (preferences) => {
     }
   };
 
+  const createPlaceholderNode = (x, y) => ({
+    id: `${Date.now()}-${Math.random()}`,
+    x,
+    y,
+    address: '1:1',
+    type: MAP_NODE_TYPES.PLACEHOLDER,
+    words: [],
+    error: '',
+    width: null,
+    height: null,
+    surahNumber: null,
+    ayahNumber: null,
+  });
+
+  const placeNodeAtClientPoint = (clientX, clientY) => {
+    const viewport = viewportRef.current;
+    if (!viewport) return false;
+
+    const rect = viewport.getBoundingClientRect();
+    const dropX = clientX - rect.left - pan.x;
+    const dropY = clientY - rect.top - pan.y;
+
+    setNodes((prev) => [...prev, createPlaceholderNode(dropX, dropY)]);
+    return true;
+  };
+
   const startPanDrag = (event) => {
     if (event.target.closest('.ayah-map__toolbar') || event.target.closest('.ayah-map__node')) {
       return;
@@ -142,11 +168,22 @@ export const useAyahMapCanvas = (preferences) => {
 
       const resizedCard = resizeNode.captureTarget?.closest('.ayah-map__ayah-card');
       if (resizedCard) {
-        const currentHeight = Math.ceil(resizedCard.getBoundingClientRect().height);
-        const contentHeight = Math.ceil(resizedCard.scrollHeight);
-        if (contentHeight > currentHeight) {
-          queueNodePatch(resizeNode.id, { height: contentHeight });
-        }
+        const content = resizedCard.querySelector('.ayah-map__ayah-content');
+        const addressLabel = resizedCard.querySelector('.ayah-map__address-label');
+        const styles = window.getComputedStyle(resizedCard);
+        const horizontalPadding =
+          parseFloat(styles.paddingLeft || '0') + parseFloat(styles.paddingRight || '0') + 2;
+        const verticalPadding =
+          parseFloat(styles.paddingTop || '0') + parseFloat(styles.paddingBottom || '0') + 2;
+
+        const contentWidth = Math.ceil(content ? content.scrollWidth : resizedCard.scrollWidth);
+        const contentHeight = Math.ceil(content ? content.scrollHeight : resizedCard.scrollHeight);
+        const labelHeight = addressLabel ? Math.ceil(addressLabel.getBoundingClientRect().height) + 6 : 0;
+
+        queueNodePatch(resizeNode.id, {
+          width: Math.max(140, contentWidth + horizontalPadding),
+          height: Math.max(54, contentHeight + verticalPadding + labelHeight),
+        });
       }
 
       if (resizeNode.captureTarget?.releasePointerCapture) {
@@ -264,28 +301,7 @@ export const useAyahMapCanvas = (preferences) => {
 
   const onDropToSurface = (event) => {
     event.preventDefault();
-
-    const viewport = viewportRef.current;
-    if (!viewport) return;
-
-    const rect = viewport.getBoundingClientRect();
-    const dropX = event.clientX - rect.left - pan.x;
-    const dropY = event.clientY - rect.top - pan.y;
-
-    setNodes((prev) => [
-      ...prev,
-      {
-        id: `${Date.now()}-${Math.random()}`,
-        x: dropX,
-        y: dropY,
-        address: '1:1',
-        type: MAP_NODE_TYPES.PLACEHOLDER,
-        words: [],
-        error: '',
-        width: null,
-        height: null,
-      },
-    ]);
+    placeNodeAtClientPoint(event.clientX, event.clientY);
   };
 
   const onAllowDrop = (event) => {
@@ -313,6 +329,8 @@ export const useAyahMapCanvas = (preferences) => {
         type: MAP_NODE_TYPES.READY,
         words: result.words,
         address: result.normalizedAddress,
+        surahNumber: result.surahNumber,
+        ayahNumber: result.ayahNumber,
         error: '',
       });
     } catch (error) {
@@ -330,6 +348,26 @@ export const useAyahMapCanvas = (preferences) => {
     }
   };
 
+  const onPlaceholderFocus = (id) => {
+    const node = nodes.find((item) => item.id === id);
+    if (!node) return;
+    if (node.address.trim() === '1:1') {
+      updateNode(id, { address: '' });
+    }
+  };
+
+  const onPlaceholderBlur = (id) => {
+    const node = nodes.find((item) => item.id === id);
+    if (!node) return;
+
+    if (!node.address.trim()) {
+      updateNode(id, { address: '1:1', error: '' });
+      return;
+    }
+
+    resolveNodeAyah(id);
+  };
+
   return {
     viewportRef,
     pan,
@@ -342,8 +380,11 @@ export const useAyahMapCanvas = (preferences) => {
     onTemplateDragStart,
     onDropToSurface,
     onAllowDrop,
+    placeNodeAtClientPoint,
     updateNode,
     onPlaceholderKeyDown,
+    onPlaceholderFocus,
+    onPlaceholderBlur,
     onNodePointerDown,
     onResizeHandlePointerDown,
   };

@@ -206,7 +206,7 @@ const Home = () => {
         />
       )}
 
-      {isMapMode && isLoggedIn && <AyahMapCanvas preferences={preferences} />}
+      {isMapMode && isLoggedIn && <AyahMapCanvas preferences={preferences} surahs={surahs} />}
 
       {!isMapMode && (
         <QuranPlayer

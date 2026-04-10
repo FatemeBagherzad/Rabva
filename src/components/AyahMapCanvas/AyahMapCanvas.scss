@@ -45,6 +45,11 @@
     background: rgba(255, 255, 255, 0.08);
     cursor: grab;
     user-select: none;
+
+    &.is-active {
+      border-color: var(--rabva-translation, #039855);
+      box-shadow: 0 0 0 1px var(--rabva-translation, #039855) inset;
+    }
   }
 
   &__viewport {
@@ -243,11 +248,29 @@
   }
 
   &__address-label {
-    position: absolute;
-    left: 0.8rem;
-    bottom: 0.35rem;
+    display: block;
     font-size: 0.95rem;
     color: var(--rabva-translation, #475467);
     font-family: var(--map-translation-font-family), sans-serif;
+    line-height: 1;
+  }
+
+  &__surah-label {
+    display: block;
+    font-size: 0.78rem;
+    color: color-mix(in srgb, var(--rabva-text, #0f172a) 70%, transparent);
+    font-family: var(--map-translation-font-family), sans-serif;
+    line-height: 1;
+    margin-top: 0.08rem;
+  }
+
+  &__meta-trail {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+    margin-inline-start: 0.4rem;
+    align-self: flex-end;
+    white-space: nowrap;
   }
 }
