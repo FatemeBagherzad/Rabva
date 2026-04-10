@@ -11,11 +11,12 @@ import QuranTxtByWord from '../../components/QuranTxtByWord/QuranTxtByWord';
 import QuranPlayer from '../../components/QuranPlayer/QuranPlayer';
 import SearchResult from '../../components/SearchResult/SearchResult';
 import UserProfileOverlay from '../../components/UserProfileOverlay/UserProfileOverlay';
+import AyahMapCanvas from '../../components/AyahMapCanvas/AyahMapCanvas';
 
 import './Home.scss';
 
 const Home = () => {
-  const { preferences } = useAuth();
+  const { preferences, isLoggedIn } = useAuth();
   const [storedPage, setStoredPage] = useLocalStorageState(1, 'currentPage');
   const safeStoredPage = Number(storedPage);
   const [currentPage, setCurrentPage] = useState(
@@ -48,6 +49,7 @@ const Home = () => {
   const [nextPageCount, setNextPageCount] = useState(1);
   const [requestedSurah, setRequestedSurah] = useState(null);
   const [showUserOverlay, setShowUserOverlay] = useState(false);
+  const [isMapMode, setIsMapMode] = useState(false);
 
   const {
     surahs,
@@ -138,8 +140,14 @@ const Home = () => {
         setSelectedRoot={setSelectedRoot}
         roots={roots}
         onUserIconClick={() => setShowUserOverlay((prev) => !prev)}
+        isMapMode={isMapMode}
+        onToggleMapMode={() => {
+          if (!isLoggedIn) return;
+          setIsMapMode((prev) => !prev);
+          setShowSearchRes(false);
+        }}
       />
-      {showQuran && (
+      {!isMapMode && showQuran && (
         <div className="quran-page" style={quranPreviewStyles}>
           <QuranHeader
             surahs={surahs}
@@ -190,7 +198,7 @@ const Home = () => {
           </div>
         </div>
       )}
-      {showSearchRes && !showQuran && (
+      {!isMapMode && showSearchRes && !showQuran && (
         <SearchResult
           ayahByRoot={ayahByRoot}
           selectedRoot={selectedRoot}
@@ -198,9 +206,13 @@ const Home = () => {
         />
       )}
 
-      <QuranPlayer
-        quranData={!showQuranByWords ? quranData : quranByWordData}
-      />
+      {isMapMode && isLoggedIn && <AyahMapCanvas preferences={preferences} />}
+
+      {!isMapMode && (
+        <QuranPlayer
+          quranData={!showQuranByWords ? quranData : quranByWordData}
+        />
+      )}
 
       <UserProfileOverlay
         isOpen={showUserOverlay}

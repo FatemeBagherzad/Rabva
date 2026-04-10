@@ -1,0 +1,253 @@
+.ayah-map {
+  margin-top: 3.5rem;
+  width: 100%;
+  height: calc(100vh - 3.5rem);
+  position: relative;
+  overflow: hidden;
+
+  &__toolbar {
+    position: fixed;
+    top: 3.5rem;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.8rem 1.2rem;
+    background: rgba(15, 23, 42, 0.88);
+    backdrop-filter: blur(4px);
+  }
+
+  &__arrow {
+    border: 1px solid rgba(255, 255, 255, 0.34);
+    border-radius: 0.4rem;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.06);
+    width: 2.6rem;
+    height: 2.6rem;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  &__seed {
+    margin-left: 1rem;
+    min-width: 7.6rem;
+    height: 2.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: #fff;
+    border-radius: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    background: rgba(255, 255, 255, 0.08);
+    cursor: grab;
+    user-select: none;
+  }
+
+  &__viewport {
+    position: absolute;
+    inset: 4.6rem 0 0;
+    overflow: hidden;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+  }
+
+  &__surface {
+    position: absolute;
+    inset: 0;
+    min-width: 100%;
+    min-height: 100%;
+  }
+
+  &__node {
+    position: absolute;
+    left: 0;
+    top: 0;
+    cursor: move;
+    touch-action: none;
+    will-change: transform;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  &__address-box {
+    min-width: 9.2rem;
+    min-height: 2.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 0.45rem;
+    background: rgba(2, 6, 23, 0.9);
+    padding: 0.4rem 0.6rem;
+  }
+
+  &__address-input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: #fff;
+    text-align: center;
+    font-size: 1.2rem;
+    outline: none;
+  }
+
+  &__error {
+    color: #fda4af;
+    font-size: 1rem;
+    margin-top: 0.2rem;
+    text-align: center;
+  }
+
+  &__loading {
+    border-radius: 0.45rem;
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    color: #fff;
+    padding: 0.7rem 0.9rem;
+    font-size: 1.15rem;
+  }
+
+  &__ayah-card {
+    padding: 0.7rem 0.9rem 1.2rem;
+    border-radius: 0.6rem;
+    background: transparent;
+    color: var(--rabva-text, #0f172a);
+    min-width: 13rem;
+    width: max-content;
+    max-width: none;
+    resize: none;
+    overflow: visible;
+    position: relative;
+    border: 1px solid transparent;
+    box-shadow: none;
+    transition: border-color 120ms ease;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  &__resize-handle {
+    position: absolute;
+    width: 1rem;
+    height: 1rem;
+    border: none;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    z-index: 2;
+    touch-action: none;
+  }
+
+  &__resize-handle--nw {
+    top: -0.5rem;
+    left: -0.5rem;
+    cursor: nwse-resize;
+  }
+
+  &__resize-handle--ne {
+    top: -0.5rem;
+    right: -0.5rem;
+    cursor: nesw-resize;
+  }
+
+  &__resize-handle--sw {
+    bottom: -0.5rem;
+    left: -0.5rem;
+    cursor: nesw-resize;
+  }
+
+  &__resize-handle--se {
+    bottom: -0.5rem;
+    right: -0.5rem;
+    cursor: nwse-resize;
+  }
+
+  &__ayah-card:hover &__resize-handle,
+  &__ayah-card:focus-within &__resize-handle {
+    background: color-mix(in srgb, var(--rabva-text, #0f172a) 30%, transparent);
+    border-radius: 999px;
+  }
+
+  &__ayah-card:hover,
+  &__ayah-card:focus-within {
+    border-color: var(--rabva-text, #0f172a);
+  }
+
+  &__ayah-content {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.45rem;
+    direction: rtl;
+    white-space: nowrap;
+  }
+
+  &__ayah-card.is-resized &__ayah-content {
+    flex-wrap: wrap;
+    white-space: normal;
+    align-items: flex-start;
+  }
+
+  &__word-block {
+    display: inline-flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.02rem;
+    border: 1px solid transparent;
+    border-radius: 0.35rem;
+    padding: 0.06rem 0.18rem;
+    transition: border-color 120ms ease;
+  }
+
+  &__ayah-card.is-resized &__word-block {
+    max-width: 100%;
+  }
+
+  &__word-block:hover {
+    border-color: color-mix(in srgb, var(--rabva-text, #0f172a) 45%, transparent);
+  }
+
+  &__word-text {
+    font-family: var(--map-quran-font-family), sans-serif;
+    font-size: var(--map-quran-font-size);
+    line-height: var(--map-line-height-quran);
+    color: var(--rabva-text, #0f172a);
+  }
+
+  &__segments {
+    font-family: var(--map-quran-font-family), sans-serif;
+    font-size: var(--map-translation-font-size);
+    line-height: 1;
+    color: var(--rabva-translation, #166534);
+    text-align: center;
+    margin-top: -0.18rem;
+    display: inline-flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 0.1rem;
+    white-space: nowrap;
+  }
+
+  &__segment-item {
+    border: 1px solid transparent;
+    border-radius: 0.2rem;
+    padding: 0 0.12rem;
+    transition: border-color 120ms ease;
+  }
+
+  &__segment-item:hover {
+    border-color: color-mix(in srgb, var(--rabva-translation, #166534) 55%, transparent);
+  }
+
+  &__address-label {
+    position: absolute;
+    left: 0.8rem;
+    bottom: 0.35rem;
+    font-size: 0.95rem;
+    color: var(--rabva-translation, #475467);
+    font-family: var(--map-translation-font-family), sans-serif;
+  }
+}

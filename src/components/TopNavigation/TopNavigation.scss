@@ -77,6 +77,69 @@
     align-items: center;
     gap: 1rem;
   }
+  &__mode-toggle {
+    border: none;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    color: #fff;
+  }
+
+  &__mode-icon {
+    width: 1.35rem;
+    height: 1.35rem;
+    display: inline-block;
+    position: relative;
+  }
+
+  &__mode-toggle.is-map .topNav__mode-icon {
+    border: 0.16rem solid currentColor;
+    border-radius: 0.18rem;
+    transform: skewY(-7deg);
+  }
+
+  &__mode-toggle.is-map .topNav__mode-icon::before,
+  &__mode-toggle.is-map .topNav__mode-icon::after {
+    content: '';
+    position: absolute;
+    top: -0.03rem;
+    bottom: -0.03rem;
+    width: 0.14rem;
+    background: currentColor;
+    border-radius: 999px;
+  }
+
+  &__mode-toggle.is-map .topNav__mode-icon::before {
+    left: 0.4rem;
+  }
+
+  &__mode-toggle.is-map .topNav__mode-icon::after {
+    right: 0.38rem;
+  }
+
+  &__mode-toggle.is-book .topNav__mode-icon {
+    border: 0.16rem solid currentColor;
+    border-radius: 0.14rem;
+  }
+
+  &__mode-toggle.is-book .topNav__mode-icon::before {
+    content: '';
+    position: absolute;
+    top: -0.03rem;
+    bottom: -0.03rem;
+    left: 50%;
+    width: 0.13rem;
+    transform: translateX(-50%);
+    background: currentColor;
+    border-radius: 999px;
+  }
+
   &__language {
     display: flex;
     align-items: center;

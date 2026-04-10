@@ -37,8 +37,10 @@ const TopNavigation = ({
   setSelectedRoot,
   roots,
   onUserIconClick,
+  isMapMode,
+  onToggleMapMode,
 }) => {
-  const { userInfo } = useAuth();
+  const { userInfo, isLoggedIn } = useAuth();
   const containerRef = useOutsideClick(() => {
     setShowLanguagesList(false);
     setShowMenu(false);
@@ -154,6 +156,18 @@ const TopNavigation = ({
               />
             )}
           </span>
+
+          {isLoggedIn && (
+            <button
+              type="button"
+              className={`topNav__mode-toggle ${isMapMode ? 'is-book' : 'is-map'}`}
+              onClick={onToggleMapMode}
+              aria-label={isMapMode ? 'Switch to Quran view' : 'Switch to map view'}
+              title={isMapMode ? 'Switch to Quran view' : 'Switch to map view'}
+            >
+              <span className="topNav__mode-icon" />
+            </button>
+          )}
 
           <span
             className="topNav__language"
