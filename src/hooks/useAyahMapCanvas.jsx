@@ -8,14 +8,25 @@ export const MAP_NODE_TYPES = {
   ERROR: 'error',
 };
 
+const MIN_SCALE = 0.25;
+const MAX_SCALE = 2.5;
+
+const clampScale = (value) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, value));
+
+const getDistance = (firstPointer, secondPointer) =>
+  Math.hypot(secondPointer.x - firstPointer.x, secondPointer.y - firstPointer.y);
+
 export const useAyahMapCanvas = (preferences) => {
   const viewportRef = useRef(null);
   const pendingNodePatchesRef = useRef(new Map());
   const rafIdRef = useRef(null);
+  const activePointersRef = useRef(new Map());
   const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [scale, setScale] = useState(1);
   const [dragPan, setDragPan] = useState(null);
   const [dragNode, setDragNode] = useState(null);
   const [resizeNode, setResizeNode] = useState(null);
+  const [pinchZoom, setPinchZoom] = useState(null);
   const [nodes, setNodes] = useState([]);
 
   const canvasStyles = useMemo(
@@ -74,14 +85,93 @@ export const useAyahMapCanvas = (preferences) => {
     if (!viewport) return false;
 
     const rect = viewport.getBoundingClientRect();
-    const dropX = clientX - rect.left - pan.x;
-    const dropY = clientY - rect.top - pan.y;
+    const dropX = (clientX - rect.left - pan.x) / scale;
+    const dropY = (clientY - rect.top - pan.y) / scale;
 
     setNodes((prev) => [...prev, createPlaceholderNode(dropX, dropY)]);
     return true;
   };
 
+  const zoomTo = (nextScale, clientX, clientY) => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+
+    const clampedScale = clampScale(nextScale);
+    const rect = viewport.getBoundingClientRect();
+    const localX = clientX - rect.left;
+    const localY = clientY - rect.top;
+    const worldX = (localX - pan.x) / scale;
+    const worldY = (localY - pan.y) / scale;
+
+    setScale(clampedScale);
+    setPan({
+      x: localX - worldX * clampedScale,
+      y: localY - worldY * clampedScale,
+    });
+  };
+
+  const zoomBy = (factor) => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const rect = viewport.getBoundingClientRect();
+    zoomTo(scale * factor, rect.left + rect.width / 2, rect.top + rect.height / 2);
+  };
+
+  const onViewportWheel = (event) => {
+    event.preventDefault();
+    const factor = event.deltaY < 0 ? 1.08 : 1 / 1.08;
+    zoomTo(scale * factor, event.clientX, event.clientY);
+  };
+
+  const onViewportPointerDownCapture = (event) => {
+    activePointersRef.current.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+    });
+
+    if (activePointersRef.current.size === 2) {
+      const [firstPointer, secondPointer] = [...activePointersRef.current.values()];
+      setDragPan(null);
+      setDragNode(null);
+      setResizeNode(null);
+      setPinchZoom({
+        startScale: scale,
+        startDistance: getDistance(firstPointer, secondPointer),
+      });
+    }
+  };
+
+  const onViewportPointerMoveCapture = (event) => {
+    if (!activePointersRef.current.has(event.pointerId)) return;
+    activePointersRef.current.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+    });
+
+    if (!pinchZoom || activePointersRef.current.size < 2) return;
+
+    const [firstPointer, secondPointer] = [...activePointersRef.current.values()];
+    const currentDistance = getDistance(firstPointer, secondPointer);
+    if (!currentDistance || !pinchZoom.startDistance) return;
+
+    const midpointX = (firstPointer.x + secondPointer.x) / 2;
+    const midpointY = (firstPointer.y + secondPointer.y) / 2;
+    const nextScale = pinchZoom.startScale * (currentDistance / pinchZoom.startDistance);
+    zoomTo(nextScale, midpointX, midpointY);
+  };
+
+  const onViewportPointerEndCapture = (event) => {
+    activePointersRef.current.delete(event.pointerId);
+    if (activePointersRef.current.size < 2) {
+      setPinchZoom(null);
+    }
+  };
+
   const startPanDrag = (event) => {
+    if (pinchZoom || activePointersRef.current.size > 1) {
+      return;
+    }
+
     if (event.target.closest('.ayah-map__toolbar') || event.target.closest('.ayah-map__node')) {
       return;
     }
@@ -118,17 +208,17 @@ export const useAyahMapCanvas = (preferences) => {
       let nextHeight = resizeNode.startHeight;
 
       if (resizeNode.handle.includes('e')) {
-        nextWidth = Math.max(minWidth, resizeNode.startWidth + dx);
+        nextWidth = Math.max(minWidth, resizeNode.startWidth + dx / scale);
       }
       if (resizeNode.handle.includes('w')) {
-        nextWidth = Math.max(minWidth, resizeNode.startWidth - dx);
+        nextWidth = Math.max(minWidth, resizeNode.startWidth - dx / scale);
         nextX = resizeNode.startNodeX + (resizeNode.startWidth - nextWidth);
       }
       if (resizeNode.handle.includes('s')) {
-        nextHeight = Math.max(minHeight, resizeNode.startHeight + dy);
+        nextHeight = Math.max(minHeight, resizeNode.startHeight + dy / scale);
       }
       if (resizeNode.handle.includes('n')) {
-        nextHeight = Math.max(minHeight, resizeNode.startHeight - dy);
+        nextHeight = Math.max(minHeight, resizeNode.startHeight - dy / scale);
         nextY = resizeNode.startNodeY + (resizeNode.startHeight - nextHeight);
       }
 
@@ -144,8 +234,8 @@ export const useAyahMapCanvas = (preferences) => {
     if (dragNode) {
       if (event.pointerId !== dragNode.pointerId) return;
 
-      const deltaX = event.clientX - dragNode.startX;
-      const deltaY = event.clientY - dragNode.startY;
+      const deltaX = (event.clientX - dragNode.startX) / scale;
+      const deltaY = (event.clientY - dragNode.startY) / scale;
       queueNodePatch(dragNode.id, {
         x: dragNode.startNodeX + deltaX,
         y: dragNode.startNodeY + deltaY,
@@ -371,8 +461,14 @@ export const useAyahMapCanvas = (preferences) => {
   return {
     viewportRef,
     pan,
+    scale,
     nodes,
     canvasStyles,
+    zoomBy,
+    onViewportWheel,
+    onViewportPointerDownCapture,
+    onViewportPointerMoveCapture,
+    onViewportPointerEndCapture,
     startPanDrag,
     movePanDrag,
     stopPanDrag,

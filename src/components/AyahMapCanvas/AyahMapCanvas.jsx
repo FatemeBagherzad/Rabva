@@ -6,8 +6,14 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
   const {
     viewportRef,
     pan,
+    scale,
     nodes,
     canvasStyles,
+    zoomBy,
+    onViewportWheel,
+    onViewportPointerDownCapture,
+    onViewportPointerMoveCapture,
+    onViewportPointerEndCapture,
     startPanDrag,
     movePanDrag,
     stopPanDrag,
@@ -53,10 +59,36 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
         )}
       </div>
 
+      <div className="ayah-map__zoom-controls">
+        <button
+          type="button"
+          className="ayah-map__zoom-button"
+          onClick={() => zoomBy(1 / 1.15)}
+          aria-label="Zoom out"
+          title="Zoom out"
+        >
+          -
+        </button>
+
+        <span className="ayah-map__zoom-readout">{Math.round(scale * 100)}%</span>
+
+        <button
+          type="button"
+          className="ayah-map__zoom-button"
+          onClick={() => zoomBy(1.15)}
+          aria-label="Zoom in"
+          title="Zoom in"
+        >
+          +
+        </button>
+      </div>
+
       <div
         ref={viewportRef}
         className="ayah-map__viewport"
+        onWheel={onViewportWheel}
         onPointerDownCapture={(event) => {
+          onViewportPointerDownCapture(event);
           if (!isMobileLike || !tapDropMode) return;
           if (event.target.closest('.ayah-map__toolbar') || event.target.closest('.ayah-map__node')) return;
           const placed = placeNodeAtClientPoint(event.clientX, event.clientY);
@@ -66,6 +98,9 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
             event.stopPropagation();
           }
         }}
+        onPointerMoveCapture={onViewportPointerMoveCapture}
+        onPointerUpCapture={onViewportPointerEndCapture}
+        onPointerCancelCapture={onViewportPointerEndCapture}
         onPointerDown={startPanDrag}
         onPointerMove={movePanDrag}
         onPointerUp={stopPanDrag}
@@ -75,7 +110,7 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
       >
         <div
           className="ayah-map__surface"
-          style={{ transform: `translate(${pan.x}px, ${pan.y}px)` }}
+          style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})` }}
         >
           {nodes.map((node) => (
             <div
