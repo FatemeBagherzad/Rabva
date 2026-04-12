@@ -122,6 +122,29 @@ const Home = () => {
     setRootPage(1);
   }, [selectedRoot]);
 
+  const handleRootSearch = (root) => {
+    setSelectedRoot(root);
+    setShowQuran(false);
+    setShowSearchRes(true);
+    setIsMapMode(false);
+  };
+
+  const handleToggleMapMode = () => {
+    if (!isLoggedIn) return;
+
+    setIsMapMode((prev) => {
+      const next = !prev;
+
+      if (next) {
+        setShowSearchRes(false);
+        setSelectedRoot(null);
+        setRootPage(1);
+      }
+
+      return next;
+    });
+  };
+
   const quranPreviewStyles = {
     '--quran-font-family': preferences?.quran_font_family || 'hafs-django',
     '--quran-font-size': `${preferences?.quran_font_size || 2.5}rem`,
@@ -147,18 +170,14 @@ const Home = () => {
         setShowTranslationByAyah={setShowTranslationByAyah}
         setShowSearchRes={setShowSearchRes}
         setShowQuran={setShowQuran}
-        setSelectedRoot={setSelectedRoot}
+        onRootSearch={handleRootSearch}
         roots={roots}
         selectedRoot={selectedRoot}
         selectedRootCount={rootPagination?.total_count || 0}
         preferences={preferences}
         onUserIconClick={() => setShowUserOverlay((prev) => !prev)}
         isMapMode={isMapMode}
-        onToggleMapMode={() => {
-          if (!isLoggedIn) return;
-          setIsMapMode((prev) => !prev);
-          setShowSearchRes(false);
-        }}
+        onToggleMapMode={handleToggleMapMode}
       />
       {!isMapMode && showQuran && (
         <div className="quran-page">

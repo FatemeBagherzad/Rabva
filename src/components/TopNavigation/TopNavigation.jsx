@@ -35,7 +35,7 @@ const TopNavigation = ({
   setShowTranslationByAyah,
   setShowSearchRes,
   setShowQuran,
-  setSelectedRoot,
+  onRootSearch,
   roots,
   selectedRoot,
   selectedRootCount,
@@ -164,9 +164,7 @@ const TopNavigation = ({
             {showSearchInput && (
               <Search
                 setShowSearchInput={setShowSearchInput}
-                setShowSearchRes={setShowSearchRes}
-                setShowQuran={setShowQuran}
-                setSelectedRoot={setSelectedRoot}
+                onRootSearch={onRootSearch}
                 roots={roots}
               />
             )}
