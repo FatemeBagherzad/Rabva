@@ -1249,7 +1249,7 @@ const UserProfileOverlay = ({
                   </label>
 
                   <label>
-                    Quran/translation distance
+                    translation distance
                     <CompactScrollSelect
                       ariaLabel="Quran and translation distance"
                       options={DISTANCE_OPTIONS}

@@ -1,6 +1,7 @@
 import besmBack from '../../assets/img/quran-besm-frame-green.png';
 import convertToPersianNumber from '../../utils/convertToPersianNumber';
 import { Fragment } from 'react';
+import LoadingDots from '../LoadingDots/LoadingDots';
 
 import './QuranTxt.scss';
 
@@ -33,7 +34,7 @@ const QuranTxt = ({
   }
 
   if (!quranData || pageAyahs.length === 0) {
-    return <div>Loading Quran data...</div>;
+    return <LoadingDots />;
   }
   if (showTranslationByAyah && !translationByAyah)
     return <p>در حال بارگزاری ...</p>;
@@ -73,6 +74,7 @@ const QuranTxt = ({
                 onClick={() =>
                   setSelectedAyah({ surah: ayah[0], ayah: ayah[1] })
                 }
+                onDoubleClick={() => isSelected && setSelectedAyah(null)}
               >
                 {ayah[2] + '\u00A0'}
               </span>

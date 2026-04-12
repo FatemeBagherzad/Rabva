@@ -42,16 +42,19 @@ const themeMap = {
     '--rabva-bg': '#ffffff',
     '--rabva-text': '#101828',
     '--rabva-translation': '#039855',
+    '--rabva-selected': '#0ea5e9',
   },
   sepia: {
     '--rabva-bg': '#f8f2e6',
     '--rabva-text': '#3b2f22',
     '--rabva-translation': '#775c2b',
+    '--rabva-selected': '#2563eb',
   },
   night: {
     '--rabva-bg': '#0f172a',
     '--rabva-text': '#e5e7eb',
     '--rabva-translation': '#86efac',
+    '--rabva-selected': '#4ade80',
   },
 };
 

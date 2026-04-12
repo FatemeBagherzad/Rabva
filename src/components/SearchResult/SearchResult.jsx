@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import convertToPersianNumber from '../../utils/convertToPersianNumber';
 import { fetchQuran } from '../../services/mainService';
+import LoadingDots from '../LoadingDots/LoadingDots';
 
 import './SearchResult.scss';
 
@@ -634,11 +635,7 @@ const SearchResult = ({
         </div>
 
         <div ref={loadMoreRef} className="search-page__load-more-sentinel" aria-hidden="true" />
-        {isRootLoading ? (
-          <div className="search-page__loading-more">
-            <span className="search-page__loading-dots" aria-label="Loading" />
-          </div>
-        ) : null}
+        {isRootLoading ? <LoadingDots /> : null}
       </div>
   );
 };

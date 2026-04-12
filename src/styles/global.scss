@@ -251,10 +251,86 @@ input {
     }
   }
 }
+@keyframes rabva-loading-dots {
+  0%,
+  16% {
+    content: '.';
+  }
+  17%,
+  32% {
+    content: '..';
+  }
+  33%,
+  48% {
+    content: '...';
+  }
+  49%,
+  64% {
+    content: '....';
+  }
+  65%,
+  80% {
+    content: '.....';
+  }
+  81%,
+  100% {
+    content: '......';
+  }
+}
+
+@keyframes rabva-loading-color {
+  0%,
+  16% {
+    color: #166534;
+  }
+  17%,
+  32% {
+    color: #15803d;
+  }
+  33%,
+  48% {
+    color: #16a34a;
+  }
+  49%,
+  64% {
+    color: #22c55e;
+  }
+  65%,
+  80% {
+    color: #4ade80;
+  }
+  81%,
+  100% {
+    color: #86efac;
+  }
+}
+
+.loading-dots {
+  display: inline-block;
+  min-width: 3em;
+  text-align: center;
+  font-size: calc(var(--menu-font-size, 1.4rem) * 2);
+  animation: rabva-loading-color 1.8s steps(1, end) infinite;
+
+  &::after {
+    content: '.';
+    animation: rabva-loading-dots 1.8s steps(1, end) infinite;
+  }
+}
+
+.loading-dots-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 2rem 0;
+}
+
 .icon {
   height: 1.6rem;
   cursor: pointer;
 }
 .selected {
-  color: var(--rabva-translation, #{$buttonbck-success-600});
+  color: var(--rabva-selected, #{$buttonbck-success-600});
+  font-weight: bold;
 }

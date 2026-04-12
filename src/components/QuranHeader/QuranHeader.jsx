@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import convertToPersianNumber from '../../utils/convertToPersianNumber';
 import { useOutsideClick } from '../../hooks/useOutsideClick';
+import LoadingDots from '../LoadingDots/LoadingDots';
 
 import chevronLeft from '../../assets/icons/chevron-left.svg';
 import chevronRight from '../../assets/icons/chevron-right.svg';
@@ -51,7 +52,7 @@ const QuranHeader = ({
   }, [currentPage]);
 
   if (!selectedSurah)
-    return <div className="quran-header__loading">در حال بارگذاری...</div>;
+    return <LoadingDots />;
 
   const goToPage = (page) => {
     if (page < 1 || page > 604) return setIsInputError(true);

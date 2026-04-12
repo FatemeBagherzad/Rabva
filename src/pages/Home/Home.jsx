@@ -12,6 +12,7 @@ import QuranPlayer from '../../components/QuranPlayer/QuranPlayer';
 import SearchResult from '../../components/SearchResult/SearchResult';
 import UserProfileOverlay from '../../components/UserProfileOverlay/UserProfileOverlay';
 import AyahMapCanvas from '../../components/AyahMapCanvas/AyahMapCanvas';
+import LoadingDots from '../../components/LoadingDots/LoadingDots';
 
 import './Home.scss';
 
@@ -133,7 +134,7 @@ const Home = () => {
   };
 
   if (!surahs || !pages || !ayahPagesInfo) {
-    return <h3>Loading ...</h3>;
+    return <LoadingDots />;
   }
   return (
     <div style={quranPreviewStyles}>
