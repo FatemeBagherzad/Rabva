@@ -76,6 +76,34 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+    direction: ltr;
+  }
+
+  &__search-root,
+  &__search-count {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.88rem;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 999px;
+    padding: 0.08rem 0.5rem;
+    line-height: 1.2;
+  }
+
+  &__search-root {
+    max-width: 8.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 700;
+  }
+
+  &__search-count {
+    min-width: 2.2rem;
+    justify-content: center;
+    opacity: 0.95;
+    font-variant-numeric: tabular-nums;
   }
   &__mode-toggle {
     border: none;

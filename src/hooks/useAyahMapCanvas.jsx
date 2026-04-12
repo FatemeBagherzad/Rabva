@@ -16,7 +16,8 @@ const clampScale = (value) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, value));
 const getDistance = (firstPointer, secondPointer) =>
   Math.hypot(secondPointer.x - firstPointer.x, secondPointer.y - firstPointer.y);
 
-export const useAyahMapCanvas = (preferences) => {
+export const useAyahMapCanvas = (preferences, options = {}) => {
+  const { selectionMode = false } = options;
   const viewportRef = useRef(null);
   const pendingNodePatchesRef = useRef(new Map());
   const rafIdRef = useRef(null);
@@ -168,6 +169,8 @@ export const useAyahMapCanvas = (preferences) => {
   };
 
   const startPanDrag = (event) => {
+    if (selectionMode) return;
+
     if (pinchZoom || activePointersRef.current.size > 1) {
       return;
     }
@@ -319,6 +322,8 @@ export const useAyahMapCanvas = (preferences) => {
   };
 
   const onNodePointerDown = (event, id, type) => {
+    if (selectionMode) return;
+
     if (event.target.closest('input, textarea, button')) return;
     if (event.target.closest('.ayah-map__resize-handle')) return;
 
@@ -458,6 +463,22 @@ export const useAyahMapCanvas = (preferences) => {
     resolveNodeAyah(id);
   };
 
+  const setMapState = (nextState) => {
+    if (!nextState || typeof nextState !== 'object') return;
+
+    if (Array.isArray(nextState.nodes)) {
+      setNodes(nextState.nodes);
+    }
+
+    if (nextState.pan && Number.isFinite(nextState.pan.x) && Number.isFinite(nextState.pan.y)) {
+      setPan({ x: nextState.pan.x, y: nextState.pan.y });
+    }
+
+    if (Number.isFinite(nextState.scale)) {
+      setScale(clampScale(nextState.scale));
+    }
+  };
+
   return {
     viewportRef,
     pan,
@@ -483,5 +504,6 @@ export const useAyahMapCanvas = (preferences) => {
     onPlaceholderBlur,
     onNodePointerDown,
     onResizeHandlePointerDown,
+    setMapState,
   };
 };

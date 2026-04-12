@@ -31,6 +31,27 @@
     cursor: pointer;
   }
 
+  &__tool-button {
+    border: 1px solid rgba(255, 255, 255, 0.34);
+    border-radius: 0.4rem;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.06);
+    height: 2.6rem;
+    padding: 0 0.6rem;
+    font-size: 0.95rem;
+    cursor: pointer;
+
+    &.is-active {
+      border-color: var(--rabva-translation, #039855);
+      box-shadow: 0 0 0 1px var(--rabva-translation, #039855) inset;
+    }
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+  }
+
   &__zoom-button {
     border: 1px solid rgba(255, 255, 255, 0.34);
     border-radius: 0.4rem;
@@ -106,6 +127,61 @@
     min-width: 100%;
     min-height: 100%;
     transform-origin: 0 0;
+  }
+
+  &__connections {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    color: var(--rabva-translation, #039855);
+    filter: none;
+    mix-blend-mode: normal;
+  }
+
+  &__connection-line {
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.5;
+    opacity: 1;
+    filter: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    shape-rendering: geometricPrecision;
+    pointer-events: stroke;
+
+    &.is-selected {
+      stroke-width: 2.1;
+    }
+
+    &.is-draft {
+      stroke-dasharray: 4 3;
+      opacity: 0.75;
+    }
+  }
+
+  &__connection-endpoint {
+    fill: color-mix(in srgb, var(--rabva-translation, #039855) 88%, white 12%);
+    stroke: color-mix(in srgb, var(--rabva-translation, #039855) 65%, black 35%);
+    stroke-width: 1;
+    pointer-events: auto;
+    cursor: grab;
+  }
+
+  &__arrowhead {
+    filter: none;
+    opacity: 1;
+    stroke: none;
+  }
+
+  &__marquee {
+    position: fixed;
+    z-index: 65;
+    border: 1px solid color-mix(in srgb, var(--rabva-translation, #039855) 70%, transparent);
+    background: color-mix(in srgb, var(--rabva-translation, #039855) 12%, transparent);
+    pointer-events: none;
   }
 
   &__node {
@@ -227,6 +303,7 @@
     gap: 0.45rem;
     direction: rtl;
     white-space: nowrap;
+    position: relative;
   }
 
   &__ayah-card.is-resized &__ayah-content {
@@ -247,12 +324,144 @@
     transition: border-color 120ms ease;
   }
 
+  &__connectable {
+    position: relative;
+  }
+
+  &__connection-points {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  &__connection-point {
+    position: absolute;
+    width: 0.62rem;
+    height: 0.62rem;
+    border: none;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--rabva-translation, #039855) 88%, white 12%);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--rabva-translation, #039855) 75%, black 25%);
+    padding: 0;
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.92);
+    transition: opacity 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+    z-index: 3;
+    touch-action: none;
+    cursor: crosshair;
+  }
+
+  &__connection-point--top {
+    left: 50%;
+    top: 0;
+    transform: translate(-50%, -50%) scale(0.92);
+  }
+
+  &__connection-point--right {
+    right: 0;
+    top: 50%;
+    transform: translate(50%, -50%) scale(0.92);
+  }
+
+  &__connection-point--bottom {
+    left: 50%;
+    bottom: 0;
+    transform: translate(-50%, 50%) scale(0.92);
+  }
+
+  &__connection-point--left {
+    left: 0;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0.92);
+  }
+
+  &__connectable.is-hover-owner > &__connection-points > &__connection-point,
+  &__connectable:focus-within > &__connection-points > &__connection-point,
+  &__connectable.is-selected > &__connection-points > &__connection-point,
+  &__connectable.is-connection-source > &__connection-points > &__connection-point,
+  &__connectable.is-connection-target > &__connection-points > &__connection-point {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  &__connection-point:hover,
+  &__connection-point.is-hovered {
+    transform: translate(var(--cp-tx, 0), var(--cp-ty, 0)) scale(1.14);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--rabva-translation, #039855) 90%, white 10%);
+  }
+
+  &__connection-point--top:hover,
+  &__connection-point--top.is-hovered {
+    --cp-tx: -50%;
+    --cp-ty: -50%;
+  }
+
+  &__connection-point--right:hover,
+  &__connection-point--right.is-hovered {
+    --cp-tx: 50%;
+    --cp-ty: -50%;
+  }
+
+  &__connection-point--bottom:hover,
+  &__connection-point--bottom.is-hovered {
+    --cp-tx: -50%;
+    --cp-ty: 50%;
+  }
+
+  &__connection-point--left:hover,
+  &__connection-point--left.is-hovered {
+    --cp-tx: -50%;
+    --cp-ty: -50%;
+  }
+
   &__ayah-card.is-resized &__word-block {
     max-width: 100%;
   }
 
   &__word-block:hover {
     border-color: color-mix(in srgb, var(--rabva-text, #0f172a) 45%, transparent);
+  }
+
+  &__selectable {
+    cursor: pointer;
+  }
+
+  &__selectable.is-selected {
+    border-color: color-mix(in srgb, var(--rabva-translation, #039855) 70%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--rabva-translation, #039855) 45%, transparent);
+  }
+
+  &__ayah-card.is-selected {
+    border-color: color-mix(in srgb, var(--rabva-translation, #039855) 88%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--rabva-translation, #039855) 42%, transparent);
+  }
+
+  &__selectable.is-group-selected {
+    border-color: color-mix(in srgb, var(--rabva-translation, #039855) 28%, transparent);
+    box-shadow: none;
+    background: color-mix(in srgb, var(--rabva-translation, #039855) 6%, transparent);
+  }
+
+  &__selectable.is-preview-selected {
+    border-color: color-mix(in srgb, var(--rabva-translation, #039855) 60%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--rabva-translation, #039855) 28%, transparent);
+  }
+
+  &__selectable.is-subset-member {
+    border-color: transparent;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  &__selection-group {
+    position: absolute;
+    border: 1px solid color-mix(in srgb, var(--rabva-translation, #039855) 78%, transparent);
+    border-radius: 0.45rem;
+    background: color-mix(in srgb, var(--rabva-translation, #039855) 6%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--rabva-translation, #039855) 30%, transparent);
+    pointer-events: auto;
+    z-index: 2;
   }
 
   &__word-text {
@@ -277,6 +486,8 @@
   }
 
   &__segment-item {
+    display: inline-flex;
+    align-items: center;
     border: 1px solid transparent;
     border-radius: 0.2rem;
     padding: 0 0.12rem;

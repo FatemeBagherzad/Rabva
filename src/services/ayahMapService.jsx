@@ -1,6 +1,4 @@
-import { fetchQuranWordByWord } from './wordService';
-
-const MAP_AYAH_PER_PAGE = 500;
+import { fetchOneAyahWordByWord } from './wordService';
 
 const normalizeDigits = (value) =>
   String(value || '')
@@ -24,11 +22,15 @@ const parseAddress = (value) => {
 };
 
 const toWordSegments = (payload, surah, ayah) => {
-  const ayahRow = payload?.data?.[surah]?.[ayah];
-  if (!ayahRow || !Array.isArray(ayahRow)) return null;
+  const data = payload?.data;
+  if (!data) return null;
+  if (Number(data.surah_number) !== Number(surah) || Number(data.ayah_number) !== Number(ayah)) {
+    return null;
+  }
 
-  const wholeWords = Array.isArray(ayahRow[0]) ? ayahRow[0] : [];
-  const segmentsByWord = Array.isArray(ayahRow[1]) ? ayahRow[1] : [];
+  const row = data.ayah_word_by_word || {};
+  const wholeWords = Array.isArray(row.whole_words) ? row.whole_words : [];
+  const segmentsByWord = Array.isArray(row.segments_by_word) ? row.segments_by_word : [];
 
   const words = wholeWords.map((word, index) => ({
     text: word || '---',
@@ -45,11 +47,9 @@ export const resolveAyahAddressToWords = async (addressValue) => {
   }
 
   const { surah, ayah } = parsed;
-  const response = await fetchQuranWordByWord({
+  const response = await fetchOneAyahWordByWord({
     surah_number: surah,
     ayah_number: ayah,
-    per_page: MAP_AYAH_PER_PAGE,
-    page: 1,
   });
 
   const words = toWordSegments(response?.data, surah, ayah);

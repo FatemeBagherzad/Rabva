@@ -7,52 +7,94 @@
   direction: rtl;
   margin: 5rem auto 12rem auto;
   font-family: 'noto-naskh-arabic';
-  &__menu {
-    background-color: $logo-success-700;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    color: whitesmoke;
-    text-align: center;
-    padding: 0.5rem;
-  }
-  &__menu-select {
-    padding: 0 0.2rem;
+  color: var(--rabva-text, #101828);
+
+  --search-ayah-font-size: 2.5rem;
+  --search-meta-font-size: 0.8rem;
+
+  &__table-wrap {
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--rabva-text, #101828) 20%, transparent);
+    border-radius: 0.55rem;
+    background: color-mix(in srgb, var(--rabva-bg, #ffffff) 96%, transparent);
   }
 
-  &__group-by-root {
-    & h5 {
-      background-color: rgb(221, 238, 221);
-    }
-  }
-  &__ayah-with-sourah-name {
-    display: grid;
-    grid-template-columns: 4.5rem 1fr;
-    align-items: center;
-    border-bottom: 1px solid grey;
-  }
-  &__sourah-name {
-    font-size: 1rem;
-  }
-  &__ayah-container {
-    display: grid;
-    grid-template-columns: 10px 1fr 10px;
-    align-items: center;
-    gap: 1rem;
+  &__table {
     width: 100%;
-    font-size: 1.5rem;
-  }
-  &__load-btn {
-    font-size: 2rem;
-    text-align: center;
-    &:hover {
-      cursor: pointer;
+    border-collapse: collapse;
+
+    th,
+    td {
+      border-bottom: 1px solid color-mix(in srgb, var(--rabva-text, #101828) 16%, transparent);
+      border-left: 1px solid color-mix(in srgb, var(--rabva-text, #101828) 16%, transparent);
+      padding: 0.6rem 0.5rem;
+      vertical-align: middle;
+      text-align: right;
+
+      &:last-child {
+        border-left: none;
+      }
+    }
+
+    th:nth-child(1),
+    td:nth-child(1) {
+      font-size: 10px;
+    }
+
+    th:nth-child(2),
+    td:nth-child(2) {
+      font-size: 9px;
+    }
+
+    th {
+      background: color-mix(in srgb, var(--rabva-translation, #039855) 16%, var(--rabva-bg, #ffffff));
+      color: var(--rabva-text, #101828);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      white-space: nowrap;
+      font-size: var(--search-meta-font-size);
+      line-height: 1.1;
     }
   }
-  &__load-btn-before {
-    border-left: 1px solid rgb(227, 227, 227);
+
+  &__cell-meta {
+    font-size: var(--search-meta-font-size);
+    line-height: 1.3;
+    white-space: nowrap;
+    width: 1%;
   }
-  &__load-btn-after {
-    border-right: 1px solid rgb(226, 226, 226);
+
+  &__sort-arrow {
+    font-size: 0.6em;
+    margin-right: 0.25rem;
+    opacity: 0.8;
+    vertical-align: middle;
+    font-style: normal;
+  }
+
+  &__sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: background 120ms ease;
+    width: 1%;
+    white-space: nowrap;
+    font-size: var(--search-meta-font-size);
+
+    &:hover {
+      background: color-mix(in srgb, var(--rabva-translation, #039855) 24%, var(--rabva-bg, #ffffff));
+    }
+
+    &.is-sorted {
+      background: color-mix(in srgb, var(--rabva-translation, #039855) 22%, var(--rabva-bg, #ffffff));
+      font-weight: 600;
+    }
+  }
+
+  &__ayah-container {
+    display: block;
+    width: 100%;
+    font-size: var(--search-ayah-font-size);
   }
   &__scroll-container {
     display: flex;
@@ -64,20 +106,141 @@
     &::-webkit-scrollbar {
       display: none;
     }
-    &.user-select-none {
+    &.is-dragging {
       cursor: grabbing;
     }
   }
   &__ayah {
     flex: 0 0 auto;
     padding: 0.5rem;
-    // scroll-snap-align: center;
+    font-size: var(--search-ayah-font-size);
+    line-height: 1.2;
+  }
+
+  &__ayah-word-by-word {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: flex-end;
+  }
+
+  &__word-box {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.08rem 0.25rem;
+  }
+
+  &__word-box.is-matched {
+    color: var(--rabva-translation, #039855);
+    font-weight: 700;
+  }
+
+  &__word-text {
+    line-height: 1.35;
+    font-size: var(--search-ayah-font-size);
+    font-family: var(--search-quran-font-family, 'noto-naskh-arabic');
+  }
+
+  &__word-segments {
+    margin-top: 0.12rem;
+    font-size: 0.95rem;
+    line-height: 1.15;
+    color: color-mix(in srgb, var(--rabva-text, #101828) 92%, var(--rabva-translation, #039855));
+    white-space: nowrap;
+  }
+
+  &__pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding: 0.75rem 0;
+  }
+
+  &__pagination-button {
+    border: 1px solid color-mix(in srgb, var(--rabva-text, #101828) 24%, transparent);
+    background: color-mix(in srgb, var(--rabva-translation, #039855) 12%, var(--rabva-bg, #ffffff));
+    color: var(--rabva-text, #101828);
+    border-radius: 0.45rem;
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+  }
+
+  &__pagination-status {
+    font-size: 1rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--rabva-text, #101828);
   }
 }
 
 .highlighted {
-  background-color: rgb(227, 227, 227);
+  background-color: color-mix(in srgb, var(--rabva-translation, #039855) 22%, var(--rabva-bg, #ffffff));
+  color: var(--rabva-text, #101828);
   font-weight: bold;
+}
+
+:root[data-rabva-theme='night'] {
+  .search-page {
+    &__table-wrap {
+      border-color: rgba(148, 163, 184, 0.35);
+      background: #0f172a;
+    }
+
+    &__table {
+      th,
+      td {
+        border-bottom-color: rgba(148, 163, 184, 0.3);
+        border-left-color: rgba(148, 163, 184, 0.3);
+      }
+
+      th {
+        background: rgba(134, 239, 172, 0.13);
+        color: #e5e7eb;
+      }
+    }
+
+    &__word-box.is-matched {
+      color: #86efac;
+    }
+
+    &__word-segments {
+      color: #d1fae5;
+    }
+
+    &__pagination-button {
+      background: rgba(134, 239, 172, 0.12);
+      border-color: rgba(148, 163, 184, 0.35);
+      color: #e5e7eb;
+    }
+
+    &__pagination-status,
+    &__sortable {
+      color: #e5e7eb;
+    }
+
+    &__sortable.is-sorted {
+      background: rgba(134, 239, 172, 0.18);
+      color: #f8fafc;
+    }
+
+    &__sort-arrow {
+      color: rgba(134, 239, 172, 0.9);
+    }
+  }
+
+  .highlighted {
+    background: rgba(134, 239, 172, 0.24);
+    color: #f8fafc;
+  }
 }
 
 .user-select-none {

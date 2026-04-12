@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { useOutsideClick } from '../../hooks/useOutsideClick';
 import { useAuth } from '../../context/AuthContext';
+import convertToPersianNumber from '../../utils/convertToPersianNumber';
 
 import MainMenu from '../MainMenu/MainMenu';
 import Search from '../Search/Search';
@@ -36,6 +37,8 @@ const TopNavigation = ({
   setShowQuran,
   setSelectedRoot,
   roots,
+  selectedRoot,
+  selectedRootCount,
   onUserIconClick,
   isMapMode,
   onToggleMapMode,
@@ -140,6 +143,12 @@ const TopNavigation = ({
 
         <div className="topNav__lang-search-User">
           <span className="topNav__search-container">
+            {selectedRoot ? (
+              <span className="topNav__search-count">{convertToPersianNumber(selectedRootCount || 0)}</span>
+            ) : null}
+            {selectedRoot ? (
+              <span className="topNav__search-root">{selectedRoot}</span>
+            ) : null}
             <img
               src={searchIcon}
               className="icon"

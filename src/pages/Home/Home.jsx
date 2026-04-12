@@ -45,6 +45,7 @@ const Home = () => {
   const [selectedAyah, setSelectedAyah] = useState(null);
   const [showSearchRes, setShowSearchRes] = useState(false);
   const [selectedRoot, setSelectedRoot] = useState(null);
+  const [rootPage, setRootPage] = useState(1);
   const [language, setLanguage] = useLocalStorageState('fa', 'language');
   const [nextPageCount, setNextPageCount] = useState(1);
   const [requestedSurah, setRequestedSurah] = useState(null);
@@ -65,6 +66,7 @@ const Home = () => {
     translationByAyah,
     translationIsRtl,
     ayahByRoot,
+    rootPagination,
     roots,
   } = useQuranData(
     currentPage,
@@ -72,6 +74,7 @@ const Home = () => {
     language,
     ayahTranslator,
     selectedRoot,
+    rootPage,
     setNextPageCount,
     requestedSurah,
   );
@@ -113,6 +116,10 @@ const Home = () => {
     setStoredPage(currentPage);
   }, [currentPage, setStoredPage]);
 
+  useEffect(() => {
+    setRootPage(1);
+  }, [selectedRoot]);
+
   const quranPreviewStyles = {
     '--quran-font-family': preferences?.quran_font_family || 'hafs-django',
     '--quran-font-size': `${preferences?.quran_font_size || 2.5}rem`,
@@ -139,6 +146,8 @@ const Home = () => {
         setShowQuran={setShowQuran}
         setSelectedRoot={setSelectedRoot}
         roots={roots}
+        selectedRoot={selectedRoot}
+        selectedRootCount={rootPagination?.total_count || 0}
         onUserIconClick={() => setShowUserOverlay((prev) => !prev)}
         isMapMode={isMapMode}
         onToggleMapMode={() => {
@@ -201,8 +210,10 @@ const Home = () => {
       {!isMapMode && showSearchRes && !showQuran && (
         <SearchResult
           ayahByRoot={ayahByRoot}
-          selectedRoot={selectedRoot}
+          rootPagination={rootPagination}
+          setRootPage={setRootPage}
           surahs={surahs}
+          preferences={preferences}
         />
       )}
 
