@@ -106,7 +106,7 @@ const SearchResult = ({ ayahByRoot, rootPagination, setRootPage, surahs, prefere
             >
               <span className="search-page__word-text">{word || '---'}</span>
               {isMatched && isHovered ? (
-                <span className="search-page__word-segments">
+                <span className="search-page__word-segments" aria-hidden="true">
                   {segments.length ? segments.join(' + ') : '---'}
                 </span>
               ) : null}
@@ -220,7 +220,7 @@ const SearchResult = ({ ayahByRoot, rootPagination, setRootPage, surahs, prefere
           </button>
 
           <span className="search-page__pagination-status">
-            {rootPagination?.current_page || 1}/{rootPagination?.total_pages || 1}
+            {convertToPersianNumber(rootPagination?.current_page || 1)}/{convertToPersianNumber(rootPagination?.total_pages || 1)}
           </span>
 
           <button

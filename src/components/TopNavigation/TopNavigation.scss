@@ -77,18 +77,20 @@
     align-items: center;
     gap: 1rem;
     direction: ltr;
+    position: relative;
   }
 
   &__search-root,
   &__search-count {
     display: inline-flex;
     align-items: center;
-    font-size: 0.88rem;
+    justify-content: center;
+    font-size: 11px;
     background: rgba(255, 255, 255, 0.14);
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 999px;
-    padding: 0.08rem 0.5rem;
-    line-height: 1.2;
+    padding: 0.35rem 0.5rem;
+    line-height: 1;
   }
 
   &__search-root {
@@ -97,11 +99,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
     font-weight: 700;
+    font-family: var(--topnav-quran-font-family, 'hafs-django');
   }
 
   &__search-count {
     min-width: 2.2rem;
-    justify-content: center;
     opacity: 0.95;
     font-variant-numeric: tabular-nums;
   }

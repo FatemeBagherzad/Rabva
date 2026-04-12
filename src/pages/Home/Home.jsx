@@ -148,6 +148,7 @@ const Home = () => {
         roots={roots}
         selectedRoot={selectedRoot}
         selectedRootCount={rootPagination?.total_count || 0}
+        preferences={preferences}
         onUserIconClick={() => setShowUserOverlay((prev) => !prev)}
         isMapMode={isMapMode}
         onToggleMapMode={() => {

@@ -5,14 +5,23 @@
 
 .search {
   display: flex;
-  position: relative;
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: transparent;
+  font-family: var(--topnav-quran-font-family, 'hafs-django');
+  color: var(--rabva-text, #101828);
 
   & input {
     direction: rtl;
+    font-family: var(--topnav-quran-font-family, 'hafs-django');
+    color: var(--rabva-text, #101828);
+    background: color-mix(in srgb, var(--rabva-bg, #ffffff) 94%, white 6%);
+    border-color: color-mix(in srgb, var(--rabva-text, #101828) 24%, transparent);
   }
   &__letters {
-    color: $header-quran-txt-grey-900;
-    background-color: $backgroundbody-btntxt;
+    color: var(--rabva-text, #101828);
+    background: color-mix(in srgb, var(--rabva-bg, #ffffff) 94%, white 6%);
     width: 20rem;
     position: absolute;
     top: 3.5rem;
@@ -28,8 +37,14 @@
     gap: 0.5rem;
     direction: rtl;
     justify-content: center;
+    border: 1px solid color-mix(in srgb, var(--rabva-text, #101828) 18%, transparent);
+    font-family: var(--topnav-quran-font-family, 'hafs-django');
     & span {
       cursor: pointer;
+
+      &:hover {
+        color: var(--rabva-translation, #039855);
+      }
     }
     @include tablet {
       font-size: inherit;
@@ -37,10 +52,9 @@
   }
   &__suggestions {
     direction: rtl;
-    color: $header-quran-txt-grey-900;
-    background-color: $backgroundbody-btntxt;
-    // box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    border-right: 2px solid red;
+    color: var(--rabva-text, #101828);
+    background: color-mix(in srgb, var(--rabva-bg, #ffffff) 94%, white 6%);
+    border: 1px solid color-mix(in srgb, var(--rabva-text, #101828) 18%, transparent);
     position: absolute;
     width: 10rem;
     top: 3.5rem;
@@ -54,15 +68,22 @@
     padding: 0.5rem;
     border-radius: 0.4rem;
     overflow-y: auto;
+    font-family: var(--topnav-quran-font-family, 'hafs-django');
     li {
       padding: 0.5rem;
-      background-color: #f1f1f1;
+      color: var(--rabva-text, #101828);
+      background: color-mix(in srgb, var(--rabva-text, #101828) 6%, var(--rabva-bg, #ffffff));
       border-radius: 0.3rem;
       cursor: pointer;
 
       &:hover {
-        background-color: #e3e2e2;
+        color: var(--rabva-translation, #039855);
+        background: color-mix(in srgb, var(--rabva-translation, #039855) 14%, var(--rabva-bg, #ffffff));
       }
     }
+  }
+
+  &__no-letters {
+    color: var(--rabva-text, #101828);
   }
 }

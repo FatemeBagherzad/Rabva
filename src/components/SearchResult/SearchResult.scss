@@ -13,7 +13,7 @@
   --search-meta-font-size: 0.8rem;
 
   &__table-wrap {
-    overflow: hidden;
+    overflow: visible;
     border: 1px solid color-mix(in srgb, var(--rabva-text, #101828) 20%, transparent);
     border-radius: 0.55rem;
     background: color-mix(in srgb, var(--rabva-bg, #ffffff) 96%, transparent);
@@ -27,7 +27,7 @@
     td {
       border-bottom: 1px solid color-mix(in srgb, var(--rabva-text, #101828) 16%, transparent);
       border-left: 1px solid color-mix(in srgb, var(--rabva-text, #101828) 16%, transparent);
-      padding: 0.6rem 0.5rem;
+      padding: 0.25rem 0.5rem;
       vertical-align: middle;
       text-align: right;
 
@@ -37,13 +37,15 @@
     }
 
     th:nth-child(1),
-    td:nth-child(1) {
-      font-size: 10px;
-    }
-
+    td:nth-child(1),
     th:nth-child(2),
     td:nth-child(2) {
-      font-size: 9px;
+      font-size: 12px;
+    }
+
+    th:nth-child(1),
+    td:nth-child(1) {
+      font-family: var(--search-quran-font-family, 'noto-naskh-arabic');
     }
 
     th {
@@ -129,6 +131,7 @@
     flex-direction: column;
     align-items: center;
     padding: 0.08rem 0.25rem;
+    position: relative;
   }
 
   &__word-box.is-matched {
@@ -143,18 +146,36 @@
   }
 
   &__word-segments {
-    margin-top: 0.12rem;
-    font-size: 0.95rem;
-    line-height: 1.15;
-    color: color-mix(in srgb, var(--rabva-text, #101828) 92%, var(--rabva-translation, #039855));
+    position: absolute;
+    bottom: calc(100% + 0.08rem);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    font-size: 0.8rem;
+    line-height: 1.2;
+    color: var(--rabva-bg, #ffffff);
+    background: var(--rabva-text, #101828);
     white-space: nowrap;
+    padding: 0.18rem 0.45rem;
+    border-radius: 0.3rem;
+    pointer-events: none;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: var(--rabva-text, #101828);
+    }
   }
 
   &__pagination {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
+    gap: 1rem;
     margin-top: 1rem;
     padding: 0.75rem 0;
   }
@@ -168,6 +189,12 @@
     height: 2rem;
     padding: 0;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    line-height: 1;
+    vertical-align: middle;
 
     &:disabled {
       opacity: 0.45;
@@ -179,6 +206,8 @@
     font-size: 1rem;
     font-variant-numeric: tabular-nums;
     color: var(--rabva-text, #101828);
+    min-width: 3rem;
+    text-align: center;
   }
 }
 
@@ -213,7 +242,12 @@
     }
 
     &__word-segments {
+      background: #1e293b;
       color: #d1fae5;
+
+      &::after {
+        border-top-color: #1e293b;
+      }
     }
 
     &__pagination-button {

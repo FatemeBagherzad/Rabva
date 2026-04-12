@@ -39,6 +39,7 @@ const TopNavigation = ({
   roots,
   selectedRoot,
   selectedRootCount,
+  preferences,
   onUserIconClick,
   isMapMode,
   onToggleMapMode,
@@ -142,7 +143,12 @@ const TopNavigation = ({
         />
 
         <div className="topNav__lang-search-User">
-          <span className="topNav__search-container">
+          <span
+            className="topNav__search-container"
+            style={{
+              '--topnav-quran-font-family': preferences?.quran_font_family || 'hafs-django',
+            }}
+          >
             {selectedRoot ? (
               <span className="topNav__search-count">{convertToPersianNumber(selectedRootCount || 0)}</span>
             ) : null}
