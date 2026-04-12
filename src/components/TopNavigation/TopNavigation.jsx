@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useOutsideClick } from '../../hooks/useOutsideClick';
+import { useAuth } from '../../context/AuthContext';
+import convertToPersianNumber from '../../utils/convertToPersianNumber';
 
 import MainMenu from '../MainMenu/MainMenu';
 import Search from '../Search/Search';
@@ -14,6 +16,16 @@ import searchIcon from '../../assets/icons/search.svg';
 
 import './TopNavigation.scss';
 
+const TOP_RIGHT_USER_ICON_SIZE = '1.7rem';
+
+const normalizeAvatarUrl = (url) => {
+  if (!url) return '';
+  if (/^(https?:)?\/\//i.test(url) || url.startsWith('blob:') || url.startsWith('data:')) {
+    return url;
+  }
+  return url.startsWith('/') ? url : `/${url}`;
+};
+
 const TopNavigation = ({
   languages,
   language,
@@ -23,9 +35,16 @@ const TopNavigation = ({
   setShowTranslationByAyah,
   setShowSearchRes,
   setShowQuran,
-  setSelectedRoot,
+  onRootSearch,
   roots,
+  selectedRoot,
+  selectedRootCount,
+  preferences,
+  onUserIconClick,
+  isMapMode,
+  onToggleMapMode,
 }) => {
+  const { userInfo, isLoggedIn } = useAuth();
   const containerRef = useOutsideClick(() => {
     setShowLanguagesList(false);
     setShowMenu(false);
@@ -35,10 +54,48 @@ const TopNavigation = ({
   const [showLanguagesList, setShowLanguagesList] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showSearchInput, setShowSearchInput] = useState(false);
+  const languageItemRefs = useRef({});
+  const avatarUrl = normalizeAvatarUrl(userInfo?.profile?.avatar_cropped || '');
 
   const toggleLanguageShow = () => setShowLanguagesList((prev) => !prev);
   const toggleMenuShow = () => setShowMenu((prev) => !prev);
   const toggleSearch = () => setShowSearchInput((prev) => !prev);
+
+  useEffect(() => {
+    if (!showLanguagesList) return;
+
+    const handleLanguageListKeyDown = (event) => {
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+
+      const targetTagName = event.target?.tagName;
+      if (targetTagName === 'INPUT' || targetTagName === 'TEXTAREA') return;
+
+      const key = event.key?.toLowerCase();
+      if (!key || key.length !== 1 || !/[a-z]/i.test(key)) return;
+
+      const languageEntries = Object.entries(languages || {});
+      const matchedEntry = languageEntries.find(([langCode, langValue]) => {
+        const displayName = String(langValue?.[0] || '').toLowerCase();
+        return (
+          String(langCode).toLowerCase().startsWith(key) ||
+          displayName.startsWith(key)
+        );
+      });
+
+      if (!matchedEntry) return;
+
+      const targetElement = languageItemRefs.current[matchedEntry[0]];
+      if (!targetElement) return;
+
+      event.preventDefault();
+      targetElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    };
+
+    document.addEventListener('keydown', handleLanguageListKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleLanguageListKeyDown);
+    };
+  }, [showLanguagesList, languages]);
 
   return (
     <div className="topNav__back">
@@ -69,7 +126,7 @@ const TopNavigation = ({
               navigate('/');
             }}
           >
-            Rabva
+            رَبْوَة
           </span>
         </div>
 
@@ -86,7 +143,18 @@ const TopNavigation = ({
         />
 
         <div className="topNav__lang-search-User">
-          <span className="topNav__search-container">
+          <span
+            className="topNav__search-container"
+            style={{
+              '--topnav-quran-font-family': preferences?.quran_font_family || 'hafs-django',
+            }}
+          >
+            {selectedRoot ? (
+              <span className="topNav__search-count">{convertToPersianNumber(selectedRootCount || 0)}</span>
+            ) : null}
+            {selectedRoot ? (
+              <span className="topNav__search-root">{selectedRoot}</span>
+            ) : null}
             <img
               src={searchIcon}
               className="icon"
@@ -96,13 +164,23 @@ const TopNavigation = ({
             {showSearchInput && (
               <Search
                 setShowSearchInput={setShowSearchInput}
-                setShowSearchRes={setShowSearchRes}
-                setShowQuran={setShowQuran}
-                setSelectedRoot={setSelectedRoot}
+                onRootSearch={onRootSearch}
                 roots={roots}
               />
             )}
           </span>
+
+          {isLoggedIn && (
+            <button
+              type="button"
+              className={`topNav__mode-toggle ${isMapMode ? 'is-book' : 'is-map'}`}
+              onClick={onToggleMapMode}
+              aria-label={isMapMode ? 'Switch to Quran view' : 'Switch to map view'}
+              title={isMapMode ? 'Switch to Quran view' : 'Switch to map view'}
+            >
+              <span className="topNav__mode-icon" />
+            </button>
+          )}
 
           <span
             className="topNav__language"
@@ -112,7 +190,22 @@ const TopNavigation = ({
             {language}
           </span>
 
-          <img src={userIcon} alt="user icon" className="icon" />
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt="profile avatar"
+              className="topNav__avatar topNav__user-icon"
+              style={{ width: TOP_RIGHT_USER_ICON_SIZE, height: TOP_RIGHT_USER_ICON_SIZE }}
+              onClick={onUserIconClick}
+            />
+          ) : (
+            <img
+              src={userIcon}
+              alt="user icon"
+              className="icon topNav__user-icon"
+              onClick={onUserIconClick}
+            />
+          )}
         </div>
 
         {showLanguagesList && (
@@ -120,6 +213,9 @@ const TopNavigation = ({
             {Object.entries(languages).map(([key, value]) => (
               <li
                 key={key}
+                ref={(element) => {
+                  languageItemRefs.current[key] = element;
+                }}
                 className="menu__option"
                 onClick={() => {
                   setLanguage(key);

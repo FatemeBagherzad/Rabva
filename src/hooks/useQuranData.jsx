@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   fetchQuran,
   fetchSurahNames,
@@ -14,14 +14,20 @@ import {
 } from '../services/translationService';
 import { fetchRoots } from '../services/grammarService';
 
+const PAGE_MIN = 1;
+const PAGE_MAX = 604;
+const API_PER_PAGE = 500;
+const ROOT_PER_PAGE = 100;
+
 const useQuranData = (
   currentPage,
   showQuranByWords,
   language,
   ayahTranslator,
   root,
+  rootPage,
   setNextPageCount,
-  requestedSurah
+  requestedSurah,
 ) => {
   const [surahs, setSurahs] = useState([]);
   const [ayahPagesInfo, setAyahPagesInfo] = useState([]);
@@ -35,49 +41,61 @@ const useQuranData = (
   const [selectedSurah, setSelectedSurah] = useState('');
   const [translationH, setTranslationH] = useState([]);
   const [translationByAyah, setTranslationByAyah] = useState([]);
+  const [translationIsRtl, setTranslationIsRtl] = useState(true);
   const [ayahByRoot, setAyahByRoot] = useState([]);
+  const [isRootLoading, setIsRootLoading] = useState(false);
+  const [rootPagination, setRootPagination] = useState({
+    current_page: 1,
+    total_pages: 1,
+    total_count: 0,
+    has_next: false,
+    has_previous: false,
+  });
   const [roots, setRoots] = useState([]);
+  const rootResultsCacheRef = useRef(new Map());
+
+  const getMergedRootPages = (rootValue, lastPage) => {
+    const merged = [];
+    for (let page = PAGE_MIN; page <= lastPage; page += 1) {
+      const cached = rootResultsCacheRef.current.get(`${rootValue}::${page}`);
+      if (!cached) break;
+      merged.push(...cached.data);
+    }
+    return merged;
+  };
 
   const trimData = (data, startSurah, startAyah, endSurah, endAyah) => {
     const trimmed = {};
     for (let s = startSurah; s <= endSurah; s++) {
       const ayahs = data[s];
       if (!ayahs) continue;
-      const filtered = Object.entries(ayahs)
-        .filter(([k]) => {
+      const filtered = Object.fromEntries(
+        Object.entries(ayahs).filter(([k]) => {
           const n = +k;
           return (
             n >= (s === startSurah ? startAyah : 1) &&
             n <= (s === endSurah ? endAyah : Infinity)
           );
-        })
-        .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {});
+        }),
+      );
       if (Object.keys(filtered).length) trimmed[s] = filtered;
     }
     return trimmed;
   };
 
   // Calculate how many pages fit on screen
-  const calculatePagesPerView = (showQuranByWords) => {
+  const calculatePagesPerView = () => {
     const screenWidth = window.innerWidth;
-    // Mobile/tablet - single page view
     if (screenWidth < 1024) return 1;
-
-    // Calculate based on screen width and content density
     if (screenWidth >= 1920) return 15;
     if (screenWidth >= 1600) return 10;
     if (screenWidth >= 1440) return 7;
-    if (screenWidth >= 1024) return 5;
-
-    return 1;
+    return 5;
   };
 
-  const getPageRange = (pages, currentPage, showQuranByWords) => {
+  const getPageRange = (pages, currentPage) => {
     if (!pages[currentPage]) return null;
-    const pagesPerView = calculatePagesPerView(showQuranByWords);
-    if (setNextPageCount) {
-      setNextPageCount(pagesPerView === 1 ? 1 : pagesPerView);
-    }
+    const pagesPerView = calculatePagesPerView();
     const [startSurah, startAyah] = pages[currentPage];
     let endSurah, endAyah;
 
@@ -96,6 +114,12 @@ const useQuranData = (
 
     return { startSurah, startAyah, endSurah, endAyah };
   };
+
+  useEffect(() => {
+    if (setNextPageCount) {
+      setNextPageCount(1);
+    }
+  }, [setNextPageCount]);
 
   //fetch Surahs, Ayah pages info, Pages info,languages,translators,roots.
   useEffect(() => {
@@ -133,9 +157,7 @@ const useQuranData = (
   //fetch Quran by Ayahs and by Words
   useEffect(() => {
     if (!pages[currentPage]) return;
-    // const [startSurah, startAyah, endSurah, endAyah] = pages[currentPage];
-
-    const pageRange = getPageRange(pages, currentPage, showQuranByWords);
+    const pageRange = getPageRange(pages, currentPage);
     if (!pageRange) return;
     const { startSurah, startAyah, endSurah, endAyah } = pageRange;
 
@@ -145,32 +167,27 @@ const useQuranData = (
         const { data } = await fetchFn({
           surah_number: startSurah,
           ayah_number: startAyah,
-          per_page: 500,
-          page: 1,
+          per_page: API_PER_PAGE,
+          page: PAGE_MIN,
         });
         const trimmed = trimData(
           data.data,
           startSurah,
           startAyah,
           endSurah,
-          endAyah
+          endAyah,
         );
         showQuranByWords ? setQuranByWordData(trimmed) : setQuranData(trimmed);
-        // console.log(trimmed);
-        // setSelectedSurah(startSurah);
         requestedSurah
           ? setSelectedSurah(requestedSurah)
           : setSelectedSurah(startSurah);
-        // setSelectedSurah((prev) => {
-        //   return prev !== startSurah ? startSurah : prev;
-        // });
       } catch (e) {
         console.error('Fetch page error', e);
       }
     };
 
     fetchPage();
-  }, [currentPage, pages, showQuranByWords]);
+  }, [currentPage, pages, showQuranByWords, requestedSurah]);
 
   //fetch Translation for H (word by word)
   useEffect(() => {
@@ -178,8 +195,7 @@ const useQuranData = (
       setTranslationH([]);
       return;
     }
-    // const [startSurah, startAyah, endSurah, endAyah] = pages[currentPage];
-    const pageRange = getPageRange(pages, currentPage, showQuranByWords);
+    const pageRange = getPageRange(pages, currentPage);
     if (!pageRange) return;
     const { startSurah, startAyah, endSurah, endAyah } = pageRange;
 
@@ -188,15 +204,15 @@ const useQuranData = (
         const { data } = await fetchQuranTranslationH({
           surah_number: startSurah,
           ayah_number: startAyah,
-          per_page: 500,
-          page: 1,
+          per_page: API_PER_PAGE,
+          page: PAGE_MIN,
         });
         const trimmed = trimData(
           data.data,
           startSurah,
           startAyah,
           endSurah,
-          endAyah
+          endAyah,
         );
         setTranslationH(data ? trimmed : []);
       } catch (error) {
@@ -209,18 +225,25 @@ const useQuranData = (
 
   //fetch translation by ayah
   useEffect(() => {
-    if (!languages || !langCateTranslators) return;
-    setSelectedLangTranslators(langCateTranslators[language]);
-    if (!ayahTranslator) return;
+    const translatorsForLanguage = langCateTranslators?.[language] || [];
+    setSelectedLangTranslators(translatorsForLanguage);
+    if (!ayahTranslator) {
+      setTranslationIsRtl(Boolean(languages?.[language]?.[1]));
+      return;
+    }
 
     const translatorSpec = allTranslatorsSpec[ayahTranslator];
     if (!translatorSpec) {
       console.warn(`Translator "${ayahTranslator}" not found in the data.`);
+      setTranslationIsRtl(Boolean(languages?.[language]?.[1]));
       return;
     }
 
+    const translatorLanguageCode = translatorSpec.language_code;
+    setTranslationIsRtl(Boolean(languages?.[translatorLanguageCode]?.[1]));
+
     const translationCode = Number(translatorSpec.translation_code);
-    const pageRange = getPageRange(pages, currentPage, showQuranByWords);
+    const pageRange = getPageRange(pages, currentPage);
     if (!pageRange) return;
 
     const { startSurah, startAyah, endSurah, endAyah } = pageRange;
@@ -231,15 +254,15 @@ const useQuranData = (
           translation_code: translationCode,
           surah_number: startSurah,
           ayah_number: startAyah,
-          per_page: 500,
-          page: 1,
+          per_page: API_PER_PAGE,
+          page: PAGE_MIN,
         });
         const trimmed = trimData(
           data.data,
           startSurah,
           startAyah,
           endSurah,
-          endAyah
+          endAyah,
         );
 
         setTranslationByAyah(trimmed);
@@ -260,56 +283,62 @@ const useQuranData = (
   ]);
 
   useEffect(() => {
-    if (!root) return;
+    if (!root) {
+      setAyahByRoot([]);
+      setIsRootLoading(false);
+      setRootPagination({
+        current_page: 1,
+        total_pages: 1,
+        total_count: 0,
+        has_next: false,
+        has_previous: false,
+      });
+      return;
+    }
 
-    let isCancelled = false;
+    const loadRootPage = async () => {
+      const page = rootPage || PAGE_MIN;
+      const cacheKey = `${root}::${page}`;
+      const cached = rootResultsCacheRef.current.get(cacheKey);
+      if (cached) {
+        setAyahByRoot(getMergedRootPages(root, page));
+        setRootPagination(cached.pagination);
+        return;
+      }
 
-    const loadFirstPage = async () => {
       try {
-        const perPage = 100;
-        const firstPage = 1;
-
+        setIsRootLoading(true);
         const { data } = await fetchAyahByRoot({
           root,
-          per_page: perPage,
-          page: firstPage,
+          per_page: ROOT_PER_PAGE,
+          page,
         });
 
         if (!data?.data) return;
+        const nextPagination = {
+          current_page: data.pagination?.current_page || rootPage || PAGE_MIN,
+          total_pages: data.pagination?.total_pages || 1,
+          total_count: data.pagination?.total_count || data.data.length || 0,
+          has_next: Boolean(data.pagination?.has_next),
+          has_previous: Boolean(data.pagination?.has_previous),
+        };
 
-        // Set first page
-        setAyahByRoot(data.data);
+        rootResultsCacheRef.current.set(cacheKey, {
+          data: data.data,
+          pagination: nextPagination,
+        });
 
-        const totalPages = data.pagination?.total_pages || 1;
-
-        // Load remaining pages in background
-        for (let page = 2; page <= totalPages; page++) {
-          if (isCancelled) break;
-
-          const { data: nextPageData } = await fetchAyahByRoot({
-            root,
-            per_page: perPage,
-            page,
-          });
-
-          if (!nextPageData?.data) break;
-
-          setAyahByRoot((prev) => [...prev, ...nextPageData.data]);
-
-          // Optional: slow it down a bit to avoid hammering the server
-          await new Promise((res) => setTimeout(res, 100));
-        }
+        setAyahByRoot(getMergedRootPages(root, page));
+        setRootPagination(nextPagination);
       } catch (error) {
-        console.error('Failed to progressively fetch ayahs by root:', error);
+        console.error('Failed to fetch ayahs by root page:', error);
+      } finally {
+        setIsRootLoading(false);
       }
     };
 
-    loadFirstPage();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [root]);
+    loadRootPage();
+  }, [root, rootPage]);
 
   return {
     surahs,
@@ -323,7 +352,10 @@ const useQuranData = (
     setSelectedSurah,
     selectedLangTranslators,
     translationByAyah,
+    translationIsRtl,
     ayahByRoot,
+    isRootLoading,
+    rootPagination,
     roots,
   };
 };

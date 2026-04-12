@@ -50,7 +50,7 @@ const QuranTxtByWord = ({
               ﴿‏{num}‎﴾{/* {'\u0028'}*/}
             </span>
             <span className="quran__ayah-number quran__ayah-number-translation">
-              {num}
+              ﴿‏{num}‎﴾
             </span>
           </span>
         );

@@ -35,11 +35,13 @@
 }
 
 html {
-  font-size: 50%; /* 1rem = 8px */
+  font-size: 56.25%; /* 1rem = 9px */
   scroll-behavior: smooth;
   -webkit-tap-highlight-color: transparent; /* Removes tap highlight on mobile */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   @include tablet {
-    font-size: 56.25%; /* 1rem = 9px */
+    font-size: 60%; /* 1rem = 9.6px */
   }
   @include desktop {
     font-size: 62.5%; /* 1rem = 10px */
@@ -48,10 +50,11 @@ html {
 
 body {
   font-family: 'inter', sans-serif;
-  background-color: $backgroundbody-btntxt;
-  color: $maintxt-playbar;
+  background-color: var(--rabva-bg, $backgroundbody-btntxt);
+  color: var(--rabva-text, $maintxt-playbar);
   min-height: 100vh;
-  font-size: 1.8rem;
+  font-size: calc(var(--menu-font-size, 1.4rem) * 1.43);
+  line-height: 1.5;
   overflow-x: hidden;
 }
 .ltr {
@@ -76,9 +79,18 @@ body {
   font-family: 'Arial', sans-serif; /* Good for English */
 }
 
+/* Menu font size variables for UI elements (pages, titles, buttons, tables, summary) */
+h1, h2, h3, h4, h5, h6 {
+  font-size: var(--menu-font-size, 1.4rem);
+}
+
+label, button, .menu-item, .table-cell {
+  font-size: var(--menu-font-size, 1.4rem);
+}
+
 a {
   text-decoration: none;
-  color: $maintxt-playbar;
+  color: var(--rabva-text, $maintxt-playbar);
   transition: color 0.3s ease;
   padding: 0;
   &:hover {
@@ -145,7 +157,7 @@ button {
   border: none;
   border-radius: 0.4rem;
   padding: 0.2rem 0.8rem;
-  font-size: 1.2rem;
+  font-size: 1.6rem;
   background-color: $buttonbck-success-600;
   color: $backgroundbody-btntxt;
   transition: background-color 0.3s;
@@ -170,7 +182,7 @@ textarea,
 option,
 select {
   font-family: inherit;
-  font-size: 1.2rem;
+  font-size: 1.6rem;
   padding: 0.2rem;
   border: 1px solid $input-border;
   border-radius: 0.4rem;
@@ -212,24 +224,113 @@ input {
   flex-direction: column;
   background-color: rgb(255, 255, 255);
   color: $maintxt-playbar;
-  width: 20rem;
+  width: 18rem;
   max-height: 30rem;
   overflow-y: auto;
   z-index: 9999;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  padding: 0 1rem;
+  padding: 0 0.8rem;
+
+  @include tablet {
+    width: 20rem;
+    padding: 0 1rem;
+  }
+
   &__option {
     display: flex;
     gap: 1rem;
     border-bottom: 1px solid $player-border-grey-200;
-    padding: 1rem 0;
+    padding: 0.8rem 0;
+    font-size: 1.4rem;
+    line-height: 1.3;
     cursor: pointer;
+
+    @include tablet {
+      padding: 1rem 0;
+      font-size: 1.6rem;
+    }
   }
 }
+@keyframes rabva-loading-dots {
+  0%,
+  16% {
+    content: '.';
+  }
+  17%,
+  32% {
+    content: '..';
+  }
+  33%,
+  48% {
+    content: '...';
+  }
+  49%,
+  64% {
+    content: '....';
+  }
+  65%,
+  80% {
+    content: '.....';
+  }
+  81%,
+  100% {
+    content: '......';
+  }
+}
+
+@keyframes rabva-loading-color {
+  0%,
+  16% {
+    color: #166534;
+  }
+  17%,
+  32% {
+    color: #15803d;
+  }
+  33%,
+  48% {
+    color: #16a34a;
+  }
+  49%,
+  64% {
+    color: #22c55e;
+  }
+  65%,
+  80% {
+    color: #4ade80;
+  }
+  81%,
+  100% {
+    color: #86efac;
+  }
+}
+
+.loading-dots {
+  display: inline-block;
+  min-width: 3em;
+  text-align: center;
+  font-size: calc(var(--menu-font-size, 1.4rem) * 2);
+  animation: rabva-loading-color 1.8s steps(1, end) infinite;
+
+  &::after {
+    content: '.';
+    animation: rabva-loading-dots 1.8s steps(1, end) infinite;
+  }
+}
+
+.loading-dots-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 2rem 0;
+}
+
 .icon {
   height: 1.6rem;
   cursor: pointer;
 }
 .selected {
-  background-color: $selected;
+  color: var(--rabva-selected, #{$buttonbck-success-600});
+  font-weight: bold;
 }

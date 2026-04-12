@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import convertToPersianNumber from '../../utils/convertToPersianNumber';
 import { useOutsideClick } from '../../hooks/useOutsideClick';
+import LoadingDots from '../LoadingDots/LoadingDots';
 
 import chevronLeft from '../../assets/icons/chevron-left.svg';
 import chevronRight from '../../assets/icons/chevron-right.svg';
-import searchIcon from '../../assets/icons/search.svg';
 
 import './QuranHeader.scss';
 
@@ -35,7 +35,6 @@ const QuranHeader = ({
   const [isEditingPage, setIsEditingPage] = useState(false);
   const [isInputError, setIsInputError] = useState(false);
   const [totalAyahs, setTotalAyahs] = useState(7);
-  const [showSearchBox, setShowSearchBox] = useState(false);
 
   const containerRef = useOutsideClick(() => {
     setShowAyahList(false);
@@ -53,15 +52,14 @@ const QuranHeader = ({
   }, [currentPage]);
 
   if (!selectedSurah)
-    return <div className="quran-header__loading">در حال بارگذاری...</div>;
+    return <LoadingDots />;
 
   const goToPage = (page) => {
-    // console.log('from goToPage', page);
     if (page < 1 || page > 604) return setIsInputError(true);
     if (page === currentPage) return;
 
     const matched = Object.entries(ayahPagesInfo).find(([, ayahs]) =>
-      Object.values(ayahs).includes(page)
+      Object.values(ayahs).includes(page),
     );
     if (matched) setSelectedSurah(matched[0]);
 
@@ -86,38 +84,48 @@ const QuranHeader = ({
     const page = ayahPagesInfo[selectedSurah][ayah];
 
     if (page) {
+      setSelectedAyah({ surah: selectedSurah, ayah: ayah });
       goToPage(Number(page));
       toggleLists(false, false);
-      setSelectedAyah({ surah: selectedSurah, ayah: ayah });
     }
   };
 
-  const toggleLists = (surah, ayah) => {
-    setShowSurahList(surah);
-    setShowAyahList(ayah);
-  };
-  const toggleSearch = () => setShowSearchBox((prev) => !prev);
-
   const renderSurahList = () => (
-    <ul className="menu quran-header__surahs">
+    <ul
+      className="menu quran-header__surahs"
+      onClick={(event) => event.stopPropagation()}
+    >
       {Object.entries(surahs).map(([id, [name]]) => (
         <li
           key={id}
-          onClick={() => handleSurahClick(id, name)}
+          onClick={(event) => {
+            event.stopPropagation();
+            handleSurahClick(id, name);
+          }}
           className="menu__option"
         >
-          {convertToPersianNumber(id)} - {name}
+          <span className="quran-header__surah-number">
+            {convertToPersianNumber(id)}
+          </span>
+          <span className="quran-header__surah-divider"> - </span>
+          <span className="quran-header__surah-name">{name}</span>
         </li>
       ))}
     </ul>
   );
 
   const renderAyahList = () => (
-    <ul className="menu quran-header__ayahs">
+    <ul
+      className="menu quran-header__ayahs"
+      onClick={(event) => event.stopPropagation()}
+    >
       {Array.from({ length: totalAyahs }, (_, i) => (
         <li
           key={i + 1}
-          onClick={() => handleAyahClick(i + 1)}
+          onClick={(event) => {
+            event.stopPropagation();
+            handleAyahClick(i + 1);
+          }}
           className="menu__option "
         >
           {convertToPersianNumber(i + 1)}
@@ -131,13 +139,27 @@ const QuranHeader = ({
       <span
         className="quran-header__translation menu__option"
         onClick={() => {
-          setShowQuranByWords((prev) => !prev);
+          setShowTranslationByAyah(false);
+          setShowQuranByWords(false);
+          setAyahTranslator('');
           setShowTranslationList(false);
         }}
       >
-        word by word
+        No translation
       </span>
       <span className="quran-header__translation-language">{language}</span>
+
+      {language === 'fa' && (
+        <span
+          className="quran-header__translation menu__option"
+          onClick={() => {
+            setShowQuranByWords((prev) => !prev);
+            setShowTranslationList(false);
+          }}
+        >
+          کلمه به کلمه (میریحیی)
+        </span>
+      )}
       <ul className={` ${rtlDirection ? 'rtl' : 'ltr'}`}>
         {selectedLangTranslators?.map((translator, index) => (
           <li
@@ -157,15 +179,25 @@ const QuranHeader = ({
     </div>
   );
 
+  const toggleLists = (surah, ayah) => {
+    setShowSurahList(surah);
+    setShowAyahList(ayah);
+  };
+
   return (
     <div className="quran-header__back">
       <div className="quran-header container" ref={containerRef}>
         <header className="quran-header__header">
-          <span onClick={() => toggleLists(!showSurahList, false)}>
+          <div
+            className="quran-header__surah-trigger"
+            onClick={() => toggleLists(!showSurahList, false)}
+          >
             {surahs[selectedSurah][0]}
-          </span>
+            {showSurahList && renderSurahList()}
+            {showAyahList && renderAyahList()}
+          </div>
 
-          <span className="quran-header__page-navigation">
+          <div className="quran-header__page-navigation">
             {currentPage < 604 && (
               <img
                 src={chevronLeft}
@@ -199,9 +231,9 @@ const QuranHeader = ({
                 className="quran-header__chevron"
               />
             )}
-          </span>
+          </div>
 
-          <span
+          <div
             className={`quran-header__translate-options ${
               showTranslationByAyah && showQuranByWords
                 ? 'quran-header__translate-options-on'
@@ -210,12 +242,10 @@ const QuranHeader = ({
             onClick={() => setShowTranslationList((prev) => !prev)}
           >
             ترجمه
-          </span>
+          </div>
         </header>
 
         <div className="quran-header__body">
-          {showSurahList && renderSurahList()}
-          {showAyahList && renderAyahList()}
           {showTranslationList && renderTranslationList()}
         </div>
       </div>

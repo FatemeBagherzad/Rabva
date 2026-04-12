@@ -1,5 +1,7 @@
 import besmBack from '../../assets/img/quran-besm-frame-green.png';
 import convertToPersianNumber from '../../utils/convertToPersianNumber';
+import { Fragment } from 'react';
+import LoadingDots from '../LoadingDots/LoadingDots';
 
 import './QuranTxt.scss';
 
@@ -8,6 +10,7 @@ const QuranTxt = ({
   surahs,
   translationByAyah,
   showTranslationByAyah,
+  isTranslationRtl,
   rtlDirection,
   language,
   selectedAyah,
@@ -31,7 +34,7 @@ const QuranTxt = ({
   }
 
   if (!quranData || pageAyahs.length === 0) {
-    return <div>Loading Quran data...</div>;
+    return <LoadingDots />;
   }
   if (showTranslationByAyah && !translationByAyah)
     return <p>در حال بارگزاری ...</p>;
@@ -44,7 +47,7 @@ const QuranTxt = ({
             selectedAyah?.surah === ayah[0] && selectedAyah?.ayah === ayah[1];
 
           return (
-            <span key={`${ayah[0]}-${ayah[1]}`} className="quran__ayah">
+            <Fragment key={`${ayah[0]}-${ayah[1]}`}>
               {ayah[1] === 1 && (
                 <div className="quran__surah-name-container">
                   <img
@@ -65,11 +68,13 @@ const QuranTxt = ({
                     بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
                   </div>
                 )}
+              <span className="quran__ayah">
               <span
                 className={`${isSelected ? 'selected' : ''}`}
                 onClick={() =>
                   setSelectedAyah({ surah: ayah[0], ayah: ayah[1] })
                 }
+                onDoubleClick={() => isSelected && setSelectedAyah(null)}
               >
                 {ayah[2] + '\u00A0'}
               </span>
@@ -80,20 +85,31 @@ const QuranTxt = ({
               {showTranslationByAyah && (
                 <div
                   className={`quran__translation-ayah ${
-                    rtlDirection ? 'rtl' : 'ltr'
+                    isTranslationRtl ? 'rtl' : 'ltr'
                   }`}
+                  dir={isTranslationRtl ? 'rtl' : 'ltr'}
                 >
                   {translationLookup[`${ayah[0]}-${ayah[1]}`]}
 
-                  <span>
-                    {' '}
-                    {language === 'fa'
-                      ? convertToPersianNumber(ayah[1])
-                      : ayah[1]}
+                  <span className="quran__ayah-number quran__ayah-number-translation">
+                    {isTranslationRtl ? (
+                      <>
+                        {' ﴿'}
+                        {language === 'fa'
+                          ? convertToPersianNumber(ayah[1])
+                          : ayah[1]}
+                        {'﴾'}
+                      </>
+                    ) : (
+                      <span className="quran__ayah-marker-ltr" dir="ltr">
+                        {` ﴿${ayah[1]}﴾`}
+                      </span>
+                    )}
                   </span>
                 </div>
               )}
-            </span>
+              </span>
+            </Fragment>
           );
         })}
       </div>

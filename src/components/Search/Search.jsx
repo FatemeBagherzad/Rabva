@@ -3,9 +3,7 @@ import './Search.scss';
 
 const Search = ({
   setShowSearchInput,
-  setShowSearchRes,
-  setShowQuran,
-  setSelectedRoot,
+  onRootSearch,
   roots,
 }) => {
   const [inputRoot, setInputRoot] = useState('');
@@ -62,9 +60,7 @@ const Search = ({
     setInputRoot(e.target.value);
   };
   const handleRootClick = (word) => {
-    setSelectedRoot(word);
-    setShowQuran(false);
-    setShowSearchRes(true);
+    onRootSearch(word);
     setShowSearchInput(false);
   };
 

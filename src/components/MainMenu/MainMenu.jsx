@@ -1,4 +1,4 @@
-import homePageIcon from '../../assets/icons/home-Page.svg';
+import homePageIcon from '../../assets/icons/home-page.svg';
 import memoAppIcon from '../../assets/icons/memorization-app.svg';
 import memoPlanIcon from '../../assets/icons/memorization-plan.svg';
 import coachesIcon from '../../assets/icons/coaches.svg';
