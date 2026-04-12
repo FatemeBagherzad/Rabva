@@ -5,12 +5,22 @@
 
 .search-page {
   direction: rtl;
-  margin: 5rem auto 12rem auto;
+  width: 100%;
+  margin: 5rem 0 12rem 0;
+  padding: 0 1rem;
   font-family: 'noto-naskh-arabic';
   color: var(--rabva-text, #101828);
 
   --search-ayah-font-size: 2.5rem;
   --search-meta-font-size: 0.8rem;
+
+  @include tablet {
+    padding: 0 2rem;
+  }
+
+  @include desktop {
+    padding: 0 2.5rem;
+  }
 
   &__table-wrap {
     overflow: visible;
@@ -145,32 +155,6 @@
     font-family: var(--search-quran-font-family, 'noto-naskh-arabic');
   }
 
-  &__word-segments {
-    position: absolute;
-    bottom: calc(100% + 0.08rem);
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 9999;
-    font-size: 0.8rem;
-    line-height: 1.2;
-    color: var(--rabva-bg, #ffffff);
-    background: var(--rabva-text, #101828);
-    white-space: nowrap;
-    padding: 0.18rem 0.45rem;
-    border-radius: 0.3rem;
-    pointer-events: none;
-
-    &::after {
-      content: '';
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      border: 5px solid transparent;
-      border-top-color: var(--rabva-text, #101828);
-    }
-  }
-
   &__pagination {
     display: flex;
     align-items: center;
@@ -239,15 +223,6 @@
 
     &__word-box.is-matched {
       color: #86efac;
-    }
-
-    &__word-segments {
-      background: #1e293b;
-      color: #d1fae5;
-
-      &::after {
-        border-top-color: #1e293b;
-      }
     }
 
     &__pagination-button {

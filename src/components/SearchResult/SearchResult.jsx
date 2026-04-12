@@ -1,10 +1,9 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import convertToPersianNumber from '../../utils/convertToPersianNumber';
 
 import './SearchResult.scss';
 
 const SearchResult = ({ ayahByRoot, rootPagination, setRootPage, surahs, preferences }) => {
-  const [hoveredWordKey, setHoveredWordKey] = useState(null);
   const [surahSortDir, setSurahSortDir] = useState(null);
   const [ayahSortDir, setAyahSortDir] = useState(null);
   const matchedWordRefs = useRef(new Map());
@@ -72,18 +71,13 @@ const SearchResult = ({ ayahByRoot, rootPagination, setRootPage, surahs, prefere
 
   const renderWordByWordAyah = (item) => {
     const wholeWords = item?.ayah_word_by_word?.whole_words || [];
-    const segmentsByWord = item?.ayah_word_by_word?.segments_by_word || [];
     const matchedWordIndex = Number(item.word_number) - 1;
 
     return (
       <span className="search-page__ayah-word-by-word">
         {wholeWords.map((word, index) => {
           const wordKey = `${item.surah_number}:${item.ayah_number}:${index}`;
-          const segments = Array.isArray(segmentsByWord[index])
-            ? segmentsByWord[index]
-            : [];
           const isMatched = index === matchedWordIndex;
-          const isHovered = hoveredWordKey === wordKey;
 
           return (
             <span
@@ -97,19 +91,8 @@ const SearchResult = ({ ayahByRoot, rootPagination, setRootPage, surahs, prefere
                 }
                 matchedWordRefs.current.set(wordKey, element);
               }}
-              onMouseEnter={() => {
-                if (isMatched) setHoveredWordKey(wordKey);
-              }}
-              onMouseLeave={() => {
-                if (isMatched) setHoveredWordKey(null);
-              }}
             >
               <span className="search-page__word-text">{word || '---'}</span>
-              {isMatched && isHovered ? (
-                <span className="search-page__word-segments" aria-hidden="true">
-                  {segments.length ? segments.join(' + ') : '---'}
-                </span>
-              ) : null}
             </span>
           );
         })}
@@ -143,7 +126,6 @@ const SearchResult = ({ ayahByRoot, rootPagination, setRootPage, surahs, prefere
   });
 
   return (
-    <div className="container">
       <div
         className="search-page"
         style={{
@@ -237,7 +219,6 @@ const SearchResult = ({ ayahByRoot, rootPagination, setRootPage, surahs, prefere
           </button>
         </div>
       </div>
-    </div>
   );
 };
 
