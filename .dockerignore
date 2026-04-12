@@ -1,0 +1,14 @@
+# Ignore common development files and directories
+.git
+.gitignore
+node_modules
+/logs
+npm-debug.log
+# Ignore cache files
+__pycache__
+*.pyc
+# Ignore all markdown files except the main README.md
+*.md
+!README.md
+# Ignore temporary files anywhere in the context
+**/temp*

@@ -1,0 +1,509 @@
+import { useMemo, useRef, useState } from 'react';
+import { resolveAyahAddressToWords } from '../services/ayahMapService';
+
+export const MAP_NODE_TYPES = {
+  PLACEHOLDER: 'placeholder',
+  LOADING: 'loading',
+  READY: 'ready',
+  ERROR: 'error',
+};
+
+const MIN_SCALE = 0.25;
+const MAX_SCALE = 2.5;
+
+const clampScale = (value) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, value));
+
+const getDistance = (firstPointer, secondPointer) =>
+  Math.hypot(secondPointer.x - firstPointer.x, secondPointer.y - firstPointer.y);
+
+export const useAyahMapCanvas = (preferences, options = {}) => {
+  const { selectionMode = false } = options;
+  const viewportRef = useRef(null);
+  const pendingNodePatchesRef = useRef(new Map());
+  const rafIdRef = useRef(null);
+  const activePointersRef = useRef(new Map());
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [scale, setScale] = useState(1);
+  const [dragPan, setDragPan] = useState(null);
+  const [dragNode, setDragNode] = useState(null);
+  const [resizeNode, setResizeNode] = useState(null);
+  const [pinchZoom, setPinchZoom] = useState(null);
+  const [nodes, setNodes] = useState([]);
+
+  const canvasStyles = useMemo(
+    () => ({
+      '--map-quran-font-family': preferences?.quran_font_family || 'hafs-django',
+      '--map-quran-font-size': `${preferences?.quran_font_size || 2.5}rem`,
+      '--map-translation-font-family': preferences?.translation_font_family || 'inter',
+      '--map-translation-font-size': `${preferences?.translation_font_size || 1.2}rem`,
+      '--map-line-height-quran': preferences?.line_height_quran || 2,
+      '--map-line-height-translation': preferences?.line_height_translation || 1.5,
+    }),
+    [preferences],
+  );
+
+  const flushQueuedNodePatches = () => {
+    rafIdRef.current = null;
+    const patchMap = pendingNodePatchesRef.current;
+    if (!patchMap.size) return;
+
+    const patches = new Map(patchMap);
+    patchMap.clear();
+
+    setNodes((prev) =>
+      prev.map((node) => {
+        const patch = patches.get(node.id);
+        return patch ? { ...node, ...patch } : node;
+      }),
+    );
+  };
+
+  const queueNodePatch = (id, patch) => {
+    const current = pendingNodePatchesRef.current.get(id) || {};
+    pendingNodePatchesRef.current.set(id, { ...current, ...patch });
+
+    if (!rafIdRef.current) {
+      rafIdRef.current = requestAnimationFrame(flushQueuedNodePatches);
+    }
+  };
+
+  const createPlaceholderNode = (x, y) => ({
+    id: `${Date.now()}-${Math.random()}`,
+    x,
+    y,
+    address: '1:1',
+    type: MAP_NODE_TYPES.PLACEHOLDER,
+    words: [],
+    error: '',
+    width: null,
+    height: null,
+    surahNumber: null,
+    ayahNumber: null,
+  });
+
+  const placeNodeAtClientPoint = (clientX, clientY) => {
+    const viewport = viewportRef.current;
+    if (!viewport) return false;
+
+    const rect = viewport.getBoundingClientRect();
+    const dropX = (clientX - rect.left - pan.x) / scale;
+    const dropY = (clientY - rect.top - pan.y) / scale;
+
+    setNodes((prev) => [...prev, createPlaceholderNode(dropX, dropY)]);
+    return true;
+  };
+
+  const zoomTo = (nextScale, clientX, clientY) => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+
+    const clampedScale = clampScale(nextScale);
+    const rect = viewport.getBoundingClientRect();
+    const localX = clientX - rect.left;
+    const localY = clientY - rect.top;
+    const worldX = (localX - pan.x) / scale;
+    const worldY = (localY - pan.y) / scale;
+
+    setScale(clampedScale);
+    setPan({
+      x: localX - worldX * clampedScale,
+      y: localY - worldY * clampedScale,
+    });
+  };
+
+  const zoomBy = (factor) => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const rect = viewport.getBoundingClientRect();
+    zoomTo(scale * factor, rect.left + rect.width / 2, rect.top + rect.height / 2);
+  };
+
+  const onViewportWheel = (event) => {
+    event.preventDefault();
+    const factor = event.deltaY < 0 ? 1.08 : 1 / 1.08;
+    zoomTo(scale * factor, event.clientX, event.clientY);
+  };
+
+  const onViewportPointerDownCapture = (event) => {
+    activePointersRef.current.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+    });
+
+    if (activePointersRef.current.size === 2) {
+      const [firstPointer, secondPointer] = [...activePointersRef.current.values()];
+      setDragPan(null);
+      setDragNode(null);
+      setResizeNode(null);
+      setPinchZoom({
+        startScale: scale,
+        startDistance: getDistance(firstPointer, secondPointer),
+      });
+    }
+  };
+
+  const onViewportPointerMoveCapture = (event) => {
+    if (!activePointersRef.current.has(event.pointerId)) return;
+    activePointersRef.current.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY,
+    });
+
+    if (!pinchZoom || activePointersRef.current.size < 2) return;
+
+    const [firstPointer, secondPointer] = [...activePointersRef.current.values()];
+    const currentDistance = getDistance(firstPointer, secondPointer);
+    if (!currentDistance || !pinchZoom.startDistance) return;
+
+    const midpointX = (firstPointer.x + secondPointer.x) / 2;
+    const midpointY = (firstPointer.y + secondPointer.y) / 2;
+    const nextScale = pinchZoom.startScale * (currentDistance / pinchZoom.startDistance);
+    zoomTo(nextScale, midpointX, midpointY);
+  };
+
+  const onViewportPointerEndCapture = (event) => {
+    activePointersRef.current.delete(event.pointerId);
+    if (activePointersRef.current.size < 2) {
+      setPinchZoom(null);
+    }
+  };
+
+  const startPanDrag = (event) => {
+    if (selectionMode) return;
+
+    if (pinchZoom || activePointersRef.current.size > 1) {
+      return;
+    }
+
+    if (event.target.closest('.ayah-map__toolbar') || event.target.closest('.ayah-map__node')) {
+      return;
+    }
+
+    if (event.currentTarget?.setPointerCapture) {
+      try {
+        event.currentTarget.setPointerCapture(event.pointerId);
+      } catch (error) {
+        // Ignore pointer-capture failures and continue with best effort drag behavior.
+      }
+    }
+
+    setDragPan({
+      pointerId: event.pointerId,
+      captureTarget: event.currentTarget,
+      startX: event.clientX,
+      startY: event.clientY,
+      startPanX: pan.x,
+      startPanY: pan.y,
+    });
+  };
+
+  const movePanDrag = (event) => {
+    if (resizeNode) {
+      if (event.pointerId !== resizeNode.pointerId) return;
+
+      const dx = event.clientX - resizeNode.startX;
+      const dy = event.clientY - resizeNode.startY;
+      const minWidth = 140;
+      const minHeight = 54;
+      let nextX = resizeNode.startNodeX;
+      let nextY = resizeNode.startNodeY;
+      let nextWidth = resizeNode.startWidth;
+      let nextHeight = resizeNode.startHeight;
+
+      if (resizeNode.handle.includes('e')) {
+        nextWidth = Math.max(minWidth, resizeNode.startWidth + dx / scale);
+      }
+      if (resizeNode.handle.includes('w')) {
+        nextWidth = Math.max(minWidth, resizeNode.startWidth - dx / scale);
+        nextX = resizeNode.startNodeX + (resizeNode.startWidth - nextWidth);
+      }
+      if (resizeNode.handle.includes('s')) {
+        nextHeight = Math.max(minHeight, resizeNode.startHeight + dy / scale);
+      }
+      if (resizeNode.handle.includes('n')) {
+        nextHeight = Math.max(minHeight, resizeNode.startHeight - dy / scale);
+        nextY = resizeNode.startNodeY + (resizeNode.startHeight - nextHeight);
+      }
+
+      queueNodePatch(resizeNode.id, {
+        x: nextX,
+        y: nextY,
+        width: nextWidth,
+        height: nextHeight,
+      });
+      return;
+    }
+
+    if (dragNode) {
+      if (event.pointerId !== dragNode.pointerId) return;
+
+      const deltaX = (event.clientX - dragNode.startX) / scale;
+      const deltaY = (event.clientY - dragNode.startY) / scale;
+      queueNodePatch(dragNode.id, {
+        x: dragNode.startNodeX + deltaX,
+        y: dragNode.startNodeY + deltaY,
+      });
+      return;
+    }
+
+    if (!dragPan) return;
+    if (event.pointerId !== dragPan.pointerId) return;
+
+    setPan({
+      x: dragPan.startPanX + (event.clientX - dragPan.startX),
+      y: dragPan.startPanY + (event.clientY - dragPan.startY),
+    });
+  };
+
+  const stopPanDrag = (event) => {
+    if (resizeNode) {
+      if (event && event.pointerId !== resizeNode.pointerId) return;
+
+      const resizedCard = resizeNode.captureTarget?.closest('.ayah-map__ayah-card');
+      if (resizedCard) {
+        const content = resizedCard.querySelector('.ayah-map__ayah-content');
+        const addressLabel = resizedCard.querySelector('.ayah-map__address-label');
+        const styles = window.getComputedStyle(resizedCard);
+        const horizontalPadding =
+          parseFloat(styles.paddingLeft || '0') + parseFloat(styles.paddingRight || '0') + 2;
+        const verticalPadding =
+          parseFloat(styles.paddingTop || '0') + parseFloat(styles.paddingBottom || '0') + 2;
+
+        const contentWidth = Math.ceil(content ? content.scrollWidth : resizedCard.scrollWidth);
+        const contentHeight = Math.ceil(content ? content.scrollHeight : resizedCard.scrollHeight);
+        const labelHeight = addressLabel ? Math.ceil(addressLabel.getBoundingClientRect().height) + 6 : 0;
+
+        queueNodePatch(resizeNode.id, {
+          width: Math.max(140, contentWidth + horizontalPadding),
+          height: Math.max(54, contentHeight + verticalPadding + labelHeight),
+        });
+      }
+
+      if (resizeNode.captureTarget?.releasePointerCapture) {
+        try {
+          resizeNode.captureTarget.releasePointerCapture(resizeNode.pointerId);
+        } catch (error) {
+          // Ignore release errors.
+        }
+      }
+
+      setResizeNode(null);
+      return;
+    }
+
+    if (dragNode) {
+      if (event && event.pointerId !== dragNode.pointerId) return;
+
+      if (dragNode.captureTarget?.releasePointerCapture) {
+        try {
+          dragNode.captureTarget.releasePointerCapture(dragNode.pointerId);
+        } catch (error) {
+          // Ignore release errors.
+        }
+      }
+
+      setDragNode(null);
+      return;
+    }
+
+    if (!dragPan) return;
+
+    if (event && event.pointerId !== dragPan.pointerId) return;
+
+    if (dragPan.captureTarget?.releasePointerCapture) {
+      try {
+        dragPan.captureTarget.releasePointerCapture(dragPan.pointerId);
+      } catch (error) {
+        // Ignore release errors.
+      }
+    }
+
+    setDragPan(null);
+  };
+
+  const onNodePointerDown = (event, id, type) => {
+    if (selectionMode) return;
+
+    if (event.target.closest('input, textarea, button')) return;
+    if (event.target.closest('.ayah-map__resize-handle')) return;
+
+    const node = nodes.find((item) => item.id === id);
+    if (!node) return;
+
+    event.stopPropagation();
+
+    if (event.currentTarget?.setPointerCapture) {
+      try {
+        event.currentTarget.setPointerCapture(event.pointerId);
+      } catch (error) {
+        // Ignore pointer-capture failures and continue with best effort drag behavior.
+      }
+    }
+
+    setDragNode({
+      id,
+      pointerId: event.pointerId,
+      captureTarget: event.currentTarget,
+      startX: event.clientX,
+      startY: event.clientY,
+      startNodeX: node.x,
+      startNodeY: node.y,
+    });
+  };
+
+  const onResizeHandlePointerDown = (event, id, handle) => {
+    event.stopPropagation();
+    event.preventDefault();
+
+    const node = nodes.find((item) => item.id === id);
+    if (!node) return;
+
+    const card = event.currentTarget.closest('.ayah-map__ayah-card');
+    if (!card) return;
+
+    const rect = card.getBoundingClientRect();
+
+    if (event.currentTarget?.setPointerCapture) {
+      try {
+        event.currentTarget.setPointerCapture(event.pointerId);
+      } catch (error) {
+        // Ignore pointer-capture failures.
+      }
+    }
+
+    setResizeNode({
+      id,
+      handle,
+      pointerId: event.pointerId,
+      captureTarget: event.currentTarget,
+      startX: event.clientX,
+      startY: event.clientY,
+      startNodeX: node.x,
+      startNodeY: node.y,
+      startWidth: node.width || rect.width,
+      startHeight: node.height || rect.height,
+    });
+  };
+
+  const panBy = (dx, dy) => {
+    setPan((prev) => ({ x: prev.x + dx, y: prev.y + dy }));
+  };
+
+  const onTemplateDragStart = (event) => {
+    event.dataTransfer.setData('text/plain', '1:1');
+    event.dataTransfer.effectAllowed = 'copy';
+  };
+
+  const onDropToSurface = (event) => {
+    event.preventDefault();
+    placeNodeAtClientPoint(event.clientX, event.clientY);
+  };
+
+  const onAllowDrop = (event) => {
+    event.preventDefault();
+  };
+
+  const updateNode = (id, patch) => {
+    setNodes((prev) => prev.map((node) => (node.id === id ? { ...node, ...patch } : node)));
+  };
+
+  const resolveNodeAyah = async (id) => {
+    const node = nodes.find((item) => item.id === id);
+    if (!node) return;
+
+    updateNode(id, { type: MAP_NODE_TYPES.LOADING, error: '' });
+
+    try {
+      const result = await resolveAyahAddressToWords(node.address);
+      if (!result.ok) {
+        updateNode(id, { type: MAP_NODE_TYPES.ERROR, error: result.error || 'Invalid address' });
+        return;
+      }
+
+      updateNode(id, {
+        type: MAP_NODE_TYPES.READY,
+        words: result.words,
+        address: result.normalizedAddress,
+        surahNumber: result.surahNumber,
+        ayahNumber: result.ayahNumber,
+        error: '',
+      });
+    } catch (error) {
+      updateNode(id, {
+        type: MAP_NODE_TYPES.ERROR,
+        error: 'Failed to load ayah',
+      });
+    }
+  };
+
+  const onPlaceholderKeyDown = (event, id) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      resolveNodeAyah(id);
+    }
+  };
+
+  const onPlaceholderFocus = (id) => {
+    const node = nodes.find((item) => item.id === id);
+    if (!node) return;
+    if (node.address.trim() === '1:1') {
+      updateNode(id, { address: '' });
+    }
+  };
+
+  const onPlaceholderBlur = (id) => {
+    const node = nodes.find((item) => item.id === id);
+    if (!node) return;
+
+    if (!node.address.trim()) {
+      updateNode(id, { address: '1:1', error: '' });
+      return;
+    }
+
+    resolveNodeAyah(id);
+  };
+
+  const setMapState = (nextState) => {
+    if (!nextState || typeof nextState !== 'object') return;
+
+    if (Array.isArray(nextState.nodes)) {
+      setNodes(nextState.nodes);
+    }
+
+    if (nextState.pan && Number.isFinite(nextState.pan.x) && Number.isFinite(nextState.pan.y)) {
+      setPan({ x: nextState.pan.x, y: nextState.pan.y });
+    }
+
+    if (Number.isFinite(nextState.scale)) {
+      setScale(clampScale(nextState.scale));
+    }
+  };
+
+  return {
+    viewportRef,
+    pan,
+    scale,
+    nodes,
+    canvasStyles,
+    zoomBy,
+    onViewportWheel,
+    onViewportPointerDownCapture,
+    onViewportPointerMoveCapture,
+    onViewportPointerEndCapture,
+    startPanDrag,
+    movePanDrag,
+    stopPanDrag,
+    panBy,
+    onTemplateDragStart,
+    onDropToSurface,
+    onAllowDrop,
+    placeNodeAtClientPoint,
+    updateNode,
+    onPlaceholderKeyDown,
+    onPlaceholderFocus,
+    onPlaceholderBlur,
+    onNodePointerDown,
+    onResizeHandlePointerDown,
+    setMapState,
+  };
+};

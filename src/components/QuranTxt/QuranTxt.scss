@@ -1,0 +1,146 @@
+@use '../../styles/partials/variables' as *;
+@use '../../styles/partials/typography' as *;
+@use '../../styles/partials/mixins' as *;
+@use '../../styles/global.scss' as *;
+
+.quran {
+  font-family: var(--quran-font-family), 'hafs-django', 'hafs-uthmanic', 'uthmanic',
+    'KFGQPC Hafs Uthmanic Script',
+    'Scheherazade New', 'Noto Naskh Arabic', serif;
+  margin: 1rem 0;
+  direction: rtl;
+  font-feature-settings: 'mark', 'mkmk', 'liga', 'calt';
+  text-rendering: optimizeLegibility;
+  margin-bottom: 15rem;
+
+  &__ayahs {
+    transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+    will-change: transform; // Optimize for performance
+    text-align: justify;
+    text-align-last: right;
+    text-justify: inter-word;
+
+    // Slide-in from right (for previous page)
+    &[data-direction='right'] {
+      animation: slideInFromRight 0.5s forwards;
+    }
+
+    // Slide-in from left (for next page)
+    &[data-direction='left'] {
+      animation: slideInFromLeft 0.5s forwards;
+    }
+  }
+
+  &__ayah {
+    font-family: var(--quran-font-family), 'hafs-django', 'hafs-uthmanic', 'uthmanic', 'Noto Naskh Arabic',
+      'Scheherazade New', serif;
+    font-feature-settings: 'ccmp', 'rlig', 'liga', 'mark', 'mkmk';
+    font-size: var(--quran-font-size, 2.5rem);
+    font-weight: 400;
+    line-height: var(--quran-line-height, 2);
+    display: inline;
+    @include tablet {
+      font-size: var(--quran-font-size, 2.2rem);
+    }
+  }
+  &__surah-name-container {
+    position: relative;
+    display: block;
+    width: 25rem;
+    max-width: 100%;
+    margin: 3rem auto 2rem;
+    text-align: center;
+  }
+  &__surah-name-back {
+    display: block;
+    width: 100%;
+  }
+  &__surah-name {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(-0.12em);
+    padding: 0 1.2rem;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    direction: rtl;
+    unicode-bidi: isolate;
+    font-family: var(--quran-font-family), 'hafs-django', 'hafs-uthmanic', 'uthmanic',
+      'KFGQPC Hafs Uthmanic Script', 'Scheherazade New', 'Noto Naskh Arabic', serif;
+  }
+  &__besm {
+    display: block;
+    width: 100%;
+    text-align: center;
+    text-align-last: center;
+    margin: 0.5rem 0 0.75rem;
+    direction: rtl;
+  }
+  &__ayah-number {
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: center;
+    width: auto;
+    min-width: 2.4em;
+    margin-inline: 0.15em;
+    text-align: center;
+    font-size: 0.72em;
+    line-height: 1;
+    vertical-align: 0.18em;
+    white-space: nowrap;
+    font-family: 'inter', 'Segoe UI Symbol', 'Noto Sans Arabic', sans-serif;
+  }
+  &__ayah-number-translation {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95em;
+    line-height: 1;
+    vertical-align: middle;
+    margin-inline-start: 0.35rem;
+    white-space: nowrap;
+    color: $buttonbck-success-600;
+    font-family: 'inter', sans-serif;
+  }
+
+  &__ayah-marker-ltr {
+    direction: ltr;
+    unicode-bidi: isolate;
+    display: inline-block;
+  }
+
+  &__translation-ayah {
+    border-bottom: 1px solid lightgray;
+    margin-top: var(--quran-translation-gap, 1rem);
+    font-size: var(--translation-font-size, 1.2rem);
+    line-height: var(--translation-line-height, 1.5);
+    color: var(--rabva-translation, $buttonbck-success-600);
+    font-family: var(--translation-font-family), 'inter', sans-serif;
+  }
+}
+
+@keyframes slideInFromRight {
+  0% {
+    transform: translateX(100%);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromLeft {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

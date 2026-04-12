@@ -1,0 +1,242 @@
+@use '../../styles/partials/variables' as *;
+@use '../../styles/partials/typography' as *;
+@use '../../styles/partials/mixins' as *;
+@use '../../styles/global.scss' as *;
+
+.quran-header__back {
+  width: 100vw;
+  background-color: var(--rabva-bg, #ffffff);
+  margin-top: 0;
+  position: fixed;
+  top: 3.5rem;
+  z-index: 100;
+  height: max(3rem, calc(var(--menu-font-size, 1.4rem) * 2));
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background-color: $logo-success-700;
+    pointer-events: none;
+    z-index: 2;
+  }
+}
+.quran-header {
+  position: relative;
+  height: max(3rem, calc(var(--menu-font-size, 1.4rem) * 2));
+  font-family: 'inter', sans-serif;
+  font-size: var(--menu-font-size, 1.4rem);
+  color: var(--rabva-text, #101828);
+  &__header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    align-items: center;
+    justify-items: center;
+    justify-content: center;
+    height: 100%;
+    background-color: var(--rabva-bg, #ffffff);
+    width: 100%;
+    overflow: visible;
+    box-sizing: border-box;
+    font-size: var(--menu-font-size, 1.4rem);
+  }
+  &__header span,
+  &__header div {
+    cursor: pointer;
+  }
+
+  &__surah-trigger,
+  &__page-navigation,
+  &__translate-options {
+    position: relative;
+    width: 100%;
+    height: calc(100% - 2px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    background-color: var(--rabva-bg, #ffffff);
+    box-sizing: border-box;
+    margin-bottom: 0;
+    font-size: var(--menu-font-size, 1.4rem);
+  }
+
+  &__surah-trigger {
+    color: var(--rabva-text, #101828);
+    font-family: var(--quran-font-family, 'hafs-django');
+    font-size: var(--menu-font-size, 1.4rem);
+
+    &:hover {
+      background: color-mix(in srgb, var(--rabva-text, #101828) 8%, var(--rabva-bg, #ffffff));
+    }
+  }
+
+  &__translate-options {
+    cursor: pointer;
+    gap: 1rem;
+    color: var(--rabva-text, #101828);
+    font-family: var(--quran-font-family, 'hafs-django');
+
+    &:hover {
+      background: color-mix(in srgb, var(--rabva-text, #101828) 8%, var(--rabva-bg, #ffffff));
+    }
+  }
+  &__translate-options-on {
+    transform: none;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--rabva-translation, #039855) 45%, transparent);
+    background: color-mix(in srgb, var(--rabva-translation, #039855) 12%, var(--rabva-bg, #ffffff));
+    color: var(--rabva-text, #101828);
+  }
+
+  &__page-navigation {
+    gap: 1rem;
+    line-height: 1;
+    color: var(--rabva-text, #101828);
+  }
+  &__page-navigation span,
+  &__page-input {
+    font-family: 'inter', sans-serif;
+    color: var(--rabva-text, #101828);
+    font-size: var(--menu-font-size, 1.4rem);
+  }
+  &__page-navigation span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+  &__chevron {
+    height: 1.5rem;
+    cursor: pointer;
+    display: block;
+  }
+  &__page-input {
+    width: 5rem;
+    line-height: 1;
+    background: color-mix(in srgb, var(--rabva-bg, #ffffff) 94%, white 6%);
+    border-color: color-mix(in srgb, var(--rabva-text, #101828) 24%, transparent);
+  }
+
+  &__surahs,
+  &__ayahs,
+  &__tranlation-list {
+    direction: rtl;
+    position: absolute;
+    top: calc(100% + 0.2rem);
+    font-family: 'inter', sans-serif;
+    color: var(--rabva-text, #101828);
+  }
+
+  &__surahs,
+  &__ayahs {
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 40;
+  }
+
+  .menu {
+    background: color-mix(in srgb, var(--rabva-bg, #ffffff) 96%, white 4%);
+    color: var(--rabva-text, #101828);
+    border: 1px solid color-mix(in srgb, var(--rabva-text, #101828) 18%, transparent);
+    font-size: var(--menu-font-size, 1.4rem);
+
+    .menu__option {
+      border-bottom-color: color-mix(in srgb, var(--rabva-text, #101828) 16%, transparent);
+      color: var(--rabva-text, #101828);
+      font-size: var(--menu-font-size, 1.4rem);
+
+      &:hover {
+        background: color-mix(in srgb, var(--rabva-translation, #039855) 12%, var(--rabva-bg, #ffffff));
+        color: var(--rabva-translation, #039855);
+      }
+    }
+  }
+
+  &__surahs.menu {
+    display: inline-flex;
+    width: max-content;
+    min-width: 0;
+    max-width: min(32rem, calc(100vw - 2rem));
+    padding: 0 0.8rem;
+    overflow-x: hidden;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .menu__option {
+      font-family: var(--quran-font-family, 'hafs-django');
+      display: flex;
+      align-items: center;
+      gap: 0.15rem;
+      white-space: nowrap;
+      width: max-content;
+      min-width: 0;
+      padding: 0.84rem 0;
+    }
+  }
+
+  &__ayahs.menu {
+    display: inline-flex;
+    width: max-content;
+    min-width: calc((5ch + 1.4rem) * 1.2);
+    max-width: calc((5ch + 1.4rem) * 1.2);
+    padding: 0 0.8rem;
+    overflow-x: hidden;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .menu__option {
+      justify-content: center;
+      width: 100%;
+      min-width: 0;
+      padding: 0.84rem 0;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+  }
+
+  &__surah-number,
+  &__surah-divider {
+    font-family: 'inter', sans-serif;
+    font-size: var(--menu-font-size, 1.4rem);
+  }
+
+  &__surah-name {
+    font-family: var(--quran-font-family, 'hafs-django');
+    font-size: var(--menu-font-size, 1.4rem);
+  }
+
+  &__tranlation-list {
+    right: 1rem;
+    @include tablet {
+      right: 2rem;
+    }
+    @include desktop {
+      right: 2.5rem;
+    }
+  }
+  // &__surah,
+  // &__ayah,
+  // &__translation {
+  //   border-bottom: 1px solid $player-border-grey-200;
+  //   padding: 0.7rem 0;
+  //   cursor: pointer;
+  // }
+
+  &__translation-language {
+    background: color-mix(in srgb, var(--rabva-text, #101828) 12%, var(--rabva-bg, #ffffff));
+    color: var(--rabva-text, #101828);
+    text-align: center;
+    padding: 0.2rem 0;
+    font-size: calc(var(--menu-font-size, 1.4rem) * 1.43);
+  }
+}
