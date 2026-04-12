@@ -366,6 +366,33 @@ const SearchResult = ({
     }
   };
 
+  const focusRowWordByWordAyah = (rowId, item) => {
+    const expanded = expandedRowsRef.current[rowId];
+
+    if (expanded) {
+      requestAnimationFrame(() => {
+        const scroller = expandedScrollRefs.current.get(rowId);
+        const centerElement = expandedCenterRefs.current.get(rowId);
+        if (!scroller || !centerElement) return;
+
+        const targetTop =
+          centerElement.offsetTop - (scroller.clientHeight - centerElement.clientHeight) / 2;
+        scroller.scrollTop = Math.max(0, targetTop);
+      });
+      return;
+    }
+
+    const matchedWordKey = `${item.surah_number}:${item.ayah_number}:${Number(item.word_number) - 1}`;
+    const matchedElement = matchedWordRefs.current.get(matchedWordKey);
+    if (!matchedElement) return;
+
+    matchedElement.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'center',
+    });
+  };
+
   const renderAyahBlock = (ayahs) => {
     if (!ayahs?.length) return null;
     return ayahs.map((ayah) => (
@@ -523,11 +550,15 @@ const SearchResult = ({
                   <tr
                     key={`${uniqueKey}-${index}`}
                     className={expanded ? 'is-expanded' : ''}
-                    onDoubleClick={() => toggleExpandedRow(rowId, item)}
                   >
                     <td className="search-page__cell-meta">{surahs[item.surah_number]?.[0] || '-'}</td>
-                    <td className="search-page__cell-meta">{convertToPersianNumber(item.ayah_number)}</td>
-                    <td>
+                    <td
+                      className="search-page__cell-meta"
+                      onDoubleClick={() => focusRowWordByWordAyah(rowId, item)}
+                    >
+                      {convertToPersianNumber(item.ayah_number)}
+                    </td>
+                    <td onDoubleClick={() => toggleExpandedRow(rowId, item)}>
                       {expanded ? (
                         <div
                           className="search-page__expanded-context user-select-none"

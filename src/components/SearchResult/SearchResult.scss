@@ -136,6 +136,9 @@
     font-family: var(--search-quran-font-family, 'noto-naskh-arabic');
     color: var(--rabva-text, #101828);
     word-break: break-word;
+    text-align: justify;
+    text-align-last: right;
+    text-justify: inter-word;
   }
 
   &__expanded-ayah-number {
