@@ -21,9 +21,96 @@ const buildStepOptions = (start, end, step) => {
   return options;
 };
 
-const QURAN_FONT_SIZE_OPTIONS = buildStepOptions(1.4, 4, 0.1);
-const TRANSLATION_FONT_SIZE_OPTIONS = buildStepOptions(1, 3, 0.1);
 const DISTANCE_OPTIONS = buildStepOptions(0, 4, 0.1);
+const QURAN_FONT_SIZE_UI_OPTIONS = buildStepOptions(1, 48, 1);
+const TRANSLATION_FONT_SIZE_UI_OPTIONS = buildStepOptions(1, 48, 1);
+
+const remToUiSize = (remValue, fallbackRem) => {
+  const value = Number(remValue);
+  const safeRem = Number.isFinite(value) ? value : fallbackRem;
+  return Math.round(safeRem * 10);
+};
+
+const uiSizeToRem = (uiValue, fallbackRem) => {
+  const value = Number(uiValue);
+  if (!Number.isFinite(value)) return fallbackRem;
+  return Number((value / 10).toFixed(1));
+};
+
+const CompactScrollSelect = ({
+  options,
+  value,
+  onChange,
+  formatOption = (option) => String(option),
+  ariaLabel,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const rootRef = useRef(null);
+  const selectedOptionRef = useRef(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handlePointerDown = (event) => {
+      if (!rootRef.current?.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('touchstart', handlePointerDown);
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('touchstart', handlePointerDown);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    selectedOptionRef.current?.scrollIntoView({ block: 'nearest' });
+  }, [isOpen, value]);
+
+  return (
+    <div className={`user-overlay__compact-select ${isOpen ? 'is-open' : ''}`} ref={rootRef}>
+      <button
+        type="button"
+        className="user-overlay__compact-select-trigger"
+        onClick={() => setIsOpen((prev) => !prev)}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        aria-label={ariaLabel}
+      >
+        <span>{formatOption(value)}</span>
+      </button>
+
+      {isOpen ? (
+        <div className="user-overlay__compact-select-panel" role="listbox" aria-label={ariaLabel}>
+          {options.map((option) => {
+            const isSelected = String(option) === String(value);
+            return (
+              <button
+                key={String(option)}
+                type="button"
+                className={`user-overlay__compact-select-option ${
+                  isSelected ? 'is-selected' : ''
+                }`}
+                role="option"
+                aria-selected={isSelected}
+                ref={isSelected ? selectedOptionRef : null}
+                onClick={() => {
+                  onChange(option);
+                  setIsOpen(false);
+                }}
+              >
+                {formatOption(option)}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
+    </div>
+  );
+};
 
 const parseApiError = (error, fallbackMessage) => {
   const payload = error?.response?.data;
@@ -1039,7 +1126,7 @@ const UserProfileOverlay = ({
             </details>
 
             <details className="user-overlay__section" open>
-              <summary>Appearance (live preview)</summary>
+              <summary>Appearance</summary>
               <div className="user-overlay__section-body">
                 <div className="user-overlay__row2">
                   <label>
@@ -1115,57 +1202,45 @@ const UserProfileOverlay = ({
                 <div className="user-overlay__row2">
                   <label>
                     Quran font size
-                    <select
-                      value={String(prefDraft.quran_font_size || 2.5)}
-                      onChange={(event) =>
-                        handlePreferenceChange('quran_font_size', Number(event.target.value))
+                    <CompactScrollSelect
+                      ariaLabel="Quran font size"
+                      options={QURAN_FONT_SIZE_UI_OPTIONS}
+                      value={remToUiSize(prefDraft.quran_font_size, 2.5)}
+                      onChange={(selectedValue) =>
+                        handlePreferenceChange(
+                          'quran_font_size',
+                          uiSizeToRem(selectedValue, prefDraft.quran_font_size || 2.5),
+                        )
                       }
-                    >
-                      {QURAN_FONT_SIZE_OPTIONS.map((value) => (
-                        <option key={value} value={value}>
-                          {value}
-                        </option>
-                      ))}
-                    </select>
+                    />
                   </label>
 
                   <label>
                     Translation font size
-                    <select
-                      value={String(prefDraft.translation_font_size || 1.2)}
-                      onChange={(event) =>
+                    <CompactScrollSelect
+                      ariaLabel="Translation font size"
+                      options={TRANSLATION_FONT_SIZE_UI_OPTIONS}
+                      value={remToUiSize(prefDraft.translation_font_size, 1.2)}
+                      onChange={(selectedValue) =>
                         handlePreferenceChange(
                           'translation_font_size',
-                          Number(event.target.value),
+                          uiSizeToRem(selectedValue, prefDraft.translation_font_size || 1.2),
                         )
                       }
-                    >
-                      {TRANSLATION_FONT_SIZE_OPTIONS.map((value) => (
-                        <option key={value} value={value}>
-                          {value}
-                        </option>
-                      ))}
-                    </select>
+                    />
                   </label>
                 </div>
 
                 <label>
                   Quran/translation distance
-                  <select
-                    value={String(prefDraft.quran_translation_gap || 1)}
-                    onChange={(event) =>
-                      handlePreferenceChange(
-                        'quran_translation_gap',
-                        Number(event.target.value),
-                      )
+                  <CompactScrollSelect
+                    ariaLabel="Quran and translation distance"
+                    options={DISTANCE_OPTIONS}
+                    value={Number(prefDraft.quran_translation_gap || 1)}
+                    onChange={(selectedValue) =>
+                      handlePreferenceChange('quran_translation_gap', Number(selectedValue))
                     }
-                  >
-                    {DISTANCE_OPTIONS.map((value) => (
-                      <option key={value} value={value}>
-                        {value}
-                      </option>
-                    ))}
-                  </select>
+                  />
                 </label>
               </div>
             </details>
