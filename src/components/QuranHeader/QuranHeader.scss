@@ -10,7 +10,7 @@
   position: fixed;
   top: 3.5rem;
   z-index: 100;
-  height: 3rem;
+  height: max(3rem, calc(var(--menu-font-size, 1.4rem) * 2));
 
   &::after {
     content: '';
@@ -26,8 +26,9 @@
 }
 .quran-header {
   position: relative;
-  height: 3rem;
-  font-family: var(--quran-font-family, 'hafs-django');
+  height: max(3rem, calc(var(--menu-font-size, 1.4rem) * 2));
+  font-family: 'inter', sans-serif;
+  font-size: var(--menu-font-size, 1.4rem);
   color: var(--rabva-text, #101828);
   &__header {
     display: grid;
@@ -39,16 +40,19 @@
     height: 100%;
     background-color: var(--rabva-bg, #ffffff);
     width: 100%;
-    overflow: hidden;
+    overflow: visible;
     box-sizing: border-box;
+    font-size: var(--menu-font-size, 1.4rem);
   }
-  &__header span {
+  &__header span,
+  &__header div {
     cursor: pointer;
   }
 
   &__surah-trigger,
   &__page-navigation,
   &__translate-options {
+    position: relative;
     width: 100%;
     height: calc(100% - 2px);
     display: flex;
@@ -58,10 +62,13 @@
     background-color: var(--rabva-bg, #ffffff);
     box-sizing: border-box;
     margin-bottom: 0;
+    font-size: var(--menu-font-size, 1.4rem);
   }
 
   &__surah-trigger {
     color: var(--rabva-text, #101828);
+    font-family: var(--quran-font-family, 'hafs-django');
+    font-size: var(--menu-font-size, 1.4rem);
 
     &:hover {
       background: color-mix(in srgb, var(--rabva-text, #101828) 8%, var(--rabva-bg, #ffffff));
@@ -94,6 +101,7 @@
   &__page-input {
     font-family: 'inter', sans-serif;
     color: var(--rabva-text, #101828);
+    font-size: var(--menu-font-size, 1.4rem);
   }
   &__page-navigation span {
     display: inline-flex;
@@ -123,14 +131,23 @@
     color: var(--rabva-text, #101828);
   }
 
+  &__surahs,
+  &__ayahs {
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 40;
+  }
+
   .menu {
     background: color-mix(in srgb, var(--rabva-bg, #ffffff) 96%, white 4%);
     color: var(--rabva-text, #101828);
     border: 1px solid color-mix(in srgb, var(--rabva-text, #101828) 18%, transparent);
+    font-size: var(--menu-font-size, 1.4rem);
 
     .menu__option {
       border-bottom-color: color-mix(in srgb, var(--rabva-text, #101828) 16%, transparent);
       color: var(--rabva-text, #101828);
+      font-size: var(--menu-font-size, 1.4rem);
 
       &:hover {
         background: color-mix(in srgb, var(--rabva-translation, #039855) 12%, var(--rabva-bg, #ffffff));
@@ -139,22 +156,63 @@
     }
   }
 
-  &__surahs {
+  &__surahs.menu {
+    display: inline-flex;
+    width: max-content;
+    min-width: 0;
+    max-width: min(32rem, calc(100vw - 2rem));
+    padding: 0 0.8rem;
+    overflow-x: hidden;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
     .menu__option {
       font-family: var(--quran-font-family, 'hafs-django');
       display: flex;
       align-items: center;
       gap: 0.15rem;
+      white-space: nowrap;
+      width: max-content;
+      min-width: 0;
+      padding: 0.84rem 0;
+    }
+  }
+
+  &__ayahs.menu {
+    display: inline-flex;
+    width: max-content;
+    min-width: calc((5ch + 1.4rem) * 1.2);
+    max-width: calc((5ch + 1.4rem) * 1.2);
+    padding: 0 0.8rem;
+    overflow-x: hidden;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .menu__option {
+      justify-content: center;
+      width: 100%;
+      min-width: 0;
+      padding: 0.84rem 0;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
     }
   }
 
   &__surah-number,
   &__surah-divider {
     font-family: 'inter', sans-serif;
+    font-size: var(--menu-font-size, 1.4rem);
   }
 
   &__surah-name {
     font-family: var(--quran-font-family, 'hafs-django');
+    font-size: var(--menu-font-size, 1.4rem);
   }
 
   &__tranlation-list {
@@ -179,6 +237,6 @@
     color: var(--rabva-text, #101828);
     text-align: center;
     padding: 0.2rem 0;
-    font-size: 2rem;
+    font-size: calc(var(--menu-font-size, 1.4rem) * 1.43);
   }
 }

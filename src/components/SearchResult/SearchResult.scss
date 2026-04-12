@@ -55,7 +55,7 @@
     td:nth-child(1),
     th:nth-child(2),
     td:nth-child(2) {
-      font-size: 12px;
+      font-size: var(--menu-font-size, 1.4rem);
     }
 
     th:nth-child(1),
@@ -70,13 +70,13 @@
       top: 0;
       z-index: 1;
       white-space: nowrap;
-      font-size: var(--search-meta-font-size);
+      font-size: var(--menu-font-size, 1.4rem);
       line-height: 1.1;
     }
   }
 
   &__cell-meta {
-    font-size: var(--search-meta-font-size);
+    font-size: var(--menu-font-size, 1.4rem);
     line-height: 1.3;
     white-space: nowrap;
     width: 1%;
@@ -96,7 +96,7 @@
     transition: background 120ms ease;
     width: 1%;
     white-space: nowrap;
-    font-size: var(--search-meta-font-size);
+    font-size: var(--menu-font-size, 1.4rem);
 
     &:hover {
       background: color-mix(in srgb, var(--rabva-translation, #039855) 24%, var(--rabva-bg, #ffffff));

@@ -24,6 +24,7 @@ const buildStepOptions = (start, end, step) => {
 const DISTANCE_OPTIONS = buildStepOptions(0, 4, 0.1);
 const QURAN_FONT_SIZE_UI_OPTIONS = buildStepOptions(1, 48, 1);
 const TRANSLATION_FONT_SIZE_UI_OPTIONS = buildStepOptions(1, 48, 1);
+const MENU_FONT_SIZE_UI_OPTIONS = buildStepOptions(8, 48, 1);
 
 const remToUiSize = (remValue, fallbackRem) => {
   const value = Number(remValue);
@@ -1231,17 +1232,34 @@ const UserProfileOverlay = ({
                   </label>
                 </div>
 
-                <label>
-                  Quran/translation distance
-                  <CompactScrollSelect
-                    ariaLabel="Quran and translation distance"
-                    options={DISTANCE_OPTIONS}
-                    value={Number(prefDraft.quran_translation_gap || 1)}
-                    onChange={(selectedValue) =>
-                      handlePreferenceChange('quran_translation_gap', Number(selectedValue))
-                    }
-                  />
-                </label>
+                <div className="user-overlay__row2">
+                  <label>
+                    Menu font size
+                    <CompactScrollSelect
+                      ariaLabel="Menu font size"
+                      options={MENU_FONT_SIZE_UI_OPTIONS}
+                      value={remToUiSize(prefDraft.menu_font_size, 1.4)}
+                      onChange={(selectedValue) =>
+                        handlePreferenceChange(
+                          'menu_font_size',
+                          uiSizeToRem(selectedValue, prefDraft.menu_font_size || 1.4),
+                        )
+                      }
+                    />
+                  </label>
+
+                  <label>
+                    Quran/translation distance
+                    <CompactScrollSelect
+                      ariaLabel="Quran and translation distance"
+                      options={DISTANCE_OPTIONS}
+                      value={Number(prefDraft.quran_translation_gap || 1)}
+                      onChange={(selectedValue) =>
+                        handlePreferenceChange('quran_translation_gap', Number(selectedValue))
+                      }
+                    />
+                  </label>
+                </div>
               </div>
             </details>
 

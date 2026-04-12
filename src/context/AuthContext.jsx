@@ -31,6 +31,7 @@ const defaultPreferences = {
   quran_font_size: 2.5,
   translation_font_family: 'inter',
   translation_font_size: 1.2,
+  menu_font_size: 1.4,
   quran_translation_gap: 1,
   line_height_quran: 2,
   line_height_translation: 1.5,

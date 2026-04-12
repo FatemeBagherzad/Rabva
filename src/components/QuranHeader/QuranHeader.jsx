@@ -90,11 +90,17 @@ const QuranHeader = ({
   };
 
   const renderSurahList = () => (
-    <ul className="menu quran-header__surahs">
+    <ul
+      className="menu quran-header__surahs"
+      onClick={(event) => event.stopPropagation()}
+    >
       {Object.entries(surahs).map(([id, [name]]) => (
         <li
           key={id}
-          onClick={() => handleSurahClick(id, name)}
+          onClick={(event) => {
+            event.stopPropagation();
+            handleSurahClick(id, name);
+          }}
           className="menu__option"
         >
           <span className="quran-header__surah-number">
@@ -108,11 +114,17 @@ const QuranHeader = ({
   );
 
   const renderAyahList = () => (
-    <ul className="menu quran-header__ayahs">
+    <ul
+      className="menu quran-header__ayahs"
+      onClick={(event) => event.stopPropagation()}
+    >
       {Array.from({ length: totalAyahs }, (_, i) => (
         <li
           key={i + 1}
-          onClick={() => handleAyahClick(i + 1)}
+          onClick={(event) => {
+            event.stopPropagation();
+            handleAyahClick(i + 1);
+          }}
           className="menu__option "
         >
           {convertToPersianNumber(i + 1)}
@@ -175,14 +187,16 @@ const QuranHeader = ({
     <div className="quran-header__back">
       <div className="quran-header container" ref={containerRef}>
         <header className="quran-header__header">
-          <span
+          <div
             className="quran-header__surah-trigger"
             onClick={() => toggleLists(!showSurahList, false)}
           >
             {surahs[selectedSurah][0]}
-          </span>
+            {showSurahList && renderSurahList()}
+            {showAyahList && renderAyahList()}
+          </div>
 
-          <span className="quran-header__page-navigation">
+          <div className="quran-header__page-navigation">
             {currentPage < 604 && (
               <img
                 src={chevronLeft}
@@ -216,9 +230,9 @@ const QuranHeader = ({
                 className="quran-header__chevron"
               />
             )}
-          </span>
+          </div>
 
-          <span
+          <div
             className={`quran-header__translate-options ${
               showTranslationByAyah && showQuranByWords
                 ? 'quran-header__translate-options-on'
@@ -227,12 +241,10 @@ const QuranHeader = ({
             onClick={() => setShowTranslationList((prev) => !prev)}
           >
             ترجمه
-          </span>
+          </div>
         </header>
 
         <div className="quran-header__body">
-          {showSurahList && renderSurahList()}
-          {showAyahList && renderAyahList()}
           {showTranslationList && renderTranslationList()}
         </div>
       </div>

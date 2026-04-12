@@ -126,6 +126,7 @@ const Home = () => {
     '--quran-font-size': `${preferences?.quran_font_size || 2.5}rem`,
     '--translation-font-family': preferences?.translation_font_family || 'inter',
     '--translation-font-size': `${preferences?.translation_font_size || 1.2}rem`,
+    '--menu-font-size': `${preferences?.menu_font_size || 1.4}rem`,
     '--quran-translation-gap': `${preferences?.quran_translation_gap || 1}rem`,
     '--quran-line-height': preferences?.line_height_quran || 2,
     '--translation-line-height': preferences?.line_height_translation || 1.5,
@@ -135,7 +136,7 @@ const Home = () => {
     return <h3>Loading ...</h3>;
   }
   return (
-    <>
+    <div style={quranPreviewStyles}>
       <TopNavigation
         languages={languages}
         language={language}
@@ -159,7 +160,7 @@ const Home = () => {
         }}
       />
       {!isMapMode && showQuran && (
-        <div className="quran-page" style={quranPreviewStyles}>
+        <div className="quran-page">
           <QuranHeader
             surahs={surahs}
             ayahPagesInfo={ayahPagesInfo}
@@ -235,7 +236,7 @@ const Home = () => {
         setLanguage={setLanguage}
         language={language}
       />
-    </>
+    </div>
   );
 };
 

@@ -1,5 +1,6 @@
 import besmBack from '../../assets/img/quran-besm-frame-green.png';
 import convertToPersianNumber from '../../utils/convertToPersianNumber';
+import { Fragment } from 'react';
 
 import './QuranTxt.scss';
 
@@ -45,7 +46,7 @@ const QuranTxt = ({
             selectedAyah?.surah === ayah[0] && selectedAyah?.ayah === ayah[1];
 
           return (
-            <span key={`${ayah[0]}-${ayah[1]}`} className="quran__ayah">
+            <Fragment key={`${ayah[0]}-${ayah[1]}`}>
               {ayah[1] === 1 && (
                 <div className="quran__surah-name-container">
                   <img
@@ -66,6 +67,7 @@ const QuranTxt = ({
                     بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
                   </div>
                 )}
+              <span className="quran__ayah">
               <span
                 className={`${isSelected ? 'selected' : ''}`}
                 onClick={() =>
@@ -104,7 +106,8 @@ const QuranTxt = ({
                   </span>
                 </div>
               )}
-            </span>
+              </span>
+            </Fragment>
           );
         })}
       </div>

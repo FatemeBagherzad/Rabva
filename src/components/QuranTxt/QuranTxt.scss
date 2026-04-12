@@ -45,20 +45,32 @@
   }
   &__surah-name-container {
     position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin: 3rem 0 2rem 0;
+    display: block;
+    width: 25rem;
+    max-width: 100%;
+    margin: 3rem auto 2rem;
+    text-align: center;
   }
   &__surah-name-back {
-    width: 25rem;
+    display: block;
+    width: 100%;
   }
   &__surah-name {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(-0.12em);
+    padding: 0 1.2rem;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    direction: rtl;
+    unicode-bidi: isolate;
+    font-family: var(--quran-font-family), 'hafs-django', 'hafs-uthmanic', 'uthmanic',
+      'KFGQPC Hafs Uthmanic Script', 'Scheherazade New', 'Noto Naskh Arabic', serif;
   }
   &__besm {
     display: block;
