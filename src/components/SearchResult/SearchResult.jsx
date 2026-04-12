@@ -3,11 +3,45 @@ import convertToPersianNumber from '../../utils/convertToPersianNumber';
 
 import './SearchResult.scss';
 
-const SearchResult = ({ ayahByRoot, rootPagination, setRootPage, surahs, preferences }) => {
+const SearchResult = ({
+  ayahByRoot,
+  isRootLoading,
+  rootPagination,
+  setRootPage,
+  surahs,
+  preferences,
+}) => {
   const [surahSortDir, setSurahSortDir] = useState(null);
   const [ayahSortDir, setAyahSortDir] = useState(null);
   const matchedWordRefs = useRef(new Map());
   const dragStateRef = useRef(null);
+  const loadMoreRef = useRef(null);
+
+  useEffect(() => {
+    const target = loadMoreRef.current;
+    if (!target) return undefined;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (!entry?.isIntersecting) return;
+        if (isRootLoading || !rootPagination?.has_next) return;
+
+        setRootPage((prev) => {
+          const nextPage = prev + 1;
+          return nextPage > (rootPagination?.total_pages || prev) ? prev : nextPage;
+        });
+      },
+      {
+        root: null,
+        rootMargin: '0px 0px 320px 0px',
+        threshold: 0,
+      },
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [isRootLoading, rootPagination?.has_next, rootPagination?.total_pages, setRootPage]);
 
   useEffect(() => {
     matchedWordRefs.current.forEach((element) => {
@@ -191,33 +225,12 @@ const SearchResult = ({ ayahByRoot, rootPagination, setRootPage, surahs, prefere
           </table>
         </div>
 
-        <div className="search-page__pagination">
-          <button
-            type="button"
-            className="search-page__pagination-button"
-            onClick={() => setRootPage((prev) => Math.max(1, prev - 1))}
-            disabled={!rootPagination?.has_previous}
-          >
-            {'<'}
-          </button>
-
-          <span className="search-page__pagination-status">
-            {convertToPersianNumber(rootPagination?.current_page || 1)}/{convertToPersianNumber(rootPagination?.total_pages || 1)}
-          </span>
-
-          <button
-            type="button"
-            className="search-page__pagination-button"
-            onClick={() =>
-              setRootPage((prev) =>
-                Math.min(rootPagination?.total_pages || prev, prev + 1),
-              )
-            }
-            disabled={!rootPagination?.has_next}
-          >
-            {'>'}
-          </button>
-        </div>
+        <div ref={loadMoreRef} className="search-page__load-more-sentinel" aria-hidden="true" />
+        {isRootLoading ? (
+          <div className="search-page__loading-more">
+            <span className="search-page__loading-dots" aria-label="Loading" />
+          </div>
+        ) : null}
       </div>
   );
 };

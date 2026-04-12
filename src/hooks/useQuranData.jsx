@@ -43,6 +43,7 @@ const useQuranData = (
   const [translationByAyah, setTranslationByAyah] = useState([]);
   const [translationIsRtl, setTranslationIsRtl] = useState(true);
   const [ayahByRoot, setAyahByRoot] = useState([]);
+  const [isRootLoading, setIsRootLoading] = useState(false);
   const [rootPagination, setRootPagination] = useState({
     current_page: 1,
     total_pages: 1,
@@ -52,6 +53,16 @@ const useQuranData = (
   });
   const [roots, setRoots] = useState([]);
   const rootResultsCacheRef = useRef(new Map());
+
+  const getMergedRootPages = (rootValue, lastPage) => {
+    const merged = [];
+    for (let page = PAGE_MIN; page <= lastPage; page += 1) {
+      const cached = rootResultsCacheRef.current.get(`${rootValue}::${page}`);
+      if (!cached) break;
+      merged.push(...cached.data);
+    }
+    return merged;
+  };
 
   const trimData = (data, startSurah, startAyah, endSurah, endAyah) => {
     const trimmed = {};
@@ -274,6 +285,7 @@ const useQuranData = (
   useEffect(() => {
     if (!root) {
       setAyahByRoot([]);
+      setIsRootLoading(false);
       setRootPagination({
         current_page: 1,
         total_pages: 1,
@@ -289,12 +301,13 @@ const useQuranData = (
       const cacheKey = `${root}::${page}`;
       const cached = rootResultsCacheRef.current.get(cacheKey);
       if (cached) {
-        setAyahByRoot(cached.data);
+        setAyahByRoot(getMergedRootPages(root, page));
         setRootPagination(cached.pagination);
         return;
       }
 
       try {
+        setIsRootLoading(true);
         const { data } = await fetchAyahByRoot({
           root,
           per_page: ROOT_PER_PAGE,
@@ -315,10 +328,12 @@ const useQuranData = (
           pagination: nextPagination,
         });
 
-        setAyahByRoot(data.data);
+        setAyahByRoot(getMergedRootPages(root, page));
         setRootPagination(nextPagination);
       } catch (error) {
         console.error('Failed to fetch ayahs by root page:', error);
+      } finally {
+        setIsRootLoading(false);
       }
     };
 
@@ -339,6 +354,7 @@ const useQuranData = (
     translationByAyah,
     translationIsRtl,
     ayahByRoot,
+    isRootLoading,
     rootPagination,
     roots,
   };

@@ -66,6 +66,7 @@ const Home = () => {
     translationByAyah,
     translationIsRtl,
     ayahByRoot,
+    isRootLoading,
     rootPagination,
     roots,
   } = useQuranData(
@@ -211,6 +212,7 @@ const Home = () => {
       {!isMapMode && showSearchRes && !showQuran && (
         <SearchResult
           ayahByRoot={ayahByRoot}
+          isRootLoading={isRootLoading}
           rootPagination={rootPagination}
           setRootPage={setRootPage}
           surahs={surahs}

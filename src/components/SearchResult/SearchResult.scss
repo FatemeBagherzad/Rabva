@@ -155,43 +155,59 @@
     font-family: var(--search-quran-font-family, 'noto-naskh-arabic');
   }
 
-  &__pagination {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 1rem;
-    padding: 0.75rem 0;
+  &__load-more-sentinel {
+    width: 100%;
+    height: 1px;
   }
 
-  &__pagination-button {
-    border: 1px solid color-mix(in srgb, var(--rabva-text, #101828) 24%, transparent);
-    background: color-mix(in srgb, var(--rabva-translation, #039855) 12%, var(--rabva-bg, #ffffff));
-    color: var(--rabva-text, #101828);
-    border-radius: 0.45rem;
-    min-width: 2rem;
-    height: 2rem;
-    padding: 0;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  &__loading-more {
+    padding: 1rem 0 0;
+    text-align: center;
     font-size: 1.2rem;
-    line-height: 1;
-    vertical-align: middle;
+    color: color-mix(in srgb, var(--rabva-text, #101828) 82%, transparent);
+  }
 
-    &:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
+  &__loading-dots {
+    display: inline-block;
+    min-width: 3em;
+    text-align: left;
+
+    &::after {
+      content: '.';
+      animation: search-page-loading-dots 1.8s steps(1, end) infinite;
     }
   }
+}
 
-  &__pagination-status {
-    font-size: 1rem;
-    font-variant-numeric: tabular-nums;
-    color: var(--rabva-text, #101828);
-    min-width: 3rem;
-    text-align: center;
+@keyframes search-page-loading-dots {
+  0%,
+  16% {
+    content: '.';
+  }
+
+  17%,
+  32% {
+    content: '..';
+  }
+
+  33%,
+  48% {
+    content: '...';
+  }
+
+  49%,
+  64% {
+    content: '....';
+  }
+
+  65%,
+  80% {
+    content: '.....';
+  }
+
+  81%,
+  100% {
+    content: '......';
   }
 }
 
@@ -225,13 +241,7 @@
       color: #86efac;
     }
 
-    &__pagination-button {
-      background: rgba(134, 239, 172, 0.12);
-      border-color: rgba(148, 163, 184, 0.35);
-      color: #e5e7eb;
-    }
-
-    &__pagination-status,
+    &__loading-more,
     &__sortable {
       color: #e5e7eb;
     }
