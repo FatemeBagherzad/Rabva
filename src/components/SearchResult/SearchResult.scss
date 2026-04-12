@@ -33,6 +33,11 @@
     width: 100%;
     border-collapse: collapse;
 
+    tr.is-expanded td {
+      border-top: 2px solid color-mix(in srgb, var(--rabva-translation, #039855) 60%, transparent);
+      border-bottom: 2px solid color-mix(in srgb, var(--rabva-translation, #039855) 60%, transparent);
+    }
+
     th,
     td {
       border-bottom: 1px solid color-mix(in srgb, var(--rabva-text, #101828) 16%, transparent);
@@ -108,6 +113,55 @@
     width: 100%;
     font-size: var(--search-ayah-font-size);
   }
+
+  &__expanded-context {
+    max-height: 22rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0.4rem 0.2rem;
+    background: color-mix(in srgb, var(--rabva-translation, #039855) 6%, var(--rabva-bg, #ffffff));
+    border-radius: 0.35rem;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  &__expanded-text {
+    margin: 0;
+    font-size: calc(var(--search-ayah-font-size) - 0.2rem);
+    line-height: 1.8;
+    font-family: var(--search-quran-font-family, 'noto-naskh-arabic');
+    color: var(--rabva-text, #101828);
+    word-break: break-word;
+  }
+
+  &__expanded-ayah-number {
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: center;
+    line-height: 1;
+    font-size: 0.72em;
+    vertical-align: 0.18em;
+    white-space: nowrap;
+    font-family: 'inter', 'Segoe UI Symbol', 'Noto Sans Arabic', sans-serif;
+    color: inherit;
+  }
+
+  &__expanded-center {
+    margin: 0.5rem 0;
+    padding: 0.35rem 0;
+  }
+
+  &__expanded-loading {
+    text-align: center;
+    color: color-mix(in srgb, var(--rabva-text, #101828) 80%, transparent);
+    font-size: 1.2rem;
+    padding-top: 0.3rem;
+  }
+
   &__scroll-container {
     display: flex;
     overflow-x: auto;
@@ -225,6 +279,11 @@
     }
 
     &__table {
+      tr.is-expanded td {
+        border-top-color: rgba(134, 239, 172, 0.7);
+        border-bottom-color: rgba(134, 239, 172, 0.7);
+      }
+
       th,
       td {
         border-bottom-color: rgba(148, 163, 184, 0.3);
@@ -239,6 +298,15 @@
 
     &__word-box.is-matched {
       color: #86efac;
+    }
+
+    &__expanded-text,
+    &__expanded-loading {
+      color: #e5e7eb;
+    }
+
+    &__expanded-context {
+      background: rgba(134, 239, 172, 0.08);
     }
 
     &__loading-more,
