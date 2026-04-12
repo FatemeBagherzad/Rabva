@@ -256,5 +256,5 @@ input {
   cursor: pointer;
 }
 .selected {
-  background-color: $selected;
+  color: var(--rabva-translation, #{$buttonbck-success-600});
 }
