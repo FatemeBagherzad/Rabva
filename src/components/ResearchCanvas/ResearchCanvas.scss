@@ -203,6 +203,22 @@
       opacity: 0.75;
     }
 
+    // Phase 1 plan #27: any connection touching a subset group on either
+    // end renders as a dashed line in every state (idle, hover, selected),
+    // so it is visually distinct from word-to-word and ayah-to-ayah lines.
+    // Highlight states change colour / width but preserve the dash pattern.
+    &.is-subset {
+      stroke-dasharray: 6 4;
+
+      &:hover {
+        stroke-dasharray: 6 4;
+      }
+
+      &.is-selected {
+        stroke-dasharray: 6 4;
+      }
+    }
+
     &.is-arming-preview {
       stroke: #f59e0b;
       stroke-width: 2.6;
@@ -539,7 +555,10 @@
 
   &__selection-group {
     position: absolute;
-    border: 1px solid color-mix(in srgb, var(--rabva-translation, #039855) 78%, transparent);
+    // Phase 1 plan #27: subset-group box border is dashed so it reads as a
+    // selection construct, distinct from per-element selection highlights
+    // and from solid ayah-card frames.
+    border: 1px dashed color-mix(in srgb, var(--rabva-translation, #039855) 78%, transparent);
     border-radius: 0.45rem;
     background: color-mix(in srgb, var(--rabva-translation, #039855) 6%, transparent);
     box-shadow: 0 0 0 1px color-mix(in srgb, var(--rabva-translation, #039855) 30%, transparent);

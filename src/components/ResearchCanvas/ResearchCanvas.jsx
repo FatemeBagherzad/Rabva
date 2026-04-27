@@ -20,10 +20,14 @@ const nodeIdFromSelectableId = (id) => {
   return match ? match[1] : null;
 };
 
-// Owner-kind classification (Phase 1 plan #13 dot-set rule).
+// Owner-kind classification (Phase 1 plan #13 dot-set rule + #28 subset-group parity).
+// Subset-group owners (`sg:` prefix) are classified as 'word' so they expose
+// ONLY top + bottom connection dots — never side dots — exactly mirroring
+// word-box geometry. This applies to both ephemeral (live-marquee) and
+// anchored (derived-from-connections, per #26) subset groups.
 const ownerKindFromOwnerId = (ownerId) => {
   if (!ownerId) return 'group';
-  if (String(ownerId).startsWith(SUBSET_GROUP_PREFIX)) return 'group';
+  if (String(ownerId).startsWith(SUBSET_GROUP_PREFIX)) return 'word';
   const rest = String(ownerId).split(':').slice(2).join(':');
   if (!rest || rest === 'group' || rest === 'meta') return 'group';
   if (rest.startsWith('w:')) return 'word';
@@ -31,9 +35,9 @@ const ownerKindFromOwnerId = (ownerId) => {
   return 'group';
 };
 // Connection-point sides per owner kind:
-//  - word     -> top + bottom only
-//  - segment  -> bottom only
-//  - group / meta / subset-group -> full 4 (perimeter)
+//  - word / subset-group -> top + bottom only
+//  - segment             -> bottom only
+//  - group / meta        -> full 4 (perimeter)
 const sidesForOwnerId = (ownerId) => {
   const kind = ownerKindFromOwnerId(ownerId);
   if (kind === 'word') return ['top', 'bottom'];
@@ -961,10 +965,60 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes, selectionGroupRects]);
 
+  // Phase 1 plan #26: subset groups are NEVER stored as their own DB row;
+  // their full membership is encoded in their stable owner-id
+  // (`sg:<nodeId>:<itemIds>`), which is itself embedded in every connection
+  // endpoint that references the group. Anchored groups are reconstructed
+  // here from the live connection list so they survive selection changes
+  // (clicking elsewhere, Esc, marquee on a different ayah). An anchored
+  // group disappears automatically when its last incident connection is
+  // deleted (no connections → no `sg:` owner-id → no anchored entry).
+  const anchoredSelectionGroups = useMemo(() => {
+    const seen = new Map();
+    for (let i = 0; i < connections.length; i += 1) {
+      const conn = connections[i];
+      [conn.sourcePointId, conn.targetPointId].forEach((pid) => {
+        const ownerId = ownerIdFromPointId(pid);
+        if (!ownerId || !ownerId.startsWith(SUBSET_GROUP_PREFIX)) return;
+        if (seen.has(ownerId)) return;
+        // Owner-id grammar (per #26 + buildSubsetGroupId): `sg:<nodeId>:<itemIds>`
+        // where `itemIds` are themselves `:`-bearing selectable ids joined by `|`
+        // (e.g. `n:NODE:w:0|n:NODE:w:1`). nodeId is guaranteed colon-free
+        // (from `nodeIdFromSelectableId`'s `^n:([^:]+):` capture). So we split
+        // on the FIRST `:` only — using `split(':')` here would silently
+        // reduce `idsBlob` to just `"n"` and break rect reconstruction.
+        const rest = ownerId.slice(SUBSET_GROUP_PREFIX.length);
+        const firstColon = rest.indexOf(':');
+        if (firstColon < 0) return;
+        const nodeId = rest.slice(0, firstColon);
+        const idsBlob = rest.slice(firstColon + 1);
+        if (!nodeId || !idsBlob) return;
+        const itemIds = idsBlob.split('|').filter(Boolean);
+        if (!itemIds.length) return;
+        seen.set(ownerId, { id: ownerId, nodeId, itemIds });
+      });
+    }
+    return Array.from(seen.values());
+  }, [connections]);
+
+  // Phase 1 plan #26: rendered set of subset groups = ephemeral (live
+  // marquee, no connections yet) UNION anchored (derived from connections).
+  // Ephemeral groups are dropped on selection change by the existing
+  // `setSelectionGroups([])` calls; anchored groups remain because they
+  // come from `connections`, not from selection state.
+  const mergedSelectionGroups = useMemo(() => {
+    const byId = new Map();
+    selectionGroups.forEach((g) => byId.set(g.id, g));
+    anchoredSelectionGroups.forEach((g) => {
+      if (!byId.has(g.id)) byId.set(g.id, g);
+    });
+    return Array.from(byId.values());
+  }, [selectionGroups, anchoredSelectionGroups]);
+
   useLayoutEffect(() => {
     const nextRects = {};
 
-    selectionGroups.forEach((group) => {
+    mergedSelectionGroups.forEach((group) => {
       const cardElement = selectableRefs.current.get(`n:${group.nodeId}:group`);
       if (!cardElement) return;
 
@@ -998,7 +1052,7 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
     });
 
     setSelectionGroupRects(nextRects);
-  }, [selectionGroups, nodes, pan.x, pan.y, scale]);
+  }, [mergedSelectionGroups, nodes, pan.x, pan.y, scale]);
 
   const marqueeRect = marquee
     ? {
@@ -1700,7 +1754,16 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
                 <g key={connection.id}>
                   <path
                     d={pathData}
-                    className={`research-canvas__connection-line ${isSelectedConnection ? 'is-selected' : ''}`}
+                    className={`research-canvas__connection-line ${isSelectedConnection ? 'is-selected' : ''} ${
+                      // Phase 1 plan #27: any connection touching a subset
+                      // group on either end renders with a dashed stroke so
+                      // it is visually distinct from word-to-word and
+                      // ayah-to-ayah connections.
+                      ownerIdFromPointId(connection.sourcePointId).startsWith(SUBSET_GROUP_PREFIX) ||
+                      ownerIdFromPointId(connection.targetPointId).startsWith(SUBSET_GROUP_PREFIX)
+                        ? 'is-subset'
+                        : ''
+                    }`}
                     markerEnd="url(#research-canvas-arrow-end)"
                     markerStart={connection.direction === 'bi' ? 'url(#research-canvas-arrow-end)' : undefined}
                     onPointerEnter={() => setHoveredConnectionId(connection.id)}
@@ -1819,10 +1882,14 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
               ? (() => {
                   // Visible arming preview per Phase 1 plan #14: while a source
                   // element is armed (mobile double-tap flow), draw an arrow
-                  // outward from its right-side connection point so the user
+                  // outward from one of its valid connection points so the user
                   // can see that connection-creation is in progress before
-                  // the target is tapped.
-                  const sourcePointId = `${armedSourceOwnerId}:cp:right`;
+                  // the target is tapped. Per plan #28, subset-group and word
+                  // owners only expose top/bottom dots, so we anchor the
+                  // preview to the owner's first valid side rather than
+                  // hard-coding `cp:right` (which does not exist for them).
+                  const previewSide = defaultSideForOwnerId(armedSourceOwnerId);
+                  const sourcePointId = connectionPointId(armedSourceOwnerId, previewSide);
                   const source = anchors[sourcePointId];
                   if (!source) return null;
                   const ownerRect = ownerRects[armedSourceOwnerId];
@@ -1911,7 +1978,11 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
                 (() => {
                   const groupOwnerId = `n:${node.id}:group`;
                   const groupSelected = selectedIds.includes(groupOwnerId);
-                  const nodeSelectionGroups = selectionGroups.filter((group) => group.nodeId === node.id);
+                  // Phase 1 plan #26: render BOTH ephemeral (live-marquee)
+                  // and anchored (derived-from-connections) subset groups
+                  // for this node so the group box and its dots persist
+                  // beyond the user's current selection.
+                  const nodeSelectionGroups = mergedSelectionGroups.filter((group) => group.nodeId === node.id);
                   const activeSourcePointId =
                     connectionDraft?.sourcePointId || connectionEditDraft?.movingPointId || null;
                   const sourceOwnerId = activeSourcePointId ? ownerIdFromPointId(activeSourcePointId) : null;
