@@ -1,0 +1,152 @@
+.research-hub {
+  max-width: 600px;
+  margin: 5rem auto 2rem;
+  padding: 1rem;
+  color: var(--rabva-text, #e5e7eb);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  &__title {
+    font-size: 1.4rem;
+    margin: 0;
+    font-weight: 600;
+  }
+
+  &__rename-input {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #444;
+    border-radius: 6px;
+    background: #1e1e2e;
+    color: inherit;
+    font-size: 0.95rem;
+
+    &:focus {
+      outline: none;
+      border-color: #4ade80;
+    }
+  }
+
+  &__create-btn {
+    width: 2.4rem;
+    height: 2.4rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: #4ade80;
+    color: #111;
+    font-weight: 700;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover {
+      background: #22c55e;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+  }
+
+  &__error {
+    color: #f87171;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  &__loading,
+  &__empty {
+    color: #888;
+    font-size: 0.95rem;
+    text-align: center;
+    padding: 2rem 0;
+  }
+
+  &__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #1e1e2e;
+    border-radius: 8px;
+    padding: 0.25rem;
+  }
+
+  &__open-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.6rem 0.75rem;
+    border: none;
+    background: transparent;
+    color: inherit;
+    text-align: start;
+    cursor: pointer;
+    border-radius: 6px;
+
+    &:hover {
+      background: #2a2a3e;
+    }
+  }
+
+  &__research-name {
+    font-size: 1rem;
+    font-weight: 500;
+  }
+
+  &__research-meta {
+    font-size: 0.8rem;
+    color: #888;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.25rem;
+    padding-right: 0.25rem;
+  }
+
+  &__action-btn {
+    padding: 0.4rem 0.5rem;
+    border: none;
+    background: transparent;
+    color: #aaa;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 1rem;
+    line-height: 1;
+
+    &:hover {
+      background: #333;
+      color: #fff;
+    }
+
+    &--delete:hover {
+      background: #7f1d1d;
+      color: #fca5a5;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+  }
+}

@@ -41,8 +41,8 @@ const TopNavigation = ({
   selectedRootCount,
   preferences,
   onUserIconClick,
-  isMapMode,
-  onToggleMapMode,
+  isResearchMode,
+  onToggleResearchMode,
 }) => {
   const { userInfo, isLoggedIn } = useAuth();
   const containerRef = useOutsideClick(() => {
@@ -173,10 +173,10 @@ const TopNavigation = ({
           {isLoggedIn && (
             <button
               type="button"
-              className={`topNav__mode-toggle ${isMapMode ? 'is-book' : 'is-map'}`}
-              onClick={onToggleMapMode}
-              aria-label={isMapMode ? 'Switch to Quran view' : 'Switch to map view'}
-              title={isMapMode ? 'Switch to Quran view' : 'Switch to map view'}
+              className={`topNav__mode-toggle ${isResearchMode ? 'is-book' : 'is-research'}`}
+              onClick={onToggleResearchMode}
+              aria-label={isResearchMode ? 'Switch to Quran view' : 'Switch to research view'}
+              title={isResearchMode ? 'Switch to Quran view' : 'Switch to research view'}
             >
               <span className="topNav__mode-icon" />
             </button>

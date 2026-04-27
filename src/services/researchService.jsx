@@ -1,4 +1,6 @@
 import { fetchOneAyahWordByWord } from './wordService';
+import { researchSocialApi } from '../api/api';
+import { withAuthHeaders } from './rabvaAccountService';
 
 const normalizeDigits = (value) =>
   String(value || '')
@@ -64,4 +66,43 @@ export const resolveAyahAddressToWords = async (addressValue) => {
     ayahNumber: ayah,
     normalizedAddress: `${surah}:${ayah}`,
   };
+};
+
+// ── Research CRUD API ──
+
+export const fetchResearches = async (token) => {
+  const response = await researchSocialApi.get('/researches/', withAuthHeaders(token));
+  return response.data;
+};
+
+export const createResearch = async (token, name) => {
+  const response = await researchSocialApi.post('/researches/', { name }, withAuthHeaders(token));
+  return response.data;
+};
+
+export const fetchResearch = async (token, researchId) => {
+  const response = await researchSocialApi.get(`/researches/${researchId}/`, withAuthHeaders(token));
+  return response.data;
+};
+
+export const renameResearch = async (token, researchId, name) => {
+  const response = await researchSocialApi.put(
+    `/researches/${researchId}/rename/`,
+    { name },
+    withAuthHeaders(token),
+  );
+  return response.data;
+};
+
+export const deleteResearch = async (token, researchId) => {
+  await researchSocialApi.delete(`/researches/${researchId}/`, withAuthHeaders(token));
+};
+
+export const saveResearch = async (token, researchId, payload) => {
+  const response = await researchSocialApi.put(
+    `/researches/${researchId}/save/`,
+    payload,
+    withAuthHeaders(token),
+  );
+  return response.data;
 };

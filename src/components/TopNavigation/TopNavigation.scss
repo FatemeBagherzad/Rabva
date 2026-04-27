@@ -128,14 +128,14 @@
     position: relative;
   }
 
-  &__mode-toggle.is-map .topNav__mode-icon {
+  &__mode-toggle.is-research .topNav__mode-icon {
     border: 0.16rem solid currentColor;
     border-radius: 0.18rem;
     transform: skewY(-7deg);
   }
 
-  &__mode-toggle.is-map .topNav__mode-icon::before,
-  &__mode-toggle.is-map .topNav__mode-icon::after {
+  &__mode-toggle.is-research .topNav__mode-icon::before,
+  &__mode-toggle.is-research .topNav__mode-icon::after {
     content: '';
     position: absolute;
     top: -0.03rem;
@@ -145,11 +145,11 @@
     border-radius: 999px;
   }
 
-  &__mode-toggle.is-map .topNav__mode-icon::before {
+  &__mode-toggle.is-research .topNav__mode-icon::before {
     left: 0.4rem;
   }
 
-  &__mode-toggle.is-map .topNav__mode-icon::after {
+  &__mode-toggle.is-research .topNav__mode-icon::after {
     right: 0.38rem;
   }
 

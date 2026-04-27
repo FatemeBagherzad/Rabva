@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Routes, Route, useLocation, useNavigate, useParams, Navigate } from 'react-router-dom';
 import { useLocalStorageState } from '../../hooks/useLocalStorageState';
 import { useSwipeable } from 'react-swipeable';
 import useQuranData from '../../hooks/useQuranData';
@@ -11,13 +12,31 @@ import QuranTxtByWord from '../../components/QuranTxtByWord/QuranTxtByWord';
 import QuranPlayer from '../../components/QuranPlayer/QuranPlayer';
 import SearchResult from '../../components/SearchResult/SearchResult';
 import UserProfileOverlay from '../../components/UserProfileOverlay/UserProfileOverlay';
-import AyahMapCanvas from '../../components/AyahMapCanvas/AyahMapCanvas';
+import ResearchCanvas from '../../components/ResearchCanvas/ResearchCanvas';
+import ResearchHub from '../../components/ResearchHub/ResearchHub';
+import ResearchCreate from '../../components/ResearchCreate/ResearchCreate';
 import LoadingDots from '../../components/LoadingDots/LoadingDots';
 
 import './Home.scss';
 
+const ResearchCanvasRoute = ({ preferences, surahs }) => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  return (
+    <ResearchCanvas
+      preferences={preferences}
+      surahs={surahs}
+      researchId={id}
+      onBackToHub={() => navigate('/research')}
+    />
+  );
+};
+
 const Home = () => {
   const { preferences, isLoggedIn } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isResearchMode = location.pathname.startsWith('/research');
   const [storedPage, setStoredPage] = useLocalStorageState(1, 'currentPage');
   const safeStoredPage = Number(storedPage);
   const [currentPage, setCurrentPage] = useState(
@@ -51,7 +70,6 @@ const Home = () => {
   const [nextPageCount, setNextPageCount] = useState(1);
   const [requestedSurah, setRequestedSurah] = useState(null);
   const [showUserOverlay, setShowUserOverlay] = useState(false);
-  const [isMapMode, setIsMapMode] = useState(false);
 
   const {
     surahs,
@@ -126,23 +144,21 @@ const Home = () => {
     setSelectedRoot(root);
     setShowQuran(false);
     setShowSearchRes(true);
-    setIsMapMode(false);
+    if (isResearchMode) navigate('/');
   };
 
-  const handleToggleMapMode = () => {
+  const handleToggleResearchMode = () => {
     if (!isLoggedIn) return;
 
-    setIsMapMode((prev) => {
-      const next = !prev;
+    if (isResearchMode) {
+      navigate('/');
+      return;
+    }
 
-      if (next) {
-        setShowSearchRes(false);
-        setSelectedRoot(null);
-        setRootPage(1);
-      }
-
-      return next;
-    });
+    setShowSearchRes(false);
+    setSelectedRoot(null);
+    setRootPage(1);
+    navigate('/research');
   };
 
   const quranPreviewStyles = {
@@ -176,10 +192,10 @@ const Home = () => {
         selectedRootCount={rootPagination?.total_count || 0}
         preferences={preferences}
         onUserIconClick={() => setShowUserOverlay((prev) => !prev)}
-        isMapMode={isMapMode}
-        onToggleMapMode={handleToggleMapMode}
+        isResearchMode={isResearchMode}
+        onToggleResearchMode={handleToggleResearchMode}
       />
-      {!isMapMode && showQuran && (
+      {!isResearchMode && showQuran && (
         <div className="quran-page">
           <QuranHeader
             surahs={surahs}
@@ -230,7 +246,7 @@ const Home = () => {
           </div>
         </div>
       )}
-      {!isMapMode && showSearchRes && !showQuran && (
+      {!isResearchMode && showSearchRes && !showQuran && (
         <SearchResult
           ayahByRoot={ayahByRoot}
           isRootLoading={isRootLoading}
@@ -241,9 +257,21 @@ const Home = () => {
         />
       )}
 
-      {isMapMode && isLoggedIn && <AyahMapCanvas preferences={preferences} surahs={surahs} />}
+      {isResearchMode && !isLoggedIn && <Navigate to="/" replace />}
 
-      {!isMapMode && (
+      {isResearchMode && isLoggedIn && (
+        <Routes>
+          <Route path="/research" element={<ResearchHub />} />
+          <Route path="/research/new" element={<ResearchCreate />} />
+          <Route
+            path="/research/:id"
+            element={<ResearchCanvasRoute preferences={preferences} surahs={surahs} />}
+          />
+          <Route path="/research/*" element={<Navigate to="/research" replace />} />
+        </Routes>
+      )}
+
+      {!isResearchMode && (
         <QuranPlayer
           quranData={!showQuranByWords ? quranData : quranByWordData}
         />

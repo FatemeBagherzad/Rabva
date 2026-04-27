@@ -30,6 +30,10 @@ export default defineConfig(({ mode }) => {
           target: backendUrl,
           changeOrigin: true,
         },
+        '/research-social': {
+          target: backendUrl,
+          changeOrigin: true,
+        },
         '/media': {
           target: backendUrl,
           changeOrigin: true,

@@ -1,4 +1,4 @@
-.ayah-map {
+.research-canvas {
   margin-top: 3.5rem;
   width: 100%;
   height: calc(100vh - 3.5rem);
@@ -106,6 +106,31 @@
     user-select: none;
   }
 
+  // Phase 1 plan #11: selection-mode visibility. While selection mode is on,
+  // pan and node-drag are disabled, so the cursor must reflect the change.
+  &.is-selection-mode &__viewport {
+    cursor: crosshair;
+  }
+
+  &__selection-mode-badge {
+    position: fixed;
+    top: 5.4rem;
+    right: 1rem;
+    z-index: 75;
+    width: 2.4rem;
+    height: 2.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--rabva-translation, #039855) 70%, black 30%);
+    background: color-mix(in srgb, var(--rabva-translation, #039855) 18%, white 82%);
+    color: color-mix(in srgb, var(--rabva-translation, #039855) 90%, black 10%);
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  }
+
   &__zoom-controls {
     position: fixed;
     right: 1rem;
@@ -139,6 +164,13 @@
     color: var(--rabva-translation, #039855);
     filter: none;
     mix-blend-mode: normal;
+    // Phase 1 plan #12: ayah-card frame + its background must sit BEHIND
+    // any connection line for hit-testing, so self-referencing curves
+    // drawn inside the card's bounding rectangle remain hover/clickable.
+    // Lifting the SVG layer above the nodes achieves that without breaking
+    // node-drag (the SVG is overall pointer-events:none; only stroked
+    // paths receive pointer events).
+    z-index: 5;
   }
 
   &__connection-line {
@@ -151,15 +183,38 @@
     stroke-linejoin: round;
     shape-rendering: geometricPrecision;
     pointer-events: stroke;
+    cursor: pointer;
+    transition: stroke-width 100ms ease, filter 100ms ease, stroke 100ms ease;
+
+    // Phase 1 plan #13: desktop hover feedback on connection lines.
+    &:hover {
+      stroke-width: 2.6;
+      stroke: color-mix(in srgb, currentColor 70%, white 30%);
+      filter: drop-shadow(0 0 4px rgba(37, 99, 235, 0.35));
+    }
 
     &.is-selected {
-      stroke-width: 2.1;
+      stroke-width: 3.4;
+      filter: drop-shadow(0 0 6px rgba(37, 99, 235, 0.55));
     }
 
     &.is-draft {
       stroke-dasharray: 4 3;
       opacity: 0.75;
     }
+
+    &.is-arming-preview {
+      stroke: #f59e0b;
+      stroke-width: 2.6;
+      stroke-dasharray: 6 4;
+      opacity: 0.95;
+      pointer-events: none;
+      animation: research-canvas-arming-dash 1s linear infinite;
+    }
+  }
+
+  @keyframes research-canvas-arming-dash {
+    to { stroke-dashoffset: -20; }
   }
 
   &__connection-endpoint {
@@ -295,6 +350,25 @@
   &__ayah-card:hover,
   &__ayah-card:focus-within {
     border-color: var(--rabva-text, #0f172a);
+  }
+
+  // Phase 1 plan #13: when a connection is hovered/selected and one of its
+  // endpoints is the meta/address (whole-ayah) element, the entire ayah-card
+  // frame becomes more visible and bold so the whole-ayah involvement is
+  // unmistakable.
+  &__ayah-card.is-whole-ayah-emphasis {
+    border-color: var(--rabva-translation, #039855);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--rabva-translation, #039855) 35%, transparent);
+    background: color-mix(in srgb, var(--rabva-translation, #039855) 8%, transparent);
+  }
+
+  // Phase 1 plan #13: endpoint emphasis on inner selectable elements
+  // (word, segment, meta) when the connection they belong to is hovered or
+  // selected — slightly bolder text, brighter background, accent border.
+  &__selectable.is-endpoint-emphasis {
+    border-color: var(--rabva-translation, #039855) !important;
+    background: color-mix(in srgb, var(--rabva-translation, #039855) 14%, transparent);
+    font-weight: 600;
   }
 
   &__ayah-content {
@@ -465,15 +539,15 @@
   }
 
   &__word-text {
-    font-family: var(--map-quran-font-family), sans-serif;
-    font-size: var(--map-quran-font-size);
-    line-height: var(--map-line-height-quran);
+    font-family: var(--research-quran-font-family), sans-serif;
+    font-size: var(--research-quran-font-size);
+    line-height: var(--research-line-height-quran);
     color: var(--rabva-text, #0f172a);
   }
 
   &__segments {
-    font-family: var(--map-quran-font-family), sans-serif;
-    font-size: var(--map-translation-font-size);
+    font-family: var(--research-quran-font-family), sans-serif;
+    font-size: var(--research-translation-font-size);
     line-height: 1;
     color: var(--rabva-translation, #166534);
     text-align: center;
@@ -502,7 +576,7 @@
     display: block;
     font-size: 0.95rem;
     color: var(--rabva-translation, #475467);
-    font-family: var(--map-translation-font-family), sans-serif;
+    font-family: var(--research-translation-font-family), sans-serif;
     line-height: 1;
   }
 
@@ -510,7 +584,7 @@
     display: block;
     font-size: 0.78rem;
     color: color-mix(in srgb, var(--rabva-text, #0f172a) 70%, transparent);
-    font-family: var(--map-translation-font-family), sans-serif;
+    font-family: var(--research-translation-font-family), sans-serif;
     line-height: 1;
     margin-top: 0.08rem;
   }
@@ -523,5 +597,54 @@
     margin-inline-start: 0.4rem;
     align-self: flex-end;
     white-space: nowrap;
+  }
+
+  // ----- Phase 1: distinct visual states (default / armed-source / single-selected / group-selected) -----
+
+  // Armed-source per-element (Phase 1 plan #12): the specific word / segment /
+  // meta / whole-ayah-group element that is armed pulses with an amber halo.
+  &__connectable.is-armed-source {
+    box-shadow: 0 0 0 2px #f59e0b, 0 0 0 5px rgba(245, 158, 11, 0.28);
+    border-radius: 4px;
+    animation: research-canvas-arming-pulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes research-canvas-arming-pulse {
+    0%, 100% { box-shadow: 0 0 0 2px #f59e0b, 0 0 0 5px rgba(245, 158, 11, 0.18); }
+    50%      { box-shadow: 0 0 0 2px #f59e0b, 0 0 0 8px rgba(245, 158, 11, 0.40); }
+  }
+
+  // Group-selected (multiple): dashed outline distinct from single-selected solid.
+  &__connectable.is-group-selected {
+    outline: 2px dashed #2563eb;
+    outline-offset: 2px;
+  }
+
+  // While arming a connection, prompt user that another node is the target.
+  &.is-arming &__node &__ayah-card {
+    cursor: crosshair;
+  }
+
+  // Mobile-friendly hit targets for connection points: keep visible dot small,
+  // expand pointer-area to >= 44x44 CSS px via padding + background-clip.
+  @media (pointer: coarse) {
+    &__connection-point {
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      background: radial-gradient(circle at center,
+        color-mix(in srgb, var(--rabva-translation, #039855) 88%, white 12%) 0 5px,
+        transparent 6px);
+      box-shadow: none;
+    }
+    &__connection-point--top    { transform: translate(-50%, -50%); }
+    &__connection-point--right  { transform: translate(50%, -50%); }
+    &__connection-point--bottom { transform: translate(-50%, 50%); }
+    &__connection-point--left   { transform: translate(-50%, -50%); }
+
+    // Connection lines also need a fatter hit area on touch.
+    &__connection-line {
+      stroke-width: 4;
+    }
   }
 }

@@ -34,3 +34,10 @@ export const rabvaAccountApi = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+export const researchSocialApi = axios.create({
+  baseURL: '/research-social',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});

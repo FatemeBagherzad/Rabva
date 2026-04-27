@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
-import { resolveAyahAddressToWords } from '../services/ayahMapService';
+import { resolveAyahAddressToWords } from '../services/researchService';
 
-export const MAP_NODE_TYPES = {
+export const RESEARCH_NODE_TYPES = {
   PLACEHOLDER: 'placeholder',
   LOADING: 'loading',
   READY: 'ready',
@@ -16,7 +16,7 @@ const clampScale = (value) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, value));
 const getDistance = (firstPointer, secondPointer) =>
   Math.hypot(secondPointer.x - firstPointer.x, secondPointer.y - firstPointer.y);
 
-export const useAyahMapCanvas = (preferences, options = {}) => {
+export const useResearchCanvas = (preferences, options = {}) => {
   const { selectionMode = false } = options;
   const viewportRef = useRef(null);
   const pendingNodePatchesRef = useRef(new Map());
@@ -32,12 +32,12 @@ export const useAyahMapCanvas = (preferences, options = {}) => {
 
   const canvasStyles = useMemo(
     () => ({
-      '--map-quran-font-family': preferences?.quran_font_family || 'hafs-django',
-      '--map-quran-font-size': `${preferences?.quran_font_size || 2.5}rem`,
-      '--map-translation-font-family': preferences?.translation_font_family || 'inter',
-      '--map-translation-font-size': `${preferences?.translation_font_size || 1.2}rem`,
-      '--map-line-height-quran': preferences?.line_height_quran || 2,
-      '--map-line-height-translation': preferences?.line_height_translation || 1.5,
+      '--research-quran-font-family': preferences?.quran_font_family || 'hafs-django',
+      '--research-quran-font-size': `${preferences?.quran_font_size || 2.5}rem`,
+      '--research-translation-font-family': preferences?.translation_font_family || 'inter',
+      '--research-translation-font-size': `${preferences?.translation_font_size || 1.2}rem`,
+      '--research-line-height-quran': preferences?.line_height_quran || 2,
+      '--research-line-height-translation': preferences?.line_height_translation || 1.5,
     }),
     [preferences],
   );
@@ -72,7 +72,7 @@ export const useAyahMapCanvas = (preferences, options = {}) => {
     x,
     y,
     address: '1:1',
-    type: MAP_NODE_TYPES.PLACEHOLDER,
+    type: RESEARCH_NODE_TYPES.PLACEHOLDER,
     words: [],
     error: '',
     width: null,
@@ -83,14 +83,15 @@ export const useAyahMapCanvas = (preferences, options = {}) => {
 
   const placeNodeAtClientPoint = (clientX, clientY) => {
     const viewport = viewportRef.current;
-    if (!viewport) return false;
+    if (!viewport) return null;
 
     const rect = viewport.getBoundingClientRect();
     const dropX = (clientX - rect.left - pan.x) / scale;
     const dropY = (clientY - rect.top - pan.y) / scale;
 
-    setNodes((prev) => [...prev, createPlaceholderNode(dropX, dropY)]);
-    return true;
+    const newNode = createPlaceholderNode(dropX, dropY);
+    setNodes((prev) => [...prev, newNode]);
+    return newNode.id;
   };
 
   const zoomTo = (nextScale, clientX, clientY) => {
@@ -175,7 +176,7 @@ export const useAyahMapCanvas = (preferences, options = {}) => {
       return;
     }
 
-    if (event.target.closest('.ayah-map__toolbar') || event.target.closest('.ayah-map__node')) {
+    if (event.target.closest('.research-canvas__toolbar') || event.target.closest('.research-canvas__node')) {
       return;
     }
 
@@ -239,9 +240,15 @@ export const useAyahMapCanvas = (preferences, options = {}) => {
 
       const deltaX = (event.clientX - dragNode.startX) / scale;
       const deltaY = (event.clientY - dragNode.startY) / scale;
-      queueNodePatch(dragNode.id, {
-        x: dragNode.startNodeX + deltaX,
-        y: dragNode.startNodeY + deltaY,
+      const moveIds = dragNode.ids || [dragNode.id];
+      moveIds.forEach((nid) => {
+        const start = dragNode.startPositions ? dragNode.startPositions[nid] : null;
+        const baseX = start ? start.x : dragNode.startNodeX;
+        const baseY = start ? start.y : dragNode.startNodeY;
+        queueNodePatch(nid, {
+          x: baseX + deltaX,
+          y: baseY + deltaY,
+        });
       });
       return;
     }
@@ -259,10 +266,10 @@ export const useAyahMapCanvas = (preferences, options = {}) => {
     if (resizeNode) {
       if (event && event.pointerId !== resizeNode.pointerId) return;
 
-      const resizedCard = resizeNode.captureTarget?.closest('.ayah-map__ayah-card');
+      const resizedCard = resizeNode.captureTarget?.closest('.research-canvas__ayah-card');
       if (resizedCard) {
-        const content = resizedCard.querySelector('.ayah-map__ayah-content');
-        const addressLabel = resizedCard.querySelector('.ayah-map__address-label');
+        const content = resizedCard.querySelector('.research-canvas__ayah-content');
+        const addressLabel = resizedCard.querySelector('.research-canvas__address-label');
         const styles = window.getComputedStyle(resizedCard);
         const horizontalPadding =
           parseFloat(styles.paddingLeft || '0') + parseFloat(styles.paddingRight || '0') + 2;
@@ -321,11 +328,11 @@ export const useAyahMapCanvas = (preferences, options = {}) => {
     setDragPan(null);
   };
 
-  const onNodePointerDown = (event, id, type) => {
+  const onNodePointerDown = (event, id, type, groupIds = null) => {
     if (selectionMode) return;
 
     if (event.target.closest('input, textarea, button')) return;
-    if (event.target.closest('.ayah-map__resize-handle')) return;
+    if (event.target.closest('.research-canvas__resize-handle')) return;
 
     const node = nodes.find((item) => item.id === id);
     if (!node) return;
@@ -340,8 +347,17 @@ export const useAyahMapCanvas = (preferences, options = {}) => {
       }
     }
 
+    const idsToMove = Array.isArray(groupIds) && groupIds.length > 0 ? groupIds : [id];
+    const startPositions = {};
+    idsToMove.forEach((nid) => {
+      const n = nodes.find((item) => item.id === nid);
+      if (n) startPositions[nid] = { x: n.x, y: n.y };
+    });
+
     setDragNode({
       id,
+      ids: idsToMove,
+      startPositions,
       pointerId: event.pointerId,
       captureTarget: event.currentTarget,
       startX: event.clientX,
@@ -358,7 +374,7 @@ export const useAyahMapCanvas = (preferences, options = {}) => {
     const node = nodes.find((item) => item.id === id);
     if (!node) return;
 
-    const card = event.currentTarget.closest('.ayah-map__ayah-card');
+    const card = event.currentTarget.closest('.research-canvas__ayah-card');
     if (!card) return;
 
     const rect = card.getBoundingClientRect();
@@ -396,7 +412,7 @@ export const useAyahMapCanvas = (preferences, options = {}) => {
 
   const onDropToSurface = (event) => {
     event.preventDefault();
-    placeNodeAtClientPoint(event.clientX, event.clientY);
+    return placeNodeAtClientPoint(event.clientX, event.clientY);
   };
 
   const onAllowDrop = (event) => {
@@ -411,17 +427,37 @@ export const useAyahMapCanvas = (preferences, options = {}) => {
     const node = nodes.find((item) => item.id === id);
     if (!node) return;
 
-    updateNode(id, { type: MAP_NODE_TYPES.LOADING, error: '' });
+    updateNode(id, { type: RESEARCH_NODE_TYPES.LOADING, error: '' });
 
     try {
       const result = await resolveAyahAddressToWords(node.address);
       if (!result.ok) {
-        updateNode(id, { type: MAP_NODE_TYPES.ERROR, error: result.error || 'Invalid address' });
+        updateNode(id, { type: RESEARCH_NODE_TYPES.ERROR, error: result.error || 'Invalid address' });
+        return;
+      }
+
+      // Single-ayah-per-canvas rule: reject if another node already has this ayah.
+      const duplicate = nodes.find(
+        (item) =>
+          item.id !== id &&
+          item.surahNumber === result.surahNumber &&
+          item.ayahNumber === result.ayahNumber,
+      );
+      if (duplicate) {
+        updateNode(id, {
+          type: RESEARCH_NODE_TYPES.ERROR,
+          words: [],
+          surahNumber: null,
+          ayahNumber: null,
+          error: `Ayah ${result.surahNumber}:${result.ayahNumber} already exists in this canvas`,
+        });
+        // Focus the existing node so the user can see where it is.
+        setTimeout(() => focusNodeById(duplicate.id), 0);
         return;
       }
 
       updateNode(id, {
-        type: MAP_NODE_TYPES.READY,
+        type: RESEARCH_NODE_TYPES.READY,
         words: result.words,
         address: result.normalizedAddress,
         surahNumber: result.surahNumber,
@@ -430,7 +466,7 @@ export const useAyahMapCanvas = (preferences, options = {}) => {
       });
     } catch (error) {
       updateNode(id, {
-        type: MAP_NODE_TYPES.ERROR,
+        type: RESEARCH_NODE_TYPES.ERROR,
         error: 'Failed to load ayah',
       });
     }
@@ -463,7 +499,7 @@ export const useAyahMapCanvas = (preferences, options = {}) => {
     resolveNodeAyah(id);
   };
 
-  const setMapState = (nextState) => {
+  const setResearchState = (nextState) => {
     if (!nextState || typeof nextState !== 'object') return;
 
     if (Array.isArray(nextState.nodes)) {
@@ -477,6 +513,29 @@ export const useAyahMapCanvas = (preferences, options = {}) => {
     if (Number.isFinite(nextState.scale)) {
       setScale(clampScale(nextState.scale));
     }
+  };
+
+  const focusNodeById = (id) => {
+    const viewport = viewportRef.current;
+    if (!viewport) return false;
+    const node = nodes.find((item) => item.id === id);
+    if (!node) return false;
+    const rect = viewport.getBoundingClientRect();
+    const nodeWidth = node.width || 200;
+    const nodeHeight = node.height || 80;
+    const centerX = node.x + nodeWidth / 2;
+    const centerY = node.y + nodeHeight / 2;
+    setPan({
+      x: rect.width / 2 - centerX * scale,
+      y: rect.height / 2 - centerY * scale,
+    });
+    return true;
+  };
+
+  const deleteNodesByIds = (ids) => {
+    if (!ids || !ids.length) return;
+    const idSet = new Set(ids);
+    setNodes((prev) => prev.filter((node) => !idSet.has(node.id)));
   };
 
   return {
@@ -504,6 +563,8 @@ export const useAyahMapCanvas = (preferences, options = {}) => {
     onPlaceholderBlur,
     onNodePointerDown,
     onResizeHandlePointerDown,
-    setMapState,
+    setResearchState,
+    focusNodeById,
+    deleteNodesByIds,
   };
 };
