@@ -15,9 +15,20 @@ const CONNECTION_SIDES = ['top', 'right', 'bottom', 'left'];
 const SUBSET_GROUP_PREFIX = 'sg:';
 const connectionPointId = (ownerId, side) => `${ownerId}:cp:${side}`;
 const ownerIdFromPointId = (pointId) => pointId.split(':cp:')[0];
+// Extract the underlying ayah-node id from any selectable / owner id.
+// Two owner-id grammars exist:
+//   1. `n:<nodeId>:<rest>`  — normal element ids (whole-ayah, words, segments).
+//   2. `sg:<nodeId>:<itemIds>` — subset-group owner ids (Phase 1 plan #26).
+// Both must resolve to `<nodeId>` so downstream logic that buckets things by
+// ayah-node (e.g. plan #24 anti-overlap stagger, node-delete connection
+// cleanup) treats subset-group connections identically to per-element ones.
 const nodeIdFromSelectableId = (id) => {
-  const match = id.match(/^n:([^:]+):/);
-  return match ? match[1] : null;
+  if (typeof id !== 'string') return null;
+  const nMatch = id.match(/^n:([^:]+):/);
+  if (nMatch) return nMatch[1];
+  const sgMatch = id.match(/^sg:([^:]+):/);
+  if (sgMatch) return sgMatch[1];
+  return null;
 };
 
 // Owner-kind classification (Phase 1 plan #13 dot-set rule + #28 subset-group parity).
@@ -865,7 +876,13 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
             suggestion_status: c.suggestionStatus || 'confirmed',
           })),
         };
-        saveResearch(token, researchId, payload).catch(() => {});
+        saveResearch(token, researchId, payload).catch((err) => {
+          // Surface backend save failures to the console so silent
+          // truncation / validation regressions (e.g. point-id length cap)
+          // do not stay hidden behind a swallowed promise rejection.
+          // eslint-disable-next-line no-console
+          console.warn('[research-canvas] saveResearch failed', err);
+        });
       }, 1500);
     }
   }, [pan, scale, nodes, connections, connectionDirection]);
