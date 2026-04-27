@@ -59,7 +59,7 @@ const DeleteConfirmDialog = ({ summary, impactItems, onConfirm, onCancel }) => {
         {impactItems && impactItems.length > 0 ? (
           <div className="delete-confirm-dialog__impact">
             <div className="delete-confirm-dialog__impact-label">
-              Connections that will also be removed:
+              الاتصالات التي ستُحذف أيضًا:
             </div>
             <ul className="delete-confirm-dialog__impact-list">
               {impactItems.map((item) => (
@@ -75,7 +75,7 @@ const DeleteConfirmDialog = ({ summary, impactItems, onConfirm, onCancel }) => {
           </div>
         ) : (
           <div className="delete-confirm-dialog__impact delete-confirm-dialog__impact--empty">
-            No other connections will be affected.
+            لا توجد اتصالات أخرى ستتأثر.
           </div>
         )}
 

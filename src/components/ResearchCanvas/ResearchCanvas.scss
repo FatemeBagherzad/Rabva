@@ -459,6 +459,15 @@
     pointer-events: auto;
   }
 
+  // Phase 1 plan #23: the active subset-group box is the sole connectable
+  // carrier while it exists. Its four connection-point dots must be
+  // unconditionally visible and interactive (no hover requirement) so they
+  // work on touch devices, where there is no hover state.
+  &__selection-group > &__connection-points > &__connection-point {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   &__connection-point:hover,
   &__connection-point.is-hovered {
     transform: translate(var(--cp-tx, 0), var(--cp-ty, 0)) scale(1.14);

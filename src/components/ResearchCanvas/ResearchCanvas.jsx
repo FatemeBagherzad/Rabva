@@ -285,6 +285,34 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
 
     const rectCenter = (r) => (r ? { x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2 } : null);
 
+    // Phase 1 plan #24: deterministic anti-overlap offset for connections
+    // sharing the same unordered ayah-node pair. Self-loops are excluded
+    // (handled by the curved self-loop renderer) and offsets are computed
+    // from the connection's stable id so the same set of connections always
+    // produces the same staggered layout across reloads.
+    const BEND_OFFSET_PX = 14;
+    const bendOffsetById = {};
+    {
+      const buckets = new Map();
+      for (let i = 0; i < connections.length; i += 1) {
+        const conn = connections[i];
+        const sNodeId = nodeIdFromSelectableId(ownerIdFromPointId(conn.sourcePointId));
+        const tNodeId = nodeIdFromSelectableId(ownerIdFromPointId(conn.targetPointId));
+        if (!sNodeId || !tNodeId || sNodeId === tNodeId) continue;
+        const key = sNodeId < tNodeId ? `${sNodeId}||${tNodeId}` : `${tNodeId}||${sNodeId}`;
+        if (!buckets.has(key)) buckets.set(key, []);
+        buckets.get(key).push(conn);
+      }
+      buckets.forEach((arr) => {
+        if (arr.length < 2) return;
+        arr.sort((a, b) => String(a.id).localeCompare(String(b.id)));
+        const center = (arr.length - 1) / 2;
+        for (let i = 0; i < arr.length; i += 1) {
+          bendOffsetById[arr[i].id] = (i - center) * BEND_OFFSET_PX;
+        }
+      });
+    }
+
     // O(1) dot-pair pick: among the (sourceSides x targetSides) cartesian
     // product (max 4x4 = 16 cheap arithmetic comparisons), choose the pair
     // whose anchors yield the shortest straight-line segment that points
@@ -335,7 +363,7 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
     // Bend direction is chosen so the line leaves each endpoint perpendicular
     // to its chosen side when possible (vertical if side is top/bottom,
     // horizontal if side is left/right).
-    const buildPolyline = (sa, ta, sSide, tSide) => {
+    const buildPolyline = (sa, ta, sSide, tSide, bendOffset = 0) => {
       // Straight line shortcut.
       if (Math.abs(sa.x - ta.x) < 0.5 || Math.abs(sa.y - ta.y) < 0.5) {
         return [sa, ta];
@@ -345,6 +373,7 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
       // Two L variants: horizontal-then-vertical OR vertical-then-horizontal.
       // Prefer the one matching the source side: vertical first if source
       // exits top/bottom, horizontal first otherwise.
+      // Plan #24 exempts single-bend L routes (bend coord is geometry-fixed).
       if (sourceVertical && !targetVertical) {
         // V then H — bend at (sa.x, ta.y).
         return [sa, { x: sa.x, y: ta.y }, ta];
@@ -355,11 +384,14 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
       }
       if (sourceVertical && targetVertical) {
         // Both ends vertical — V then H then V (mid Y midpoint).
-        const midY = (sa.y + ta.y) / 2;
+        // Plan #24: perturb the freely-choosable mid-Y by per-connection offset
+        // so collinear bands become visually separable.
+        const midY = (sa.y + ta.y) / 2 + bendOffset;
         return [sa, { x: sa.x, y: midY }, { x: ta.x, y: midY }, ta];
       }
       // Both horizontal — H then V then H (mid X midpoint).
-      const midX = (sa.x + ta.x) / 2;
+      // Plan #24: perturb the freely-choosable mid-X by per-connection offset.
+      const midX = (sa.x + ta.x) / 2 + bendOffset;
       return [sa, { x: midX, y: sa.y }, { x: midX, y: ta.y }, ta];
     };
 
@@ -372,7 +404,13 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
 
       const pair = pickDotPair(sourceOwnerId, targetOwnerId, sourceRect, targetRect);
       if (pair) {
-        result[conn.id] = buildPolyline(pair.sa, pair.ta, pair.sSide, pair.tSide);
+        result[conn.id] = buildPolyline(
+          pair.sa,
+          pair.ta,
+          pair.sSide,
+          pair.tSide,
+          bendOffsetById[conn.id] || 0,
+        );
         continue;
       }
       // Fallback: stored anchors or rect centers.
@@ -858,6 +896,29 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [setResearchState, nodes, pan, scale, connections, connectionDirection]);
 
+  // Phase 1 plan #20: defense-in-depth contextmenu suppression for words and
+  // sub-words. Even though every word/segment span has its own React
+  // `onContextMenu={preventDefault+stopPropagation}` (item 11), we install a
+  // capture-phase native listener on the canvas viewport so that the
+  // browser's default menu and any bubble-phase delegation can never fire on
+  // those targets — guaranteeing no whole-ayah Delete menu can ever appear
+  // on a word/sub-word right-click. Scoped to the canvas viewport per
+  // universal principle #10 (canvas isolation); cleaned up on unmount.
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return undefined;
+    const handler = (event) => {
+      const target = event.target;
+      if (!target || typeof target.closest !== 'function') return;
+      if (target.closest('.research-canvas__word-block, .research-canvas__segment-item')) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    };
+    viewport.addEventListener('contextmenu', handler, true);
+    return () => viewport.removeEventListener('contextmenu', handler, true);
+  }, []);
+
   useLayoutEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport) return;
@@ -890,8 +951,15 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
     // pan and divide by scale), so they are invariant under pan/zoom and only
     // need to recompute when nodes themselves change. Per Universal Principle
     // #12 (scale-first), pan/zoom must NOT trigger O(N) anchor recomputation.
+    //
+    // Phase 1 plan #23: subset-group boxes mount AFTER `selectionGroupRects`
+    // is computed (the group div returns null until its rect is known), so we
+    // also depend on `selectionGroupRects` here. This guarantees the group
+    // box's connection-point dots get registered into `anchors`, which in
+    // turn makes them first-class targets for both drag-to-connect and the
+    // double-tap arming model used by `findNearestConnectionPointId`.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nodes]);
+  }, [nodes, selectionGroupRects]);
 
   useLayoutEffect(() => {
     const nextRects = {};
@@ -900,17 +968,26 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
       const cardElement = selectableRefs.current.get(`n:${group.nodeId}:group`);
       if (!cardElement) return;
 
-      const cardRect = cardElement.getBoundingClientRect();
+      // Phase 1 plan #22: the group box is rendered as an absolutely
+      // positioned child of `__ayah-content`, NOT of the card. Use the
+      // content element as the reference rect so the box aligns to the
+      // actual word/segment positions. Also divide by scale because
+      // `getBoundingClientRect()` returns post-transform viewport pixels
+      // while the rendered `left/top/width/height` are pre-transform local
+      // CSS px (the parent transform scales them).
+      const contentElement = cardElement.querySelector('.research-canvas__ayah-content') || cardElement;
+      const contentRect = contentElement.getBoundingClientRect();
       const itemRects = group.itemIds
         .map((itemId) => selectableRefs.current.get(itemId)?.getBoundingClientRect())
         .filter(Boolean);
 
       if (!itemRects.length) return;
 
-      const left = Math.min(...itemRects.map((rect) => rect.left)) - cardRect.left;
-      const top = Math.min(...itemRects.map((rect) => rect.top)) - cardRect.top;
-      const right = Math.max(...itemRects.map((rect) => rect.right)) - cardRect.left;
-      const bottom = Math.max(...itemRects.map((rect) => rect.bottom)) - cardRect.top;
+      const safeScale = scale || 1;
+      const left = (Math.min(...itemRects.map((rect) => rect.left)) - contentRect.left) / safeScale;
+      const top = (Math.min(...itemRects.map((rect) => rect.top)) - contentRect.top) / safeScale;
+      const right = (Math.max(...itemRects.map((rect) => rect.right)) - contentRect.left) / safeScale;
+      const bottom = (Math.max(...itemRects.map((rect) => rect.bottom)) - contentRect.top) / safeScale;
 
       nextRects[group.id] = {
         left,
@@ -1174,7 +1251,17 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
   // (word / segment / meta / whole-ayah-group) — the unit of selection inside
   // an ayah node is the individual selectable element, per Phase 1 plan #12.
   const handleElementTap = (event, ownerId) => {
-    if (event.pointerType !== 'touch') return false;
+    // Phase 1 plan #25: accept the canonical mobile pointer types AND
+    // unknown/empty pointerType on devices that report touch capability,
+    // because some mobile browsers and embedded WebViews dispatch synthetic
+    // pointer events without a populated `pointerType` string. Without this,
+    // double-tap arming on words / sub-words silently stops working in those
+    // environments — the regression reported after items #18–#22.
+    const isTouchLike =
+      event.pointerType === 'touch' ||
+      event.pointerType === 'pen' ||
+      (!event.pointerType && typeof navigator !== 'undefined' && (navigator.maxTouchPoints || 0) > 0);
+    if (!isTouchLike) return false;
     if (!ownerId) return false;
     // Phase 1 plan #12: whole-ayah selection is exclusive to the meta/address
     // element. Tapping the ayah-card frame (`:group`) must NOT select the
@@ -1289,50 +1376,52 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
     onNodePointerDown(event, nodeId, nodeType);
   };
 
-  // Phase 1 plan #18: human-readable label for any selectable owner id, used
-  // by the delete confirmation dialog to describe the impact.
+  // Phase 1 plan #18 + #21: human-readable label for any selectable owner
+  // id, used by the delete confirmation dialog. Per plan #21, the noun
+  // "ayah" is rendered in Arabic ("آية") in user-visible text; numerals
+  // stay Western and CSS / code identifiers stay English.
   const labelForOwnerId = useCallback(
     (ownerId) => {
-      if (!ownerId || typeof ownerId !== 'string') return 'unknown';
+      if (!ownerId || typeof ownerId !== 'string') return '—';
       if (ownerId.startsWith(SUBSET_GROUP_PREFIX)) {
         const rest = ownerId.slice(SUBSET_GROUP_PREFIX.length);
         const nodeId = rest.split(':')[0];
         const node = nodes.find((n) => n.id === nodeId);
-        const addr = node ? `${node.surahNumber}:${node.ayahNumber}` : 'ayah';
-        return `selection in ${addr}`;
+        const addr = node ? `${node.surahNumber}:${node.ayahNumber}` : '';
+        return addr ? `تحديد في آية ${addr}` : 'تحديد';
       }
       const nodeId = nodeIdFromSelectableId(ownerId);
       const node = nodes.find((n) => n.id === nodeId);
-      const addr = node ? `${node.surahNumber || node.address}:${node.ayahNumber || ''}`.replace(/:$/, '') : 'ayah';
+      const addr = node ? `${node.surahNumber || node.address}:${node.ayahNumber || ''}`.replace(/:$/, '') : '';
       const rest = ownerId.split(':').slice(2).join(':');
-      if (!rest || rest === 'group' || rest === 'meta') return `ayah ${addr}`;
+      if (!rest || rest === 'group' || rest === 'meta') return `آية ${addr}`;
       if (rest.startsWith('w:')) {
         const i = parseInt(rest.slice(2), 10);
-        const text = node?.words?.[i]?.text || `word ${i + 1}`;
-        return `${addr} · ${text}`;
+        const text = node?.words?.[i]?.text || `كلمة ${i + 1}`;
+        return `آية ${addr} · ${text}`;
       }
       if (rest.startsWith('s:')) {
         const [, wi, si] = rest.split(':');
-        const text = node?.words?.[parseInt(wi, 10)]?.segments?.[parseInt(si, 10)] || `seg ${si}`;
-        return `${addr} · ${text}`;
+        const text = node?.words?.[parseInt(wi, 10)]?.segments?.[parseInt(si, 10)] || `جزء ${si}`;
+        return `آية ${addr} · ${text}`;
       }
-      return `ayah ${addr}`;
+      return `آية ${addr}`;
     },
     [nodes],
   );
 
-  // Phase 1 plan #18: derive the dialog props (summary + impact list) from
-  // the pendingDelete menu so the user sees exactly what will change before
-  // confirming.
+  // Phase 1 plan #18 + #21: derive the dialog props (summary + impact list)
+  // from the pendingDelete menu so the user sees exactly what will change
+  // before confirming. Visible labels use Arabic ("آية" / "آيات").
   const deleteConfirmProps = useMemo(() => {
     if (!pendingDelete) return null;
     if (pendingDelete.kind === 'connection') {
       const connId = pendingDelete.ids[0];
       const conn = connections.find((c) => c.id === connId);
-      const fromLabel = conn ? labelForOwnerId(ownerIdFromPointId(conn.sourcePointId)) : 'source';
-      const toLabel = conn ? labelForOwnerId(ownerIdFromPointId(conn.targetPointId)) : 'target';
+      const fromLabel = conn ? labelForOwnerId(ownerIdFromPointId(conn.sourcePointId)) : '—';
+      const toLabel = conn ? labelForOwnerId(ownerIdFromPointId(conn.targetPointId)) : '—';
       return {
-        summary: 'Delete this connection?',
+        summary: 'حذف هذا الاتصال؟',
         impactItems: conn ? [{ id: conn.id, from: fromLabel, to: toLabel }] : [],
       };
     }
@@ -1340,11 +1429,11 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
       const targetNodes = new Set(pendingDelete.ids);
       const summary =
         targetNodes.size === 1
-          ? `Delete ayah ${(() => {
+          ? `حذف آية ${(() => {
               const n = nodes.find((x) => x.id === [...targetNodes][0]);
               return n ? `${n.surahNumber}:${n.ayahNumber}` : '';
-            })()}?`
-          : `Delete ${targetNodes.size} ayahs?`;
+            })()}؟`
+          : `حذف ${targetNodes.size} آيات؟`;
       const impactItems = connections
         .filter((c) => {
           const sNode = nodeIdFromSelectableId(ownerIdFromPointId(c.sourcePointId));
@@ -1759,9 +1848,27 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
               onPointerDown={(event) => handleNodePointerDown(event, node.id, node.type)}
               onPointerUp={(event) => {
                 cancelLongPress();
-                // Resolve the most-specific selectable owner under the pointer
-                // so element-level (word / segment / meta) double-tap arming works.
-                const ownerEl = event.target.closest('[data-owner-id]');
+                // Phase 1 plan #25: `onNodePointerDown` calls
+                // `setPointerCapture` on the node div for drag, which
+                // rewrites `event.target` of the subsequent `pointerup` to
+                // the node element itself \u2014 hiding the original word /
+                // segment span the user touched. To recover the true target
+                // for double-tap arming, we hit-test by client coordinates
+                // via `elementFromPoint` (works on all pointer types) and
+                // resolve the owner-id from THAT element, not from
+                // `event.target`. Without this, mobile double-tap on a word
+                // always collapses to `n:<id>:group` (whole-ayah) and is
+                // rejected by `handleElementTap`'s `:group` guard.
+                let ownerEl = null;
+                if (typeof document !== 'undefined' && document.elementFromPoint) {
+                  const hit = document.elementFromPoint(event.clientX, event.clientY);
+                  if (hit && typeof hit.closest === 'function') {
+                    ownerEl = hit.closest('[data-owner-id]');
+                  }
+                }
+                if (!ownerEl) {
+                  ownerEl = event.target.closest('[data-owner-id]');
+                }
                 const ownerId = ownerEl?.dataset?.ownerId || `n:${node.id}:group`;
                 handleElementTap(event, ownerId);
               }}
@@ -1932,7 +2039,10 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
                           event.stopPropagation();
                         }}
                       >
-                        {renderConnectionPoints(wordOwnerId)}
+                        {/* Phase 1 plan #22: while a subset group owns this
+                            word, the group box is the sole connectable
+                            carrier — hide the per-word connection-point dots. */}
+                        {wordInSubsetGroup ? null : renderConnectionPoints(wordOwnerId)}
                         <span className="research-canvas__word-text">{word.text}</span>
                         <span className="research-canvas__segments">
                           {word.segments.length ? (
@@ -1959,7 +2069,10 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
                                   event.stopPropagation();
                                 }}
                               >
-                                {renderConnectionPoints(segmentOwnerId)}
+                                {/* Phase 1 plan #22: subset-group members
+                                    hide their own connection-point dots;
+                                    the group box carries the dots. */}
+                                {segmentInSubsetGroup ? null : renderConnectionPoints(segmentOwnerId)}
                                 {segment}
                               </span>
                                 );
