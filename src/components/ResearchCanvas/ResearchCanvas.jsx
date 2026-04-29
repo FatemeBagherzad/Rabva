@@ -1529,7 +1529,7 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
   const onCancelDelete = useCallback(() => setPendingDelete(null), []);
 
   return (
-    <div className={`research-canvas ${connectionDraft || connectionEditDraft ? 'is-connecting' : ''} ${armedSourceOwnerId ? 'is-arming' : ''} ${selectionMode ? 'is-selection-mode' : ''}`} style={canvasStyles}>
+    <div className={`research-canvas ${connectionDraft || connectionEditDraft ? 'is-connecting' : ''} ${armedSourceOwnerId ? 'is-arming' : ''} ${selectionMode ? 'is-selection-mode' : ''}`} style={{ ...canvasStyles, '--rabva-canvas-scale': scale }}>
       <div className="research-canvas__toolbar">
         <button
           type="button"
@@ -1766,23 +1766,27 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
               if (!pathData) return null;
 
               const isSelectedConnection = selectedConnectionId === connection.id;
+              const isHoveredConnection = hoveredConnectionId === connection.id;
+              const isSubsetConnection =
+                ownerIdFromPointId(connection.sourcePointId).startsWith(SUBSET_GROUP_PREFIX) ||
+                ownerIdFromPointId(connection.targetPointId).startsWith(SUBSET_GROUP_PREFIX);
+              const invScale = 1 / (scale || 1);
+              const visibleStrokeBase = isSelectedConnection ? 1.8 : isHoveredConnection ? 1.4 : 0.75;
+              const visibleDasharray = isSubsetConnection
+                ? `${6 * invScale} ${4 * invScale}`
+                : undefined;
 
               return (
                 <g key={connection.id}>
+                  {/* Invisible wide hit-path so thin visible strokes remain easy to hover/select. */}
                   <path
                     d={pathData}
-                    className={`research-canvas__connection-line ${isSelectedConnection ? 'is-selected' : ''} ${
-                      // Phase 1 plan #27: any connection touching a subset
-                      // group on either end renders with a dashed stroke so
-                      // it is visually distinct from word-to-word and
-                      // ayah-to-ayah connections.
-                      ownerIdFromPointId(connection.sourcePointId).startsWith(SUBSET_GROUP_PREFIX) ||
-                      ownerIdFromPointId(connection.targetPointId).startsWith(SUBSET_GROUP_PREFIX)
-                        ? 'is-subset'
-                        : ''
-                    }`}
-                    markerEnd="url(#research-canvas-arrow-end)"
-                    markerStart={connection.direction === 'bi' ? 'url(#research-canvas-arrow-end)' : undefined}
+                    className="research-canvas__connection-hit"
+                    fill="none"
+                    stroke="transparent"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ pointerEvents: 'stroke', cursor: 'pointer', strokeWidth: 14 * invScale }}
                     onPointerEnter={() => setHoveredConnectionId(connection.id)}
                     onPointerLeave={() =>
                       setHoveredConnectionId((prev) => (prev === connection.id ? null : prev))
@@ -1801,13 +1805,25 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
                       openContextMenuForConnection(event.clientX, event.clientY, connection.id);
                     }}
                   />
+                  <path
+                    d={pathData}
+                    className={`research-canvas__connection-line ${isSelectedConnection ? 'is-selected' : ''} ${isHoveredConnection ? 'is-hovered' : ''} ${isSubsetConnection ? 'is-subset' : ''}`}
+                    markerEnd="url(#research-canvas-arrow-end)"
+                    markerStart={connection.direction === 'bi' ? 'url(#research-canvas-arrow-end)' : undefined}
+                    style={{
+                      pointerEvents: 'none',
+                      strokeWidth: visibleStrokeBase * invScale,
+                      ...(visibleDasharray ? { strokeDasharray: visibleDasharray } : {}),
+                    }}
+                  />
 
                   {isSelectedConnection && sourcePoint ? (
                     <circle
                       className="research-canvas__connection-endpoint"
                       cx={sourcePoint.x}
                       cy={sourcePoint.y}
-                      r="5"
+                      r={5 / (scale || 1)}
+                      style={{ strokeWidth: 0.5 / (scale || 1) }}
                       onPointerDown={(event) => startConnectionEndpointEdit(event, connection.id, 'source')}
                     />
                   ) : null}
@@ -1817,7 +1833,8 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
                       className="research-canvas__connection-endpoint"
                       cx={targetPoint.x}
                       cy={targetPoint.y}
-                      r="5"
+                      r={5 / (scale || 1)}
+                      style={{ strokeWidth: 0.5 / (scale || 1) }}
                       onPointerDown={(event) => startConnectionEndpointEdit(event, connection.id, 'target')}
                     />
                   ) : null}
@@ -1849,6 +1866,10 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
                     className="research-canvas__connection-line is-draft"
                     markerEnd="url(#research-canvas-arrow-end)"
                     markerStart={connection.direction === 'bi' ? 'url(#research-canvas-arrow-end)' : undefined}
+                    style={{
+                      strokeWidth: 0.75 / (scale || 1),
+                      strokeDasharray: `${4 / (scale || 1)} ${3 / (scale || 1)}`,
+                    }}
                   />
                 );
               })()
@@ -1890,6 +1911,10 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
                     d={draftPath}
                     className="research-canvas__connection-line is-draft"
                     markerEnd="url(#research-canvas-arrow-end)"
+                    style={{
+                      strokeWidth: 0.75 / (scale || 1),
+                      strokeDasharray: `${4 / (scale || 1)} ${3 / (scale || 1)}`,
+                    }}
                   />
                 );
               })()
@@ -1918,6 +1943,10 @@ const ResearchCanvas = ({ preferences, surahs, researchId, onBackToHub }) => {
                       d={draftPath}
                       className="research-canvas__connection-line is-draft is-arming-preview"
                       markerEnd="url(#research-canvas-arrow-end)"
+                      style={{
+                        strokeWidth: 1.4 / (scale || 1),
+                        strokeDasharray: `${6 / (scale || 1)} ${4 / (scale || 1)}`,
+                      }}
                     />
                   );
                 })()

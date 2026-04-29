@@ -173,10 +173,16 @@
     z-index: 5;
   }
 
+  &__connection-hit {
+    // Invisible wide hit-path; width is set inline from JS based on scale
+    // (CSS calc(var()) on SVG stroke-width is unreliable on Safari mobile).
+    pointer-events: stroke;
+    cursor: pointer;
+  }
+
   &__connection-line {
     stroke: currentColor;
     fill: none;
-    stroke-width: 1.5;
     opacity: 1;
     filter: none;
     stroke-linecap: round;
@@ -184,45 +190,24 @@
     shape-rendering: geometricPrecision;
     pointer-events: stroke;
     cursor: pointer;
-    transition: stroke-width 100ms ease, filter 100ms ease, stroke 100ms ease;
+    transition: filter 100ms ease, stroke 100ms ease;
 
-    // Phase 1 plan #13: desktop hover feedback on connection lines.
-    &:hover {
-      stroke-width: 2.6;
+    // Width is set inline; SCSS only controls colour/filter for hover/select.
+    &.is-hovered {
       stroke: color-mix(in srgb, currentColor 70%, white 30%);
       filter: drop-shadow(0 0 4px rgba(37, 99, 235, 0.35));
     }
 
     &.is-selected {
-      stroke-width: 3.4;
       filter: drop-shadow(0 0 6px rgba(37, 99, 235, 0.55));
     }
 
     &.is-draft {
-      stroke-dasharray: 4 3;
       opacity: 0.75;
-    }
-
-    // Phase 1 plan #27: any connection touching a subset group on either
-    // end renders as a dashed line in every state (idle, hover, selected),
-    // so it is visually distinct from word-to-word and ayah-to-ayah lines.
-    // Highlight states change colour / width but preserve the dash pattern.
-    &.is-subset {
-      stroke-dasharray: 6 4;
-
-      &:hover {
-        stroke-dasharray: 6 4;
-      }
-
-      &.is-selected {
-        stroke-dasharray: 6 4;
-      }
     }
 
     &.is-arming-preview {
       stroke: #f59e0b;
-      stroke-width: 2.6;
-      stroke-dasharray: 6 4;
       opacity: 0.95;
       pointer-events: none;
       animation: research-canvas-arming-dash 1s linear infinite;
@@ -236,7 +221,6 @@
   &__connection-endpoint {
     fill: color-mix(in srgb, var(--rabva-translation, #039855) 88%, white 12%);
     stroke: color-mix(in srgb, var(--rabva-translation, #039855) 65%, black 35%);
-    stroke-width: 1;
     pointer-events: auto;
     cursor: grab;
   }
