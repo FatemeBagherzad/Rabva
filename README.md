@@ -1,4 +1,4 @@
-# Rabva — Quran Platform
+# Rabva Platform
 
 **Live website:** https://rabva.ddns.net/
 
