@@ -1,6 +1,6 @@
 # Rabva Platform
 
-**Live website:** https://rabva.ddns.net/
+**Live website:** https://www.rabva.info:5443/
 
 Rabva is a Quran study and memorization platform. It lets users read the full Quran page by page, browse each ayah word-by-word with morphological segments, search by Arabic root with paginated results, read ayah translations in many languages, and explore an interactive research canvas for making semantic connections between ayahs. Registered users get personalized reading preferences, font and theme settings, an avatar, and a saved reading position across devices.
 
