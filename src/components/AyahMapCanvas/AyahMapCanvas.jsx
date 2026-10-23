@@ -14,7 +14,10 @@ const nodeIdFromSelectableId = (id) => {
 };
 
 const pointInRect = (point, rect) =>
-  point.x >= rect.left && point.x <= rect.right && point.y >= rect.top && point.y <= rect.bottom;
+  point.x >= rect.left &&
+  point.x <= rect.right &&
+  point.y >= rect.top &&
+  point.y <= rect.bottom;
 
 const pointNearRect = (point, rect, padding) =>
   point.x >= rect.left - padding &&
@@ -27,12 +30,15 @@ const linePointAt = (p0, p1, t) => ({
   y: p0.y + (p1.y - p0.y) * t,
 });
 
-const buildSubsetGroupId = (nodeId, itemIds) => `${SUBSET_GROUP_PREFIX}${nodeId}:${itemIds.join('|')}`;
+const buildSubsetGroupId = (nodeId, itemIds) =>
+  `${SUBSET_GROUP_PREFIX}${nodeId}:${itemIds.join('|')}`;
 
 const getCookieValue = (name) => {
   if (typeof document === 'undefined') return null;
   const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const match = document.cookie.match(new RegExp(`(?:^|; )${escapedName}=([^;]*)`));
+  const match = document.cookie.match(
+    new RegExp(`(?:^|; )${escapedName}=([^;]*)`),
+  );
   return match ? match[1] : null;
 };
 
@@ -81,7 +87,8 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
   const [anchors, setAnchors] = useState({});
   const [ownerRects, setOwnerRects] = useState({});
   const [connectionDraft, setConnectionDraft] = useState(null);
-  const [hoveredConnectionPointId, setHoveredConnectionPointId] = useState(null);
+  const [hoveredConnectionPointId, setHoveredConnectionPointId] =
+    useState(null);
   const [hoveredOwnerId, setHoveredOwnerId] = useState(null);
   const [marquee, setMarquee] = useState(null);
   const [canUndo, setCanUndo] = useState(false);
@@ -145,7 +152,9 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
     if (id.startsWith(SUBSET_GROUP_PREFIX)) {
       setSelectionGroups((prev) => prev.filter((group) => group.id !== id));
     }
-    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
+    );
   };
 
   const clearSelectionState = () => {
@@ -230,9 +239,17 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
       }
     }
 
-    const movingPointId = endpoint === 'source' ? connection.sourcePointId : connection.targetPointId;
-    const fixedPointId = endpoint === 'source' ? connection.targetPointId : connection.sourcePointId;
-    const movingAnchor = anchors[movingPointId] || clientToCanvasPoint(event.clientX, event.clientY);
+    const movingPointId =
+      endpoint === 'source'
+        ? connection.sourcePointId
+        : connection.targetPointId;
+    const fixedPointId =
+      endpoint === 'source'
+        ? connection.targetPointId
+        : connection.sourcePointId;
+    const movingAnchor =
+      anchors[movingPointId] ||
+      clientToCanvasPoint(event.clientX, event.clientY);
     if (!movingAnchor) return;
 
     setSelectedConnectionId(connectionId);
@@ -315,7 +332,9 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
       };
     };
 
-    const straightScore = obstacleScoreForSampler((t) => linePointAt(source, target, t));
+    const straightScore = obstacleScoreForSampler((t) =>
+      linePointAt(source, target, t),
+    );
     if (straightScore.hitCount === 0 && straightScore.nearCount <= 2) {
       return `M ${source.x} ${source.y} L ${target.x} ${target.y}`;
     }
@@ -351,7 +370,9 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
       });
     });
 
-    const chosen = candidates.sort((a, b) => a.score - b.score || a.hitCount - b.hitCount)[0];
+    const chosen = candidates.sort(
+      (a, b) => a.score - b.score || a.hitCount - b.hitCount,
+    )[0];
 
     return `M ${source.x} ${source.y} C ${chosen.c1.x} ${chosen.c1.y}, ${chosen.c2.x} ${chosen.c2.y}, ${target.x} ${target.y}`;
   };
@@ -370,7 +391,9 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
     event.preventDefault();
     event.stopPropagation();
 
-    const sourceAnchor = anchors[sourcePointId] || clientToCanvasPoint(event.clientX, event.clientY);
+    const sourceAnchor =
+      anchors[sourcePointId] ||
+      clientToCanvasPoint(event.clientX, event.clientY);
     if (!sourceAnchor) return;
 
     if (viewportRef.current?.setPointerCapture) {
@@ -391,11 +414,17 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
   };
 
   const onConnectionPointerMoveCapture = (event) => {
-    if (connectionEditDraft && event.pointerId === connectionEditDraft.pointerId) {
+    if (
+      connectionEditDraft &&
+      event.pointerId === connectionEditDraft.pointerId
+    ) {
       const nextPoint = clientToCanvasPoint(event.clientX, event.clientY);
       if (!nextPoint) return;
 
-      const nearestPointId = findNearestConnectionPointId(nextPoint, connectionEditDraft.fixedPointId);
+      const nearestPointId = findNearestConnectionPointId(
+        nextPoint,
+        connectionEditDraft.fixedPointId,
+      );
       const snappedPoint = nearestPointId ? anchors[nearestPointId] : nextPoint;
       setHoveredConnectionPointId(nearestPointId);
 
@@ -412,11 +441,15 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
       return;
     }
 
-    if (!connectionDraft || event.pointerId !== connectionDraft.pointerId) return;
+    if (!connectionDraft || event.pointerId !== connectionDraft.pointerId)
+      return;
     const nextPoint = clientToCanvasPoint(event.clientX, event.clientY);
     if (!nextPoint) return;
 
-    const nearestPointId = findNearestConnectionPointId(nextPoint, connectionDraft.sourcePointId);
+    const nearestPointId = findNearestConnectionPointId(
+      nextPoint,
+      connectionDraft.sourcePointId,
+    );
     const snappedPoint = nearestPointId ? anchors[nearestPointId] : nextPoint;
     setHoveredConnectionPointId(nearestPointId);
 
@@ -433,14 +466,18 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
   };
 
   const onConnectionPointerEndCapture = (event) => {
-    if (connectionEditDraft && event.pointerId === connectionEditDraft.pointerId) {
+    if (
+      connectionEditDraft &&
+      event.pointerId === connectionEditDraft.pointerId
+    ) {
       if (
         hoveredConnectionPointId &&
         hoveredConnectionPointId !== connectionEditDraft.fixedPointId
       ) {
         setConnections((prev) =>
           prev.map((connection) => {
-            if (connection.id !== connectionEditDraft.connectionId) return connection;
+            if (connection.id !== connectionEditDraft.connectionId)
+              return connection;
 
             if (connectionEditDraft.endpoint === 'source') {
               return { ...connection, sourcePointId: hoveredConnectionPointId };
@@ -465,7 +502,8 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
       return;
     }
 
-    if (!connectionDraft || event.pointerId !== connectionDraft.pointerId) return;
+    if (!connectionDraft || event.pointerId !== connectionDraft.pointerId)
+      return;
 
     if (
       hoveredConnectionPointId &&
@@ -549,11 +587,15 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
             pan: parsed.pan || { x: 0, y: 0 },
             scale: Number.isFinite(parsed.scale) ? parsed.scale : 1,
             nodes: parsed.nodes,
-            connections: Array.isArray(parsed.connections) ? parsed.connections : [],
+            connections: Array.isArray(parsed.connections)
+              ? parsed.connections
+              : [],
             connectionDirection: parsed.connectionDirection || 'uni',
           };
           applySnapshot(initialSnapshot);
-          historyRef.current = [{ key: snapshotToKey(initialSnapshot), snapshot: initialSnapshot }];
+          historyRef.current = [
+            { key: snapshotToKey(initialSnapshot), snapshot: initialSnapshot },
+          ];
           redoRef.current = [];
           syncHistoryFlags();
         }
@@ -599,7 +641,10 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
         window.localStorage.removeItem(MAP_STATE_STORAGE_KEY);
       } else {
         window.localStorage.setItem(MAP_STATE_STORAGE_KEY, raw);
-        setCookieValue(MAP_STATE_COOKIE_KEY, encodeURIComponent(`local:${MAP_STATE_STORAGE_KEY}`));
+        setCookieValue(
+          MAP_STATE_COOKIE_KEY,
+          encodeURIComponent(`local:${MAP_STATE_STORAGE_KEY}`),
+        );
       }
     }
   }, [pan, scale, nodes, connections, connectionDirection]);
@@ -667,15 +712,20 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
 
       const cardRect = cardElement.getBoundingClientRect();
       const itemRects = group.itemIds
-        .map((itemId) => selectableRefs.current.get(itemId)?.getBoundingClientRect())
+        .map((itemId) =>
+          selectableRefs.current.get(itemId)?.getBoundingClientRect(),
+        )
         .filter(Boolean);
 
       if (!itemRects.length) return;
 
-      const left = Math.min(...itemRects.map((rect) => rect.left)) - cardRect.left;
+      const left =
+        Math.min(...itemRects.map((rect) => rect.left)) - cardRect.left;
       const top = Math.min(...itemRects.map((rect) => rect.top)) - cardRect.top;
-      const right = Math.max(...itemRects.map((rect) => rect.right)) - cardRect.left;
-      const bottom = Math.max(...itemRects.map((rect) => rect.bottom)) - cardRect.top;
+      const right =
+        Math.max(...itemRects.map((rect) => rect.right)) - cardRect.left;
+      const bottom =
+        Math.max(...itemRects.map((rect) => rect.bottom)) - cardRect.top;
 
       nextRects[group.id] = {
         left,
@@ -700,8 +750,17 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
   const onSelectPointerDownCapture = (event) => {
     if (!selectionMode) return;
     if (connectionDraft || connectionEditDraft) return;
-    if (event.target.closest('.ayah-map__connection-line, .ayah-map__connection-endpoint')) return;
-    if (event.target.closest('.ayah-map__toolbar') || event.target.closest('.ayah-map__node')) return;
+    if (
+      event.target.closest(
+        '.ayah-map__connection-line, .ayah-map__connection-endpoint',
+      )
+    )
+      return;
+    if (
+      event.target.closest('.ayah-map__toolbar') ||
+      event.target.closest('.ayah-map__node')
+    )
+      return;
 
     clearSelectionState();
 
@@ -719,7 +778,11 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
   const onSelectPointerMoveCapture = (event) => {
     if (connectionDraft) return;
     if (!marquee || event.pointerId !== marquee.pointerId) return;
-    const nextMarquee = { ...marquee, currentX: event.clientX, currentY: event.clientY };
+    const nextMarquee = {
+      ...marquee,
+      currentX: event.clientX,
+      currentY: event.clientY,
+    };
     setMarquee(nextMarquee);
 
     const selectionRect = {
@@ -751,15 +814,15 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
       nextSelected
         .filter((id) => !id.endsWith(':group'))
         .forEach((id) => {
-        const nodeId = nodeIdFromSelectableId(id);
-        if (!nodeId) return;
-        if (!byNode.has(nodeId)) {
-          byNode.set(nodeId, { groupHit: false, items: new Set() });
-        }
+          const nodeId = nodeIdFromSelectableId(id);
+          if (!nodeId) return;
+          if (!byNode.has(nodeId)) {
+            byNode.set(nodeId, { groupHit: false, items: new Set() });
+          }
 
-        const entry = byNode.get(nodeId);
-        entry.items.add(id);
-      });
+          const entry = byNode.get(nodeId);
+          entry.items.add(id);
+        });
 
       const normalizedSelection = [];
       const nextSelectionGroups = [];
@@ -777,7 +840,8 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
         }
 
         const hasAllItems =
-          allItemIds.length > 0 && allItemIds.every((itemId) => entry.items.has(itemId));
+          allItemIds.length > 0 &&
+          allItemIds.every((itemId) => entry.items.has(itemId));
 
         if (hasAllItems) {
           normalizedSelection.push(`n:${nodeId}:group`);
@@ -814,9 +878,17 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
   };
 
   return (
-    <div className={`ayah-map ${connectionDraft || connectionEditDraft ? 'is-connecting' : ''}`} style={canvasStyles}>
+    <div
+      className={`ayah-map ${connectionDraft || connectionEditDraft ? 'is-connecting' : ''}`}
+      style={canvasStyles}
+    >
       <div className="ayah-map__toolbar">
-        <button type="button" className="ayah-map__arrow" title="Future edge tool" aria-label="Future edge tool">
+        <button
+          type="button"
+          className="ayah-map__arrow"
+          title="Future edge tool"
+          aria-label="Future edge tool"
+        >
           ↗
         </button>
 
@@ -875,7 +947,11 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
             1:1
           </button>
         ) : (
-          <div className="ayah-map__seed" draggable onDragStart={onTemplateDragStart}>
+          <div
+            className="ayah-map__seed"
+            draggable
+            onDragStart={onTemplateDragStart}
+          >
             1:1
           </div>
         )}
@@ -892,7 +968,9 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
           -
         </button>
 
-        <span className="ayah-map__zoom-readout">{Math.round(scale * 100)}%</span>
+        <span className="ayah-map__zoom-readout">
+          {Math.round(scale * 100)}%
+        </span>
 
         <button
           type="button"
@@ -918,13 +996,20 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
             !event.target.closest('.ayah-map__node') &&
             !event.target.closest('.ayah-map__connection-line') &&
             !event.target.closest('.ayah-map__connection-endpoint');
-          if (clickedOnEmptySpace && (selectedIds.length || selectedConnectionId)) {
+          if (
+            clickedOnEmptySpace &&
+            (selectedIds.length || selectedConnectionId)
+          ) {
             setSelectedIds([]);
             setSelectedConnectionId(null);
           }
 
           if (!isMobileLike || !tapDropMode) return;
-          if (event.target.closest('.ayah-map__toolbar') || event.target.closest('.ayah-map__node')) return;
+          if (
+            event.target.closest('.ayah-map__toolbar') ||
+            event.target.closest('.ayah-map__node')
+          )
+            return;
           const placed = placeNodeAtClientPoint(event.clientX, event.clientY);
           if (placed) {
             setTapDropMode(false);
@@ -933,7 +1018,9 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
           }
         }}
         onPointerMoveCapture={(event) => {
-          const owner = event.target?.closest?.('.ayah-map__connectable')?.dataset?.ownerId || null;
+          const owner =
+            event.target?.closest?.('.ayah-map__connectable')?.dataset
+              ?.ownerId || null;
           if (!connectionDraft && !connectionEditDraft) {
             setHoveredOwnerId(owner);
           }
@@ -977,21 +1064,42 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
 
         <div
           className="ayah-map__surface"
-          style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})` }}
+          style={{
+            transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`,
+          }}
         >
-          <svg className="ayah-map__connections" xmlns="http://www.w3.org/2000/svg">
+          <svg
+            className="ayah-map__connections"
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <defs>
-              <marker id="ayah-map-arrow-end" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                <path className="ayah-map__arrowhead" d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
+              <marker
+                id="ayah-map-arrow-end"
+                viewBox="0 0 10 10"
+                refX="8"
+                refY="5"
+                markerWidth="6"
+                markerHeight="6"
+                orient="auto-start-reverse"
+              >
+                <path
+                  className="ayah-map__arrowhead"
+                  d="M 0 0 L 10 5 L 0 10 z"
+                  fill="currentColor"
+                />
               </marker>
             </defs>
             {connections.map((connection) => {
               const sourcePoint = anchors[connection.sourcePointId];
               const targetPoint = anchors[connection.targetPointId];
-              const pathData = connectionPathData(connection.sourcePointId, connection.targetPointId);
+              const pathData = connectionPathData(
+                connection.sourcePointId,
+                connection.targetPointId,
+              );
               if (!pathData) return null;
 
-              const isSelectedConnection = selectedConnectionId === connection.id;
+              const isSelectedConnection =
+                selectedConnectionId === connection.id;
 
               return (
                 <g key={connection.id}>
@@ -999,7 +1107,11 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
                     d={pathData}
                     className={`ayah-map__connection-line ${isSelectedConnection ? 'is-selected' : ''}`}
                     markerEnd="url(#ayah-map-arrow-end)"
-                    markerStart={connection.direction === 'bi' ? 'url(#ayah-map-arrow-end)' : undefined}
+                    markerStart={
+                      connection.direction === 'bi'
+                        ? 'url(#ayah-map-arrow-end)'
+                        : undefined
+                    }
                     onPointerDown={(event) => {
                       event.stopPropagation();
                       setSelectedConnectionId(connection.id);
@@ -1012,7 +1124,13 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
                       cx={sourcePoint.x}
                       cy={sourcePoint.y}
                       r="5"
-                      onPointerDown={(event) => startConnectionEndpointEdit(event, connection.id, 'source')}
+                      onPointerDown={(event) =>
+                        startConnectionEndpointEdit(
+                          event,
+                          connection.id,
+                          'source',
+                        )
+                      }
                     />
                   ) : null}
 
@@ -1022,81 +1140,97 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
                       cx={targetPoint.x}
                       cy={targetPoint.y}
                       r="5"
-                      onPointerDown={(event) => startConnectionEndpointEdit(event, connection.id, 'target')}
+                      onPointerDown={(event) =>
+                        startConnectionEndpointEdit(
+                          event,
+                          connection.id,
+                          'target',
+                        )
+                      }
                     />
                   ) : null}
                 </g>
               );
             })}
 
-            {connectionEditDraft ? (
-              (() => {
-                const connection = connections.find((item) => item.id === connectionEditDraft.connectionId);
-                if (!connection) return null;
+            {connectionEditDraft
+              ? (() => {
+                  const connection = connections.find(
+                    (item) => item.id === connectionEditDraft.connectionId,
+                  );
+                  if (!connection) return null;
 
-                const source =
-                  connectionEditDraft.endpoint === 'source'
-                    ? { x: connectionEditDraft.x, y: connectionEditDraft.y }
-                    : anchors[connection.sourcePointId];
-                const target =
-                  connectionEditDraft.endpoint === 'target'
-                    ? { x: connectionEditDraft.x, y: connectionEditDraft.y }
-                    : anchors[connection.targetPointId];
-                if (!source || !target) return null;
+                  const source =
+                    connectionEditDraft.endpoint === 'source'
+                      ? { x: connectionEditDraft.x, y: connectionEditDraft.y }
+                      : anchors[connection.sourcePointId];
+                  const target =
+                    connectionEditDraft.endpoint === 'target'
+                      ? { x: connectionEditDraft.x, y: connectionEditDraft.y }
+                      : anchors[connection.targetPointId];
+                  if (!source || !target) return null;
 
-                const draftPath = `M ${source.x} ${source.y} L ${target.x} ${target.y}`;
+                  const draftPath = `M ${source.x} ${source.y} L ${target.x} ${target.y}`;
 
-                return (
-                  <path
-                    d={draftPath}
-                    className="ayah-map__connection-line is-draft"
-                    markerEnd="url(#ayah-map-arrow-end)"
-                    markerStart={connection.direction === 'bi' ? 'url(#ayah-map-arrow-end)' : undefined}
-                  />
-                );
-              })()
-            ) : null}
+                  return (
+                    <path
+                      d={draftPath}
+                      className="ayah-map__connection-line is-draft"
+                      markerEnd="url(#ayah-map-arrow-end)"
+                      markerStart={
+                        connection.direction === 'bi'
+                          ? 'url(#ayah-map-arrow-end)'
+                          : undefined
+                      }
+                    />
+                  );
+                })()
+              : null}
 
-            {connectionDraft && anchors[connectionDraft.sourcePointId] ? (
-              (() => {
-                const draftTargetId = hoveredConnectionPointId || '__draft-target__';
-                const draftAnchors = {
-                  ...anchors,
-                  '__draft-target__': { x: connectionDraft.x, y: connectionDraft.y },
-                };
-                const source = draftAnchors[connectionDraft.sourcePointId];
-                const target = draftAnchors[draftTargetId];
-                if (!source || !target) return null;
+            {connectionDraft && anchors[connectionDraft.sourcePointId]
+              ? (() => {
+                  const draftTargetId =
+                    hoveredConnectionPointId || '__draft-target__';
+                  const draftAnchors = {
+                    ...anchors,
+                    '__draft-target__': {
+                      x: connectionDraft.x,
+                      y: connectionDraft.y,
+                    },
+                  };
+                  const source = draftAnchors[connectionDraft.sourcePointId];
+                  const target = draftAnchors[draftTargetId];
+                  if (!source || !target) return null;
 
-                const dx = target.x - source.x;
-                const dy = target.y - source.y;
-                const distance = Math.hypot(dx, dy) || 1;
-                const tangentX = dx / distance;
-                const tangentY = dy / distance;
-                const normalX = -tangentY;
-                const normalY = tangentX;
-                const offset = Math.min(90, Math.max(16, distance * 0.2));
-                const pull = Math.min(120, Math.max(26, distance * 0.34));
+                  const dx = target.x - source.x;
+                  const dy = target.y - source.y;
+                  const distance = Math.hypot(dx, dy) || 1;
+                  const tangentX = dx / distance;
+                  const tangentY = dy / distance;
+                  const normalX = -tangentY;
+                  const normalY = tangentX;
+                  const offset = Math.min(90, Math.max(16, distance * 0.2));
+                  const pull = Math.min(120, Math.max(26, distance * 0.34));
 
-                const c1 = {
-                  x: source.x + tangentX * pull + normalX * offset,
-                  y: source.y + tangentY * pull + normalY * offset,
-                };
-                const c2 = {
-                  x: target.x - tangentX * pull + normalX * offset,
-                  y: target.y - tangentY * pull + normalY * offset,
-                };
-                const draftPath = `M ${source.x} ${source.y} C ${c1.x} ${c1.y}, ${c2.x} ${c2.y}, ${target.x} ${target.y}`;
+                  const c1 = {
+                    x: source.x + tangentX * pull + normalX * offset,
+                    y: source.y + tangentY * pull + normalY * offset,
+                  };
+                  const c2 = {
+                    x: target.x - tangentX * pull + normalX * offset,
+                    y: target.y - tangentY * pull + normalY * offset,
+                  };
+                  const draftPath = `M ${source.x} ${source.y} C ${c1.x} ${c1.y}, ${c2.x} ${c2.y}, ${target.x} ${target.y}`;
 
-                return (
-                  <path
-                    d={draftPath}
-                    className="ayah-map__connection-line is-draft"
-                    markerEnd="url(#ayah-map-arrow-end)"
-                  />
-                );
-              })()
-            ) : null}
+                  return (
+                    <path
+                      d={draftPath}
+                      className="ayah-map__connection-line is-draft"
+                      markerEnd="url(#ayah-map-arrow-end)"
+                    />
+                  );
+                })()
+              : null}
           </svg>
 
           {nodes.map((node) => (
@@ -1104,203 +1238,260 @@ const AyahMapCanvas = ({ preferences, surahs }) => {
               key={node.id}
               className={`ayah-map__node ayah-map__node--${node.type}`}
               style={{ transform: `translate3d(${node.x}px, ${node.y}px, 0)` }}
-              onPointerDown={(event) => onNodePointerDown(event, node.id, node.type)}
+              onPointerDown={(event) =>
+                onNodePointerDown(event, node.id, node.type)
+              }
             >
-              {(node.type === MAP_NODE_TYPES.PLACEHOLDER || node.type === MAP_NODE_TYPES.ERROR) && (
+              {(node.type === MAP_NODE_TYPES.PLACEHOLDER ||
+                node.type === MAP_NODE_TYPES.ERROR) && (
                 <div className="ayah-map__address-box">
                   <input
                     value={node.address}
-                    onChange={(event) => updateNode(node.id, { address: event.target.value })}
+                    onChange={(event) =>
+                      updateNode(node.id, { address: event.target.value })
+                    }
                     onKeyDown={(event) => onPlaceholderKeyDown(event, node.id)}
                     onFocus={() => onPlaceholderFocus(node.id)}
                     onBlur={() => onPlaceholderBlur(node.id)}
                     className="ayah-map__address-input"
                   />
-                  {node.error ? <div className="ayah-map__error">{node.error}</div> : null}
+                  {node.error ? (
+                    <div className="ayah-map__error">{node.error}</div>
+                  ) : null}
                 </div>
               )}
 
-              {node.type === MAP_NODE_TYPES.LOADING && <div className="ayah-map__loading">Loading...</div>}
+              {node.type === MAP_NODE_TYPES.LOADING && (
+                <div className="ayah-map__loading">Loading...</div>
+              )}
 
-              {node.type === MAP_NODE_TYPES.READY && (
+              {node.type === MAP_NODE_TYPES.READY &&
                 (() => {
                   const groupOwnerId = `n:${node.id}:group`;
                   const groupSelected = selectedIds.includes(groupOwnerId);
-                  const nodeSelectionGroups = selectionGroups.filter((group) => group.nodeId === node.id);
+                  const nodeSelectionGroups = selectionGroups.filter(
+                    (group) => group.nodeId === node.id,
+                  );
                   const activeSourcePointId =
-                    connectionDraft?.sourcePointId || connectionEditDraft?.movingPointId || null;
-                  const sourceOwnerId = activeSourcePointId ? ownerIdFromPointId(activeSourcePointId) : null;
-                  const targetOwnerId = hoveredConnectionPointId ? ownerIdFromPointId(hoveredConnectionPointId) : null;
+                    connectionDraft?.sourcePointId ||
+                    connectionEditDraft?.movingPointId ||
+                    null;
+                  const sourceOwnerId = activeSourcePointId
+                    ? ownerIdFromPointId(activeSourcePointId)
+                    : null;
+                  const targetOwnerId = hoveredConnectionPointId
+                    ? ownerIdFromPointId(hoveredConnectionPointId)
+                    : null;
 
                   const connectableStateClass = (ownerId, directlySelected) => {
                     const classes = [];
 
                     if (directlySelected) classes.push('is-selected');
-                    if (!directlySelected && groupSelected && ownerId !== groupOwnerId) {
+                    if (
+                      !directlySelected &&
+                      groupSelected &&
+                      ownerId !== groupOwnerId
+                    ) {
                       classes.push('is-group-selected');
                     }
-                    if (hoveredOwnerId === ownerId) classes.push('is-hover-owner');
-                    if (sourceOwnerId === ownerId) classes.push('is-connection-source');
-                    if (targetOwnerId === ownerId) classes.push('is-connection-target');
+                    if (hoveredOwnerId === ownerId)
+                      classes.push('is-hover-owner');
+                    if (sourceOwnerId === ownerId)
+                      classes.push('is-connection-source');
+                    if (targetOwnerId === ownerId)
+                      classes.push('is-connection-target');
 
                     return classes.join(' ');
                   };
 
                   const previewSelected = (itemId) =>
                     selectionPreviewIds.includes(itemId) &&
-                    !nodeSelectionGroups.some((group) => group.itemIds.includes(itemId));
+                    !nodeSelectionGroups.some((group) =>
+                      group.itemIds.includes(itemId),
+                    );
 
                   return (
                     <div
-                  ref={setSelectableRef(`n:${node.id}:group`)}
-                  className={`ayah-map__ayah-card ayah-map__selectable ayah-map__connectable ${
-                    node.width ? 'is-resized' : ''
-                  } ${connectableStateClass(groupOwnerId, groupSelected)}`}
-                  data-owner-id={groupOwnerId}
-                  style={{
-                    width: node.width ? `${node.width}px` : undefined,
-                    height: node.height ? `${node.height}px` : undefined,
-                  }}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    if (!selectionMode) return;
-                    toggleSelected(`n:${node.id}:group`);
-                  }}
-                >
-                  {renderConnectionPoints(`n:${node.id}:group`)}
-                  <button
-                    type="button"
-                    className="ayah-map__resize-handle ayah-map__resize-handle--nw"
-                    onPointerDown={(event) => onResizeHandlePointerDown(event, node.id, 'nw')}
-                    aria-label="Resize from top-left"
-                  />
-                  <button
-                    type="button"
-                    className="ayah-map__resize-handle ayah-map__resize-handle--ne"
-                    onPointerDown={(event) => onResizeHandlePointerDown(event, node.id, 'ne')}
-                    aria-label="Resize from top-right"
-                  />
-                  <button
-                    type="button"
-                    className="ayah-map__resize-handle ayah-map__resize-handle--sw"
-                    onPointerDown={(event) => onResizeHandlePointerDown(event, node.id, 'sw')}
-                    aria-label="Resize from bottom-left"
-                  />
-                  <button
-                    type="button"
-                    className="ayah-map__resize-handle ayah-map__resize-handle--se"
-                    onPointerDown={(event) => onResizeHandlePointerDown(event, node.id, 'se')}
-                    aria-label="Resize from bottom-right"
-                  />
-                  <div className="ayah-map__ayah-content">
-                    {nodeSelectionGroups.map((group) => {
-                      const rect = selectionGroupRects[group.id];
-                      if (!rect) return null;
-
-                      return (
-                        <div
-                          key={group.id}
-                          ref={setSelectableRef(group.id)}
-                          className={`ayah-map__selection-group ayah-map__selectable ayah-map__connectable ${connectableStateClass(
-                            group.id,
-                            selectedIds.includes(group.id),
-                          )}`}
-                          data-owner-id={group.id}
-                          style={{
-                            left: `${rect.left}px`,
-                            top: `${rect.top}px`,
-                            width: `${rect.width}px`,
-                            height: `${rect.height}px`,
-                          }}
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            if (!selectionMode) return;
-                            toggleSelected(group.id);
-                          }}
-                        >
-                          {renderConnectionPoints(group.id)}
-                        </div>
-                      );
-                    })}
-
-                    {node.words.map((word, index) => (
-                      (() => {
-                        const wordOwnerId = `n:${node.id}:w:${index}`;
-                        const wordSelected = selectedIds.includes(wordOwnerId);
-                        const wordInSubsetGroup = nodeSelectionGroups.some((group) => group.itemIds.includes(wordOwnerId));
-                        return (
-                      <span
-                        key={`${node.id}-${index}`}
-                        ref={setSelectableRef(wordOwnerId)}
-                        className={`ayah-map__word-block ayah-map__selectable ayah-map__connectable ${connectableStateClass(wordOwnerId, wordSelected)} ${previewSelected(wordOwnerId) ? 'is-preview-selected' : ''} ${wordInSubsetGroup ? 'is-subset-member' : ''}`}
-                        data-owner-id={wordOwnerId}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          if (!selectionMode) return;
-                          toggleSelected(wordOwnerId);
-                        }}
-                      >
-                        {renderConnectionPoints(wordOwnerId)}
-                        <span className="ayah-map__word-text">{word.text}</span>
-                        <span className="ayah-map__segments">
-                          {word.segments.length ? (
-                            word.segments.map((segment, segmentIndex) => (
-                              (() => {
-                                const segmentOwnerId = `n:${node.id}:s:${index}:${segmentIndex}`;
-                                const segmentSelected = selectedIds.includes(segmentOwnerId);
-                                const segmentInSubsetGroup = nodeSelectionGroups.some((group) => group.itemIds.includes(segmentOwnerId));
-                                return (
-                              <span
-                                key={`${node.id}-${index}-${segmentIndex}`}
-                                ref={setSelectableRef(segmentOwnerId)}
-                                className={`ayah-map__segment-item ayah-map__selectable ayah-map__connectable ${connectableStateClass(segmentOwnerId, segmentSelected)} ${previewSelected(segmentOwnerId) ? 'is-preview-selected' : ''} ${segmentInSubsetGroup ? 'is-subset-member' : ''}`}
-                                data-owner-id={segmentOwnerId}
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  if (!selectionMode) return;
-                                  toggleSelected(segmentOwnerId);
-                                }}
-                              >
-                                {renderConnectionPoints(segmentOwnerId)}
-                                {segment}
-                              </span>
-                                );
-                              })()
-                            ))
-                          ) : (
-                            <span className="ayah-map__segment-item">---</span>
-                          )}
-                        </span>
-                      </span>
-                        );
-                      })()
-                    ))}
-                    {(() => {
-                      const metaOwnerId = `n:${node.id}:meta`;
-                      const metaSelected = selectedIds.includes(metaOwnerId);
-                      const metaInSubsetGroup = nodeSelectionGroups.some((group) => group.itemIds.includes(metaOwnerId));
-                      return (
-                    <span
-                      ref={setSelectableRef(metaOwnerId)}
-                      className={`ayah-map__meta-trail ayah-map__selectable ayah-map__connectable ${connectableStateClass(metaOwnerId, metaSelected)} ${previewSelected(metaOwnerId) ? 'is-preview-selected' : ''} ${metaInSubsetGroup ? 'is-subset-member' : ''}`}
-                      data-owner-id={metaOwnerId}
+                      ref={setSelectableRef(`n:${node.id}:group`)}
+                      className={`ayah-map__ayah-card ayah-map__selectable ayah-map__connectable ${
+                        node.width ? 'is-resized' : ''
+                      } ${connectableStateClass(groupOwnerId, groupSelected)}`}
+                      data-owner-id={groupOwnerId}
+                      style={{
+                        width: node.width ? `${node.width}px` : undefined,
+                        height: node.height ? `${node.height}px` : undefined,
+                      }}
                       onClick={(event) => {
                         event.stopPropagation();
                         if (!selectionMode) return;
-                        toggleSelected(metaOwnerId);
+                        toggleSelected(`n:${node.id}:group`);
                       }}
                     >
-                      {renderConnectionPoints(metaOwnerId)}
-                      <span className="ayah-map__address-label">{node.address}</span>
-                      <span className="ayah-map__surah-label">{surahs?.[node.surahNumber]?.[0] || ''}</span>
-                    </span>
-                      );
-                    })()}
-                  </div>
-                </div>
+                      {renderConnectionPoints(`n:${node.id}:group`)}
+                      <button
+                        type="button"
+                        className="ayah-map__resize-handle ayah-map__resize-handle--nw"
+                        onPointerDown={(event) =>
+                          onResizeHandlePointerDown(event, node.id, 'nw')
+                        }
+                        aria-label="Resize from top-left"
+                      />
+                      <button
+                        type="button"
+                        className="ayah-map__resize-handle ayah-map__resize-handle--ne"
+                        onPointerDown={(event) =>
+                          onResizeHandlePointerDown(event, node.id, 'ne')
+                        }
+                        aria-label="Resize from top-right"
+                      />
+                      <button
+                        type="button"
+                        className="ayah-map__resize-handle ayah-map__resize-handle--sw"
+                        onPointerDown={(event) =>
+                          onResizeHandlePointerDown(event, node.id, 'sw')
+                        }
+                        aria-label="Resize from bottom-left"
+                      />
+                      <button
+                        type="button"
+                        className="ayah-map__resize-handle ayah-map__resize-handle--se"
+                        onPointerDown={(event) =>
+                          onResizeHandlePointerDown(event, node.id, 'se')
+                        }
+                        aria-label="Resize from bottom-right"
+                      />
+                      <div className="ayah-map__ayah-content">
+                        {nodeSelectionGroups.map((group) => {
+                          const rect = selectionGroupRects[group.id];
+                          if (!rect) return null;
+
+                          return (
+                            <div
+                              key={group.id}
+                              ref={setSelectableRef(group.id)}
+                              className={`ayah-map__selection-group ayah-map__selectable ayah-map__connectable ${connectableStateClass(
+                                group.id,
+                                selectedIds.includes(group.id),
+                              )}`}
+                              data-owner-id={group.id}
+                              style={{
+                                left: `${rect.left}px`,
+                                top: `${rect.top}px`,
+                                width: `${rect.width}px`,
+                                height: `${rect.height}px`,
+                              }}
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                if (!selectionMode) return;
+                                toggleSelected(group.id);
+                              }}
+                            >
+                              {renderConnectionPoints(group.id)}
+                            </div>
+                          );
+                        })}
+
+                        {node.words.map((word, index) =>
+                          (() => {
+                            const wordOwnerId = `n:${node.id}:w:${index}`;
+                            const wordSelected =
+                              selectedIds.includes(wordOwnerId);
+                            const wordInSubsetGroup = nodeSelectionGroups.some(
+                              (group) => group.itemIds.includes(wordOwnerId),
+                            );
+                            return (
+                              <span
+                                key={`${node.id}-${index}`}
+                                ref={setSelectableRef(wordOwnerId)}
+                                className={`ayah-map__word-block ayah-map__selectable ayah-map__connectable ${connectableStateClass(wordOwnerId, wordSelected)} ${previewSelected(wordOwnerId) ? 'is-preview-selected' : ''} ${wordInSubsetGroup ? 'is-subset-member' : ''}`}
+                                data-owner-id={wordOwnerId}
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  if (!selectionMode) return;
+                                  toggleSelected(wordOwnerId);
+                                }}
+                              >
+                                {renderConnectionPoints(wordOwnerId)}
+                                <span className="ayah-map__word-text">
+                                  {word.text}
+                                </span>
+                                <span className="ayah-map__segments">
+                                  {word.segments.length ? (
+                                    word.segments.map((segment, segmentIndex) =>
+                                      (() => {
+                                        const segmentOwnerId = `n:${node.id}:s:${index}:${segmentIndex}`;
+                                        const segmentSelected =
+                                          selectedIds.includes(segmentOwnerId);
+                                        const segmentInSubsetGroup =
+                                          nodeSelectionGroups.some((group) =>
+                                            group.itemIds.includes(
+                                              segmentOwnerId,
+                                            ),
+                                          );
+                                        return (
+                                          <span
+                                            key={`${node.id}-${index}-${segmentIndex}`}
+                                            ref={setSelectableRef(
+                                              segmentOwnerId,
+                                            )}
+                                            className={`ayah-map__segment-item ayah-map__selectable ayah-map__connectable ${connectableStateClass(segmentOwnerId, segmentSelected)} ${previewSelected(segmentOwnerId) ? 'is-preview-selected' : ''} ${segmentInSubsetGroup ? 'is-subset-member' : ''}`}
+                                            data-owner-id={segmentOwnerId}
+                                            onClick={(event) => {
+                                              event.stopPropagation();
+                                              if (!selectionMode) return;
+                                              toggleSelected(segmentOwnerId);
+                                            }}
+                                          >
+                                            {renderConnectionPoints(
+                                              segmentOwnerId,
+                                            )}
+                                            {segment}
+                                          </span>
+                                        );
+                                      })(),
+                                    )
+                                  ) : (
+                                    <span className="ayah-map__segment-item">
+                                      ---
+                                    </span>
+                                  )}
+                                </span>
+                              </span>
+                            );
+                          })(),
+                        )}
+                        {(() => {
+                          const metaOwnerId = `n:${node.id}:meta`;
+                          const metaSelected =
+                            selectedIds.includes(metaOwnerId);
+                          const metaInSubsetGroup = nodeSelectionGroups.some(
+                            (group) => group.itemIds.includes(metaOwnerId),
+                          );
+                          return (
+                            <span
+                              ref={setSelectableRef(metaOwnerId)}
+                              className={`ayah-map__meta-trail ayah-map__selectable ayah-map__connectable ${connectableStateClass(metaOwnerId, metaSelected)} ${previewSelected(metaOwnerId) ? 'is-preview-selected' : ''} ${metaInSubsetGroup ? 'is-subset-member' : ''}`}
+                              data-owner-id={metaOwnerId}
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                if (!selectionMode) return;
+                                toggleSelected(metaOwnerId);
+                              }}
+                            >
+                              {renderConnectionPoints(metaOwnerId)}
+                              <span className="ayah-map__address-label">
+                                {node.address}
+                              </span>
+                              <span className="ayah-map__surah-label">
+                                {surahs?.[node.surahNumber]?.[0] || ''}
+                              </span>
+                            </span>
+                          );
+                        })()}
+                      </div>
+                    </div>
                   );
-                })()
-              )}
+                })()}
             </div>
           ))}
         </div>
